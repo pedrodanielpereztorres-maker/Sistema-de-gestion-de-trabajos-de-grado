@@ -1,0 +1,46 @@
+# Documentos privados y trabajos de grado
+almacen_privado/
+trabajo_de_grado/
+
+# Archivos de pruebas locales y temporales de la PWA
+scratch.py
+assets/iconos_sgtg_premium/tmp_*
+
+# Entorno virtual y caché de Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Compilación de Reflex
+.web/
+
+# Estados de Reflex
+.states
+
+# Base de datos local
+*.db
+
+# Assets externos
+assets/external/
+
+# Virtualenvs adicionales
+.venv_test/
+env/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Editor/IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Local env
+.env
+.env.local
+!.env.example

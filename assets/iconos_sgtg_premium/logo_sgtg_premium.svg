@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0D2141"/>
+      <stop offset="100%" style="stop-color:#071120"/>
+    </linearGradient>
+    <linearGradient id="goldV" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8D5A3"/>
+      <stop offset="45%" style="stop-color:#C9A84C"/>
+      <stop offset="100%" style="stop-color:#9A7A28"/>
+    </linearGradient>
+    <linearGradient id="goldH" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#9A7A28"/>
+      <stop offset="50%" style="stop-color:#E8D5A3"/>
+      <stop offset="100%" style="stop-color:#9A7A28"/>
+    </linearGradient>
+    <radialGradient id="inner" cx="50%" cy="35%" r="65%">
+      <stop offset="0%" style="stop-color:#1A3560"/>
+      <stop offset="100%" style="stop-color:#071120"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Fondo cuadrado redondeado (para app icon) -->
+  <rect width="512" height="512" rx="90" fill="url(#bgGrad)"/>
+
+  <!-- Escudo heráldico centrado -->
+  <g transform="translate(256,256)">
+    <!-- Sombra del escudo -->
+    <path d="M -148,-148 Q -148,-168 -128,-168 L 128,-168 Q 148,-168 148,-148 L 148,72 Q 148,118 72,158 L 0,182 L -72,158 Q -148,118 -148,72 Z"
+      fill="#000000" opacity="0.4" transform="translate(5,8)"/>
+    <!-- Cuerpo del escudo -->
+    <path d="M -148,-148 Q -148,-168 -128,-168 L 128,-168 Q 148,-168 148,-148 L 148,72 Q 148,118 72,158 L 0,182 L -72,158 Q -148,118 -148,72 Z"
+      fill="url(#inner)"/>
+    <!-- Borde dorado exterior -->
+    <path d="M -148,-148 Q -148,-168 -128,-168 L 128,-168 Q 148,-168 148,-148 L 148,72 Q 148,118 72,158 L 0,182 L -72,158 Q -148,118 -148,72 Z"
+      fill="none" stroke="url(#goldV)" stroke-width="3"/>
+    <!-- Borde interior sutil -->
+    <path d="M -136,-140 Q -136,-156 -120,-156 L 120,-156 Q 136,-156 136,-140 L 136,68 Q 136,110 66,148 L 0,170 L -66,148 Q -136,110 -136,68 Z"
+      fill="none" stroke="#C9A84C" stroke-width="0.8" opacity="0.45"/>
+
+    <!-- Línea divisoria superior -->
+    <line x1="-120" y1="-118" x2="120" y2="-118" stroke="url(#goldH)" stroke-width="1.5"/>
+
+    <!-- IUTEPI -->
+    <text x="0" y="-128" font-family="Georgia,serif" font-size="11" fill="#C9A84C" text-anchor="middle" letter-spacing="7" opacity="0.9">IUTEPI</text>
+
+    <!-- ── BIRRETE ── -->
+    <!-- Tablilla -->
+    <rect x="-30" y="-108" width="60" height="13" rx="2.5" fill="url(#goldV)"/>
+    <!-- Cuerpo triangular -->
+    <polygon points="0,-95 -56,-66 56,-66" fill="#FFFFFF"/>
+    <!-- Base -->
+    <rect x="-56" y="-66" width="112" height="14" rx="3.5" fill="url(#goldV)"/>
+    <!-- Cordón de borla -->
+    <path d="M 30,-102 Q 52,-102 56,-90 Q 58,-80 50,-72" fill="none" stroke="url(#goldV)" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Borla exterior -->
+    <circle cx="48" cy="-68" r="7" fill="url(#goldV)"/>
+    <!-- Borla interior -->
+    <circle cx="48" cy="-68" r="4" fill="url(#inner)"/>
+    <circle cx="48" cy="-68" r="4" fill="none" stroke="#E8D5A3" stroke-width="0.8"/>
+    <!-- Hilos -->
+    <line x1="46" y1="-61" x2="43" y2="-52" stroke="#C9A84C" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="48" y1="-61" x2="48" y2="-51" stroke="#C9A84C" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="50" y1="-61" x2="53" y2="-52" stroke="#C9A84C" stroke-width="1.2" stroke-linecap="round"/>
+
+    <!-- ── PERGAMINO ── -->
+    <rect x="-42" y="-14" width="84" height="70" rx="5" fill="#FFFFFF"/>
+    <!-- Banda superior -->
+    <rect x="-42" y="-14" width="84" height="11" rx="5" fill="url(#goldV)"/>
+    <rect x="-42" y="-8" width="84" height="5" fill="url(#goldV)"/>
+    <!-- Banda inferior -->
+    <rect x="-42" y="45" width="84" height="11" rx="5" fill="url(#goldV)"/>
+    <rect x="-42" y="45" width="84" height="5" fill="url(#goldV)"/>
+    <!-- Líneas de texto -->
+    <rect x="-28" y="5" width="56" height="3.5" rx="1.5" fill="#C9A84C" opacity="0.35"/>
+    <rect x="-28" y="13" width="48" height="3" rx="1.5" fill="#0A1628" opacity="0.12"/>
+    <rect x="-28" y="21" width="52" height="3" rx="1.5" fill="#0A1628" opacity="0.12"/>
+    <rect x="-28" y="29" width="40" height="3" rx="1.5" fill="#0A1628" opacity="0.12"/>
+    <!-- Sello -->
+    <circle cx="22" cy="38" r="9" fill="url(#goldV)"/>
+    <circle cx="22" cy="38" r="6.5" fill="none" stroke="#FFFFFF" stroke-width="0.7"/>
+    <polyline points="17,38 21,42 28,33" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Línea divisoria inferior -->
+    <line x1="-120" y1="88" x2="120" y2="88" stroke="url(#goldH)" stroke-width="1.5"/>
+
+    <!-- SGTG -->
+    <text x="0" y="118" font-family="Georgia,serif" font-size="36" font-weight="700" fill="url(#goldV)" text-anchor="middle" letter-spacing="10">SGTG</text>
+
+    <!-- Subtítulo -->
+    <text x="0" y="138" font-family="Georgia,serif" font-size="7.5" fill="#C9A84C" text-anchor="middle" letter-spacing="2.5" opacity="0.7">TRABAJO DE GRADO</text>
+
+    <!-- Ornamentos -->
+    <polygon points="-82,138 -80.5,134.5 -79,138 -82.5,135.8 -78.5,135.8" fill="#C9A84C" opacity="0.7"/>
+    <polygon points="82,138 80.5,134.5 79,138 82.5,135.8 78.5,135.8" fill="#C9A84C" opacity="0.7"/>
+
+    <!-- Punto ornamental base del escudo -->
+    <ellipse cx="0" cy="180" rx="5" ry="2.5" fill="#C9A84C" opacity="0.7"/>
+  </g>
+</svg>

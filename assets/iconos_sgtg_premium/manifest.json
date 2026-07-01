@@ -1,0 +1,21 @@
+{
+  "name": "SGTG IUTEPI",
+  "short_name": "SGTG",
+  "description": "Sistema de Gestión de Trabajo de Grado - IUTEPI",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#071120",
+  "theme_color": "#C9A84C",
+  "icons": [
+    {
+      "src": "/iconos_sgtg_premium/icon_192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/iconos_sgtg_premium/icon_512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
