@@ -1,10 +1,10 @@
-# SGT — Sistema de Gestión de Tesis y Pasantías
+# SGTG — Sistema de Gestión de Trabajo de Grado
 ## IUTEPI — [Año actual]
 
 ## Descripción
-Sistema de Gestión de Tesis y Pasantías del IUTEPI. Permite a los
+Sistema de Gestión de Trabajo de Grado del IUTEPI. Permite a los
 administradores registrar estudiantes, asignar tutores y empresas, gestionar
-tesis y generar reportes. Los estudiantes acceden desde cualquier dispositivo
+trabajos de grado y generar reportes. Los estudiantes acceden desde cualquier dispositivo
 para ver su información y perfil.
 
 ## Requisitos previos
@@ -18,7 +18,7 @@ para ver su información y perfil.
 3. Activar entorno: `.venv\Scripts\activate` (Windows)
 4. Instalar dependencias: `pip install -r requirements.txt`
 5. Copiar `.env.example` a `.env` y configurar con tus credenciales locales
-6. Crear la base de datos en PostgreSQL: `CREATE DATABASE DB_TESIS;`
+6. Crear la base de datos en PostgreSQL: `CREATE DATABASE DB_TRABAJO_GRADO;`
 7. Ejecutar: `reflex run` (desarrollo) o `reflex run --env prod` (producción)
 
 ## Configuración inicial
@@ -39,7 +39,7 @@ env PYTHONPATH=. .venv/bin/python -m unittest discover -s tests
 
 ## Roles
 - **Administrador**: acceso completo, solo desde PC/Laptop
-- **Estudiante**: acceso a su perfil y tesis, desde cualquier dispositivo
+- **Estudiante**: acceso a su perfil y trabajo de grado, desde cualquier dispositivo
 
 ## Estructura del proyecto
 ```
