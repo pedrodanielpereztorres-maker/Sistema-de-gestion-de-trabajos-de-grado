@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS trabajo_de_grado (
 
 CREATE TABLE IF NOT EXISTS documento (
     id SERIAL PRIMARY KEY,
-    tesis_id INTEGER REFERENCES tesis(id) ON DELETE CASCADE,
+    tesis_id INTEGER REFERENCES trabajo_de_grado(id) ON DELETE CASCADE,
     titulo VARCHAR(255) NOT NULL,
     descripcion TEXT,
     fecha_subida DATE DEFAULT CURRENT_DATE,

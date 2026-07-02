@@ -134,13 +134,6 @@ class EstadoAutenticacion(rx.State):
             )
 
     def iniciar_sesion(self):
-        try:
-            asyncio.get_running_loop()
-        except RuntimeError:
-            return asyncio.run(self._iniciar_sesion_impl())
-        return self._iniciar_sesion_impl()
-
-    async def _iniciar_sesion_impl(self):
         # 1. Verificar bloqueo por Rate Limiting
         if self.bloqueado_hasta:
             limite = datetime.fromisoformat(self.bloqueado_hasta)
@@ -154,32 +147,7 @@ class EstadoAutenticacion(rx.State):
 
         correo_entrada = self.entrada_usuario.strip().lower()
 
-        def _fetch_user_by_email(email: str):
-            conn2 = obtener_conexion()
-            if conn2 is None:
-                return None, "🔌 Fallo de Conexión: No se pudo establecer comunicación con el servidor de la base de datos. Compruebe su conexión de red o contacte al administrador."
-            try:
-                with conn2:
-                    with conn2.cursor() as cursor:
-                        logger.debug("Intento de login recibido.")
-                        cursor.execute("""
-                            SELECT u.id, u.cedula, u.nombre, u.apellido, u.correo, u.contrasena_hash, u.esta_activo, r.nombre
-                            FROM usuario u
-                            LEFT JOIN rol r ON u.rol_id = r.id
-                            WHERE LOWER(TRIM(u.correo)) = %s;
-                        """, (email,))
-                        resultado = cursor.fetchone()
-                        return resultado, ""
-            except Exception as exc:
-                logger.error(f"Error en login: {exc}", exc_info=True)
-                return None, "💥 Error Crítico: Ocurrió una anomalía interna en el sistema al intentar procesar su solicitud. Por favor, reintente más tarde o reporte este evento a soporte."
-            finally:
-                try:
-                    conn2.close()
-                except Exception:
-                    pass
-
-        resultado, error = await asyncio.to_thread(_fetch_user_by_email, correo_entrada)
+        resultado, error = self._fetch_user_by_email(correo_entrada)
         if error:
             return rx.toast.error(error)
 
@@ -192,29 +160,7 @@ class EstadoAutenticacion(rx.State):
                 token = secrets.token_urlsafe(64)
                 ahora_utc = datetime.now(timezone.utc)
 
-                def _create_session(user_id: int, token_val: str, creado: datetime, expira: datetime):
-                    conn3 = obtener_conexion()
-                    if conn3 is None:
-                        return False
-                    try:
-                        with conn3:
-                            with conn3.cursor() as cursor:
-                                cursor.execute("""
-                                    INSERT INTO sesion (usuario_id, token, creado_en, expira_en, esta_activa)
-                                    VALUES (%s, %s, %s, %s, TRUE);
-                                """, (user_id, token_val, creado, expira))
-                            conn3.commit()
-                        return True
-                    except Exception as exc:
-                        logger.error(f"Error al crear sesión: {exc}", exc_info=True)
-                        return False
-                    finally:
-                        try:
-                            conn3.close()
-                        except Exception:
-                            pass
-
-                if not await asyncio.to_thread(_create_session, u_id, token, ahora_utc, ahora_utc + timedelta(hours=24)):
+                if not self._create_session(u_id, token, ahora_utc, ahora_utc + timedelta(hours=24)):
                     return rx.toast.error("💥 Error Crítico: No se pudo iniciar la sesión en el servidor. Reintente más tarde.")
 
                 self.intentos_fallidos = 0
@@ -228,7 +174,6 @@ class EstadoAutenticacion(rx.State):
                     correo=u_cor,
                     token_sesion=token,
                 )
-                # Guardamos el token como cadena; el cliente conserva la cookie.
                 self.token_cookie = token
                 self.entrada_contrasena = ""
                 logger.debug("Sesión creada exitosamente.")
@@ -239,6 +184,53 @@ class EstadoAutenticacion(rx.State):
             self.bloqueado_hasta = (datetime.now(timezone.utc) + timedelta(minutes=5)).isoformat()
             return rx.toast.error("⚠️ Seguridad: Demasiados intentos fallidos consecutivos. Su cuenta ha sido bloqueada temporalmente por un lapso de 5 minutos.")
         return rx.toast.error("❌ Credenciales Incorrectas: El correo electrónico o la contraseña ingresados no coinciden con ningún registro activo.")
+
+    def _fetch_user_by_email(self, email: str):
+        conn2 = obtener_conexion()
+        if conn2 is None:
+            return None, "🔌 Fallo de Conexión: No se pudo establecer comunicación con el servidor de la base de datos. Compruebe su conexión de red o contacte al administrador."
+        try:
+            with conn2:
+                with conn2.cursor() as cursor:
+                    logger.debug("Intento de login recibido.")
+                    cursor.execute("""
+                        SELECT u.id, u.cedula, u.nombre, u.apellido, u.correo, u.contrasena_hash, u.esta_activo, r.nombre
+                        FROM usuario u
+                        LEFT JOIN rol r ON u.rol_id = r.id
+                        WHERE LOWER(TRIM(u.correo)) = %s;
+                    """, (email,))
+                    resultado = cursor.fetchone()
+                    return resultado, ""
+        except Exception as exc:
+            logger.error(f"Error en login: {exc}", exc_info=True)
+            return None, "💥 Error Crítico: Ocurrió una anomalía interna en el sistema al intentar procesar su solicitud. Por favor, reintente más tarde o reporte este evento a soporte."
+        finally:
+            try:
+                conn2.close()
+            except Exception:
+                pass
+
+    def _create_session(self, user_id: int, token_val: str, creado: datetime, expira: datetime):
+        conn3 = obtener_conexion()
+        if conn3 is None:
+            return False
+        try:
+            with conn3:
+                with conn3.cursor() as cursor:
+                    cursor.execute("""
+                        INSERT INTO sesion (usuario_id, token, creado_en, expira_en, esta_activa)
+                        VALUES (%s, %s, %s, %s, TRUE);
+                    """, (user_id, token_val, creado, expira))
+                conn3.commit()
+            return True
+        except Exception as exc:
+            logger.error(f"Error al crear sesión: {exc}", exc_info=True)
+            return False
+        finally:
+            try:
+                conn3.close()
+            except Exception:
+                pass
 
     async def cerrar_sesion(self):
         if self.usuario and self.usuario.token_sesion:

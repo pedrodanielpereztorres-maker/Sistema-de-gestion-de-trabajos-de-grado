@@ -322,7 +322,7 @@ def modal_registrar_estudiante() -> rx.Component:
                                     color_scheme="indigo",
                                 ),
                                 rx.text(
-                                    "El estudiante está realizando Trabajo de Grado",
+                                    "El estudiante está realizando Pasantías",
                                     font_weight="800",
                                     color="#0F172A",
                                     font_size="13.5px",
