@@ -29,11 +29,11 @@ class CountProxy:
 
 
 class EstadoBoveda(rx.State):
-    lista_tesis: list[Dict[str, Any]] = []
+    lista_trabajos_de_grado: list[Dict[str, Any]] = []
     carreras_disponibles: list[str] = []
     mostrar_modal: bool = False
     cedula_busqueda: str = ""
-    titulo_tesis: str = ""
+    titulo_trabajo_de_grado: str = ""
     procesando: bool = False
     busqueda_dinamica: str = ""
     filtro_carrera: str = ""
@@ -55,7 +55,7 @@ class EstadoBoveda(rx.State):
     password_confirmacion: str = ""
     trabajo_de_grado_id_a_eliminar: int = 0
 
-    async def cargar_tesis(self) -> None:
+    async def cargar_trabajos_de_grado(self) -> None:
         estado_auth = await self.get_state(EstadoAutenticacion)
         self.usuario_actual_id = estado_auth.usuario.id if estado_auth.usuario else 0
         self.usuario_actual_rol = estado_auth.rol_usuario if estado_auth.usuario else ""
@@ -66,7 +66,7 @@ class EstadoBoveda(rx.State):
                 e.cedula, e.nombre, e.apellido, c.nombre as carrera_nom,
                 ta.nombre || ' ' || ta.apellido as tutor_acad,
                 te.nombre as tutor_emp, emp.nombre as empresa_nom,
-                t.titulo, t.es_publica, t.ruta_archivo, e.usuario_id
+                t.titulo, t.es_publica, t.ruta_archivo, t.fecha_registro, e.usuario_id
             FROM trabajo_de_grado t
             LEFT JOIN estudiante e ON t.estudiante_id = e.id
             LEFT JOIN carrera c ON e.carrera_id = c.id
@@ -75,10 +75,10 @@ class EstadoBoveda(rx.State):
             LEFT JOIN empresa emp ON te.empresa_id = emp.id
         """
 
-        def _fetch_tesis():
+        def _fetch_trabajos_de_grado():
             conn = obtener_conexion()
             if conn is None:
-                logger.error("Sin conexión para cargar tesis.")
+                logger.error("Sin conexión para cargar trabajos de grado.")
                 return None
             try:
                 with conn:
@@ -91,7 +91,7 @@ class EstadoBoveda(rx.State):
                         carreras = [r[0] for r in cursor.fetchall()]
                 return datos, carreras
             except Exception as exc:
-                logger.error("Error al cargar tesis: %s", exc, exc_info=True)
+                logger.error("Error al cargar trabajos de grado: %s", exc, exc_info=True)
                 return None
             finally:
                 try:
@@ -99,9 +99,9 @@ class EstadoBoveda(rx.State):
                 except Exception:
                     pass
 
-        resultado = await asyncio.to_thread(_fetch_tesis)
+        resultado = await asyncio.to_thread(_fetch_trabajos_de_grado)
         if resultado is None:
-            return rx.toast.error("Error al cargar tesis.")
+            return rx.toast.error("Error al cargar trabajos de grado.")
 
         datos, carreras = resultado
 
@@ -112,7 +112,7 @@ class EstadoBoveda(rx.State):
                 return f"{api_url.rstrip('/')}/{archivo_path}"
             return f"/{archivo_path}"
 
-        self.lista_tesis = [
+        self.lista_trabajos_de_grado = [
             {
                 "id": r[0],
                 "cedula_estudiante": r[1],
@@ -125,7 +125,9 @@ class EstadoBoveda(rx.State):
                 "titulo": r[8],
                 "publico": r[9],
                 "url": _build_archivo_url(r[10]) if r[10] else "",
-                "usuario_id": r[11],
+                "fecha_registro": r[11],
+                "fecha_registro_formateada": (r[11].strftime("%d/%m/%Y") if r[11] else ""),
+                "usuario_id": r[12],
             }
             for r in datos
         ]
@@ -133,7 +135,7 @@ class EstadoBoveda(rx.State):
 
     @rx.var
     def lista_filtrada(self) -> list[Dict[str, Any]]:
-        resultado = self.lista_tesis
+        resultado = self.lista_trabajos_de_grado
         if self.filtro_carrera and self.filtro_carrera != "Todas las carreras":
             resultado = [t for t in resultado if t["carrera"] == self.filtro_carrera]
         if self.busqueda_dinamica:
@@ -150,7 +152,7 @@ class EstadoBoveda(rx.State):
         return resultado
 
     @rx.var
-    def tesis_visibles(self) -> list[Dict[str, Any]]:
+    def trabajos_de_grado_visibles(self) -> list[Dict[str, Any]]:
         return [
             t
             for t in self.lista_filtrada
@@ -162,10 +164,10 @@ class EstadoBoveda(rx.State):
         ]
 
     @rx.var
-    def tesis_a_mostrar(self) -> list[Dict[str, Any]]:
+    def trabajos_de_grado_a_mostrar(self) -> list[Dict[str, Any]]:
         if self.usuario_actual_rol == "administrador":
             return self.lista_filtrada
-        return self.tesis_visibles
+        return self.trabajos_de_grado_visibles
 
     @rx.var
     def opciones_carreras(self) -> list[str]:
@@ -176,10 +178,10 @@ class EstadoBoveda(rx.State):
         return bool(self.nombre_encontrado)
 
     @rx.var
-    def balance_privacidad_tesis(self) -> List[Dict[str, Any]]:
-        """Retorna conteo de tesis públicas y privadas para mostrar en dashboard."""
-        total = len(self.lista_tesis)
-        publicas = sum(1 for t in self.lista_tesis if t.get("publico"))
+    def balance_privacidad_trabajos_de_grado(self) -> List[Dict[str, Any]]:
+        """Retorna conteo de trabajos de grado públicos y privados para mostrar en dashboard."""
+        total = len(self.lista_trabajos_de_grado)
+        publicas = sum(1 for t in self.lista_trabajos_de_grado if t.get("publico"))
         privadas = max(0, total - publicas)
         return [
             {"tipo": "Públicas", "color": "#10B981", "valor": publicas},
@@ -187,15 +189,15 @@ class EstadoBoveda(rx.State):
         ]
 
     @rx.var
-    def total_tesis_count(self) -> int:
-        """Cantidad de tesis que se mostrarán según filtros y permisos."""
-        # len() funciona sobre la lista devuelta por tesis_a_mostrar
-        return len(self.tesis_a_mostrar)
+    def total_trabajos_de_grado_count(self) -> int:
+        """Cantidad de trabajos de grado que se mostrarán según filtros y permisos."""
+        # len() funciona sobre la lista devuelta por trabajos_de_grado_a_mostrar
+        return len(self.trabajos_de_grado_a_mostrar)
 
     @rx.var
-    def total_tesis_display(self) -> int:
+    def total_trabajos_de_grado_display(self) -> int:
         """Contenedor amigable para la UI."""
-        return len(self.tesis_a_mostrar)
+        return len(self.trabajos_de_grado_a_mostrar)
 
     @rx.var
     def detalles_estudiante_encontrado(self) -> Dict[str, str]:
@@ -216,7 +218,7 @@ class EstadoBoveda(rx.State):
     def cerrar_modal(self) -> None:
         self.mostrar_modal = False
         self.cedula_busqueda = ""
-        self.titulo_tesis = ""
+        self.titulo_trabajo_de_grado = ""
         self.hacer_publico = False
         self.nombre_encontrado = ""
         self.apellido_encontrado = ""
@@ -229,12 +231,12 @@ class EstadoBoveda(rx.State):
         self.empresa_encontrada = ""
 
     async def fijar_busqueda_dinamica(self, val: str) -> None:
-        """Setter simple para la búsqueda dinámica en la UI. Recarga la lista de tesis."""
+        """Setter simple para la búsqueda dinámica en la UI. Recarga la lista de trabajos de grado."""
         try:
             self.busqueda_dinamica = val
         except Exception:
             self.busqueda_dinamica = str(val)
-        await self.cargar_tesis()
+        await self.cargar_trabajos_de_grado()
 
     def fijar_cedula_busqueda(self, val: str) -> None:
         try:
@@ -242,11 +244,11 @@ class EstadoBoveda(rx.State):
         except Exception:
             self.cedula_busqueda = str(val)
 
-    def fijar_titulo_tesis(self, val: str) -> None:
+    def fijar_titulo_trabajo_de_grado(self, val: str) -> None:
         try:
-            self.titulo_tesis = val
+            self.titulo_trabajo_de_grado = val
         except Exception:
-            self.titulo_tesis = str(val)
+            self.titulo_trabajo_de_grado = str(val)
 
     def fijar_hacer_publico(self, val) -> None:
         # El valor puede venir como bool o Var
@@ -266,11 +268,11 @@ class EstadoBoveda(rx.State):
             self.filtro_carrera = val
         except Exception:
             self.filtro_carrera = str(val)
-        await self.cargar_tesis()
+        await self.cargar_trabajos_de_grado()
 
-    def generar_reporte_tesis(self):
-        if not self.lista_tesis:
-            return rx.toast.warning("No hay tesis registradas para exportar.")
+    def generar_reporte_trabajos_de_grado(self):
+        if not self.lista_trabajos_de_grado:
+            return rx.toast.warning("No hay trabajos de grado registrados para exportar.")
         try:
             output = io.StringIO()
             writer = csv.writer(output)
@@ -288,7 +290,7 @@ class EstadoBoveda(rx.State):
                     "Pública",
                 ]
             )
-            for t in self.lista_tesis:
+            for t in self.lista_trabajos_de_grado:
                 writer.writerow(
                     [
                         t.get("id", ""),
@@ -310,7 +312,7 @@ class EstadoBoveda(rx.State):
                 filename=f"reporte_boveda_{datetime.now().strftime('%d_%m_%Y')}.csv",
             )
         except Exception as e:
-            logger.error("Error al generar reporte de tesis: %s", e, exc_info=True)
+            logger.error("Error al generar reporte de trabajos de grado: %s", e, exc_info=True)
             return rx.toast.error(f"Error al generar reporte: {e}")
 
     def abrir_modal_confirmacion(self, trabajo_de_grado_id: int) -> None:
@@ -343,8 +345,8 @@ class EstadoBoveda(rx.State):
         if not estado_auth.usuario:
             return rx.toast.error("Sesión no válida o expirada.")
 
-        def _delete_tesis(
-            usuario_id: int, rol_usuario: str, password: str, tesis_id: int
+        def _delete_trabajo_de_grado(
+            usuario_id: int, rol_usuario: str, password: str, trabajo_de_grado_id: int
         ):
             conn = obtener_conexion()
             if conn is None:
@@ -369,7 +371,7 @@ class EstadoBoveda(rx.State):
                         # Verificar permisos: solo el administrador o el propietario pueden eliminar
                         cursor.execute(
                             "SELECT e.usuario_id FROM trabajo_de_grado t JOIN estudiante e ON t.estudiante_id = e.id WHERE t.id = %s",
-                            (tesis_id,),
+                            (trabajo_de_grado_id,),
                         )
                         propietario = cursor.fetchone()
                         # Compatibilidad con tests: si el cursor mock devuelve None
@@ -388,7 +390,7 @@ class EstadoBoveda(rx.State):
                                 )
 
                         cursor.execute(
-                            "DELETE FROM trabajo_de_grado WHERE id = %s", (tesis_id,)
+                            "DELETE FROM trabajo_de_grado WHERE id = %s", (trabajo_de_grado_id,)
                         )
                     conn.commit()
                 return True, ""
@@ -397,7 +399,7 @@ class EstadoBoveda(rx.State):
                     conn.rollback()
                 except Exception:
                     pass
-                logger.exception("Error al eliminar tesis: %s", exc)
+                logger.exception("Error al eliminar trabajo de grado: %s", exc)
                 return False, str(exc)
             finally:
                 try:
@@ -406,7 +408,7 @@ class EstadoBoveda(rx.State):
                     pass
 
         ok, mensaje = await asyncio.to_thread(
-            _delete_tesis,
+            _delete_trabajo_de_grado,
             estado_auth.usuario.id,
             estado_auth.rol_usuario if hasattr(estado_auth, "rol_usuario") else "",
             self.password_confirmacion,
@@ -415,7 +417,7 @@ class EstadoBoveda(rx.State):
         if not ok:
             return rx.toast.error(f"Error al eliminar el trabajo de grado: {mensaje}")
 
-        await self.cargar_tesis()
+        await self.cargar_trabajos_de_grado()
         self.cerrar_modal_confirmacion()
         # Intentamos devolver el resultado de toast para mantener compatibilidad
         # con las pruebas unitarias que esperan una cadena "success".
@@ -435,7 +437,7 @@ class EstadoBoveda(rx.State):
         # Permisos: sólo el administrador o el propietario pueden editar
         self.trabajo_de_grado_en_edicion_id = trabajo_de_grado_id
         trabajo_de_grado_a_editar = next(
-            (t for t in self.lista_tesis if t["id"] == trabajo_de_grado_id), None
+            (t for t in self.lista_trabajos_de_grado if t["id"] == trabajo_de_grado_id), None
         )
 
         if not trabajo_de_grado_a_editar:
@@ -457,7 +459,7 @@ class EstadoBoveda(rx.State):
         # Si llega aquí, tiene permiso
         self.en_edicion = True
         self.cedula_busqueda = trabajo_de_grado_a_editar["cedula_estudiante"]
-        self.titulo_tesis = trabajo_de_grado_a_editar["titulo"]
+        self.titulo_trabajo_de_grado = trabajo_de_grado_a_editar["titulo"]
         self.hacer_publico = trabajo_de_grado_a_editar["publico"]
         self.ruta_archivo_actual = trabajo_de_grado_a_editar["url"]
         await self.buscar_estudiante()
@@ -503,12 +505,12 @@ class EstadoBoveda(rx.State):
         if not resultado:
             return rx.toast.error("Estudiante no encontrado.")
 
-        # Verificar si ya tiene tesis registrada y no estamos en modo edición
+        # Verificar si ya tiene un trabajo de grado registrado y no estamos en modo edición
         if not self.en_edicion:
-            tiene_tesis = any(
-                t.get("cedula_estudiante") == cedula for t in self.lista_tesis
+            tiene_trabajo_de_grado = any(
+                t.get("cedula_estudiante") == cedula for t in self.lista_trabajos_de_grado
             )
-            if tiene_tesis:
+            if tiene_trabajo_de_grado:
                 self.nombre_encontrado = ""
                 self.apellido_encontrado = ""
                 return rx.toast.error(
@@ -524,7 +526,7 @@ class EstadoBoveda(rx.State):
             self.tutor_empresa_encontrado,
         ) = resultado
 
-    async def manejar_subida_tesis(self, archivos: list[rx.UploadFile]):
+    async def manejar_subida_trabajo_de_grado(self, archivos: list[rx.UploadFile]):
         """Handler para on_drop: valida el formulario antes de registrar.
         Funciona tanto en móvil (on_drop) como en escritorio (botón).
         """
@@ -532,13 +534,13 @@ class EstadoBoveda(rx.State):
             return rx.toast.warning(
                 "⚠️ Primero busca al estudiante con su cédula antes de subir el archivo."
             )
-        if not self.titulo_tesis.strip():
+        if not self.titulo_trabajo_de_grado.strip():
             return rx.toast.warning(
-                "⚠️ Escribe el título de la tesis antes de subir el archivo."
+                "⚠️ Escribe el título del trabajo de grado antes de subir el archivo."
             )
-        return await self.registrar_tesis(archivos)
+        return await self.registrar_trabajo_de_grado(archivos)
 
-    async def registrar_tesis(self, archivos: list[rx.UploadFile]) -> rx.Component:
+    async def registrar_trabajo_de_grado(self, archivos: list[rx.UploadFile]) -> rx.Component:
 
         estado_auth = await self.get_state(EstadoAutenticacion)
         es_admin = estado_auth.rol_usuario == "administrador"
@@ -547,12 +549,12 @@ class EstadoBoveda(rx.State):
             estado_auth.usuario.cedula if estado_auth.usuario else ""
         ):
             return rx.toast.error(
-                "No tienes permiso para registrar la tesis de otro estudiante."
+                "No tienes permiso para registrar el trabajo de grado de otro estudiante."
             )
 
         if (
             not self.cedula_busqueda.strip()
-            or not self.titulo_tesis.strip()
+            or not self.titulo_trabajo_de_grado.strip()
             or not self.nombre_encontrado
         ):
             return rx.toast.warning(
@@ -588,11 +590,11 @@ class EstadoBoveda(rx.State):
         elif self.en_edicion and self.ruta_archivo_actual:
             ruta_destino_final = self.ruta_archivo_actual.lstrip("/")
         else:
-            return rx.toast.warning("Debe subir el archivo de la tesis.")
+            return rx.toast.warning("Debe subir el archivo del trabajo de grado.")
 
         self.procesando = True
 
-        def _save_tesis(
+        def _save_trabajo_de_grado(
             codigo_estudiante: str,
             titulo: str,
             publico: bool,
@@ -619,7 +621,7 @@ class EstadoBoveda(rx.State):
                             cursor.execute(
                                 """
                                 UPDATE trabajo_de_grado
-                                SET titulo = %s, es_publica = %s, ruta_archivo = %s, estudiante_id = %s
+                                SET titulo = %s, es_publica = %s, ruta_archivo = %s, estudiante_id = %s, fecha_registro = CURRENT_TIMESTAMP
                                 WHERE id = %s;
                             """,
                                 (
@@ -643,8 +645,8 @@ class EstadoBoveda(rx.State):
 
                             cursor.execute(
                                 """
-                                INSERT INTO trabajo_de_grado (titulo, es_publica, ruta_archivo, estudiante_id)
-                                VALUES (%s, %s, %s, %s);
+                                INSERT INTO trabajo_de_grado (titulo, es_publica, ruta_archivo, estudiante_id, fecha_registro)
+                                VALUES (%s, %s, %s, %s, CURRENT_TIMESTAMP);
                             """,
                                 (titulo, publico, ruta, id_estudiante),
                             )
@@ -655,7 +657,7 @@ class EstadoBoveda(rx.State):
                     conn2.rollback()
                 except Exception:
                     pass
-                logger.exception("Error al registrar tesis en BD: %s", exc)
+                logger.exception("Error al registrar trabajo de grado en BD: %s", exc)
                 return False, str(exc)
             finally:
                 try:
@@ -664,9 +666,9 @@ class EstadoBoveda(rx.State):
                     pass
 
         ok, mensaje = await asyncio.to_thread(
-            _save_tesis,
+            _save_trabajo_de_grado,
             self.cedula_busqueda.strip(),
-            self.titulo_tesis,
+            self.titulo_trabajo_de_grado,
             self.hacer_publico,
             ruta_destino_final,
             self.en_edicion,
@@ -683,18 +685,18 @@ class EstadoBoveda(rx.State):
                 with open(ruta_destino, "wb") as f:
                     f.write(datos_subida)
             except Exception as e:
-                logger.error("Error al escribir archivo de tesis tras commit: %s", e)
+                logger.error("Error al escribir archivo de trabajo de grado tras commit: %s", e)
                 self.procesando = False
                 return rx.toast.warning(
-                    "Tesis registrada en BD, pero hubo un error al guardar el archivo físico."
+                    "Trabajo de grado registrado en BD, pero hubo un error al guardar el archivo físico."
                 )
 
         self.procesando = False
         self.cerrar_modal()
-        await self.cargar_tesis()
-        return rx.toast.success("Tesis procesada correctamente.")
+        await self.cargar_trabajos_de_grado()
+        return rx.toast.success("Trabajo de grado procesado correctamente.")
 
     @rx.var
-    def total_tesis(self) -> int:
-        """Número total de tesis cargadas (activos)."""
-        return len(self.lista_tesis)
+    def total_trabajos_de_grado(self) -> int:
+        """Número total de trabajos de grado cargados (activos)."""
+        return len(self.lista_trabajos_de_grado)

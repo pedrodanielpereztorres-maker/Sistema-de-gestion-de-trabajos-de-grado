@@ -573,7 +573,7 @@ def fila_tutor(tutor: TutorAcademico) -> rx.Component:
                 # Lógica: Si tiene movimientos -> Desactivar. Si no -> Eliminar.
                 rx.cond(
                     tutor.tiene_movimientos,
-                    # Caso: Tiene tesis (Solo desactivar)
+                    # Caso: Tiene trabajos de grado (Solo desactivar)
                     rx.icon_button(
                         rx.icon(rx.cond(tutor.activo, "power-off", "power"), size=16),
                         on_click=lambda: EstadoMantenimiento.alternar_estado_tutor(
@@ -619,7 +619,7 @@ def contenido_tutores() -> rx.Component:
             rx.hstack(
                 rx.icon("info", size=14, color="#3B82F6"),
                 rx.text(
-                    "Los tutores con tesis asignadas no pueden eliminarse, solo desactivarse.",
+                    "Los tutores con trabajos de grado asignados no pueden eliminarse, solo desactivarse.",
                     font_size="12px",
                     color="#3B82F6",
                 ),

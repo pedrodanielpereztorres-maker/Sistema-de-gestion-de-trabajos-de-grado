@@ -17,22 +17,22 @@ class EstadoReportes(rx.State):
         "total_estudiantes": 0,
         "con_pasantia": 0,
         "sin_pasantia": 0,
-        "total_tesis": 0,
+        "total_trabajos_de_grado": 0,
     }
     estadisticas_carreras: List[Dict[str, Any]] = []
     mejores_tutores: List[Dict[str, Any]] = []
     mejores_empresas: List[Dict[str, Any]] = []
     procesando: bool = False
 
-    async def exportar_tesis_excel(self):
+    async def exportar_trabajos_de_grado_excel(self):
         """
         Genera y descarga un Excel con todos los Trabajos de Grado registrados de manera profesional.
         """
         boveda = await self.get_state(EstadoBoveda)
-        if not boveda.lista_tesis:
-            await boveda.cargar_tesis()
+        if not boveda.lista_trabajos_de_grado:
+            await boveda.cargar_trabajos_de_grado()
 
-        if not boveda.lista_tesis:
+        if not boveda.lista_trabajos_de_grado:
             return rx.toast.warning(
                 "No hay Trabajos de Grado registrados para exportar."
             )
@@ -137,10 +137,10 @@ class EstadoReportes(rx.State):
             ws.freeze_panes = "A5"
             ws.sheet_view.showGridLines = False
             ultima_letra = ws.cell(row=4, column=len(headers)).column_letter
-            ws.auto_filter.ref = f"A4:{ultima_letra}{len(boveda.lista_tesis) + 4}"
+            ws.auto_filter.ref = f"A4:{ultima_letra}{len(boveda.lista_trabajos_de_grado) + 4}"
 
             # Datos
-            for row_num, t in enumerate(boveda.lista_tesis, 5):
+            for row_num, t in enumerate(boveda.lista_trabajos_de_grado, 5):
                 ws.row_dimensions[row_num].height = 20
                 datos_fila = [
                     t.get("id", ""),
@@ -203,13 +203,13 @@ class EstadoReportes(rx.State):
                         con_pasantia = cursor.fetchone()[0]
 
                         cursor.execute("SELECT COUNT(*) FROM trabajo_de_grado")
-                        total_tesis = cursor.fetchone()[0]
+                        total_trabajos_de_grado = cursor.fetchone()[0]
 
                         resumen = {
                             "total_estudiantes": total,
                             "con_pasantia": con_pasantia,
                             "sin_pasantia": total - con_pasantia,
-                            "total_tesis": total_tesis,
+                            "total_trabajos_de_grado": total_trabajos_de_grado,
                         }
 
                         # 2. Estadísticas por Carrera
@@ -575,14 +575,14 @@ class EstadoReportes(rx.State):
             logger.exception("Error al generar PDF de reportes: %s", e)
             return rx.toast.error("Error técnico al generar el PDF.")
 
-    async def exportar_tesis_pdf(self):
+    async def exportar_trabajos_de_grado_pdf(self):
         """Genera un reporte PDF profesional de la bóveda de Trabajos de Grado (horizontal)."""
         boveda = await self.get_state(EstadoBoveda)
-        if not boveda.lista_tesis:
-            await boveda.cargar_tesis()
+        if not boveda.lista_trabajos_de_grado:
+            await boveda.cargar_trabajos_de_grado()
 
-        if not boveda.lista_tesis:
-            return rx.toast.warning("No hay tesis registradas para exportar.")
+        if not boveda.lista_trabajos_de_grado:
+            return rx.toast.warning("No hay trabajos de grado registrados para exportar.")
 
         try:
             import os
@@ -624,7 +624,7 @@ class EstadoReportes(rx.State):
             pdf.cell(
                 0,
                 5,
-                f"Fecha de emisión: {datetime.now().strftime('%d/%m/%Y %H:%M')}  |  Total registros: {len(boveda.lista_tesis)}",
+                f"Fecha de emisión: {datetime.now().strftime('%d/%m/%Y %H:%M')}  |  Total registros: {len(boveda.lista_trabajos_de_grado)}",
                 ln=True,
                 align="L",
             )
@@ -650,7 +650,7 @@ class EstadoReportes(rx.State):
             pdf.set_text_color(30, 41, 59)
             pdf.set_font("Helvetica", "", 7)
             relleno = False
-            for t in boveda.lista_tesis:
+            for t in boveda.lista_trabajos_de_grado:
                 (
                     pdf.set_fill_color(248, 250, 252)
                     if relleno

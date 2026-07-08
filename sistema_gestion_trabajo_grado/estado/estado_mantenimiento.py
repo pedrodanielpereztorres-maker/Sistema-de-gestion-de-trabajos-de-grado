@@ -180,7 +180,7 @@ class EstadoMantenimiento(rx.State):
                             """,
                                 (t[0],),
                             )
-                            tesis_v = cursor.fetchone()[0]
+                            trabajo_de_grado_v = cursor.fetchone()[0]
                             tutores_temp.append(
                                 TutorAcademico(
                                     id=t[0],
@@ -191,7 +191,7 @@ class EstadoMantenimiento(rx.State):
                                     carrera=t[7],
                                     especialidad=t[5],
                                     activo=t[6],
-                                    tiene_movimientos=bool(tesis_v),
+                                    tiene_movimientos=bool(trabajo_de_grado_v),
                                 )
                             )
                 return {
@@ -394,7 +394,7 @@ class EstadoMantenimiento(rx.State):
         await self.cargar_datos()
 
         boveda = await self.get_state(EstadoBoveda)
-        await boveda.cargar_tesis()
+        await boveda.cargar_trabajos_de_grado()
 
         return rx.toast.success(
             "🎉 Registro Exitoso: El nuevo usuario ha sido registrado y vinculado correctamente en el sistema."
@@ -724,7 +724,7 @@ class EstadoMantenimiento(rx.State):
         await self.cargar_datos()
 
         boveda = await self.get_state(EstadoBoveda)
-        await boveda.cargar_tesis()
+        await boveda.cargar_trabajos_de_grado()
 
         return rx.toast.success("Datos del tutor guardados correctamente.")
 

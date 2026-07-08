@@ -76,7 +76,7 @@ app.add_page(
         EstadoEstudiante.cargar_estudiantes,
         EstadoDashboard.cargar_dashboard,
         EstadoPerfil.cargar_datos_iniciales,
-        EstadoBoveda.cargar_tesis,
+        EstadoBoveda.cargar_trabajos_de_grado,
         EstadoDocumento.cargar_documentos,
     ],
 )
@@ -84,7 +84,7 @@ app.add_page(pagina_login, route="/login")
 app.add_page(
     pagina_boveda,
     route="/boveda",
-    on_load=[EstadoAutenticacion.verificar_sesion, EstadoBoveda.cargar_tesis],
+    on_load=[EstadoAutenticacion.verificar_sesion, EstadoBoveda.cargar_trabajos_de_grado],
 )
 app.add_page(
     pagina_estudiantes,

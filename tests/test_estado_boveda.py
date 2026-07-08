@@ -78,11 +78,11 @@ class TestEstadoBoveda(unittest.TestCase):
 
     def test_lista_filtrada_filtra_por_carrera_y_busqueda(self):
         estado = EstadoBoveda()
-        estado.lista_tesis = [
+        estado.lista_trabajos_de_grado = [
             {
                 "id": 1,
                 "carrera": "Sistemas",
-                "titulo": "Tesis A",
+                "titulo": "Trabajo de grado A",
                 "nombre_estudiante": "Juan",
                 "cedula_estudiante": "123",
             },
@@ -95,23 +95,23 @@ class TestEstadoBoveda(unittest.TestCase):
             },
         ]
         estado.filtro_carrera = "Sistemas"
-        estado.busqueda_dinamica = "tesis"
+        estado.busqueda_dinamica = "trabajo de grado"
 
         resultado = estado.lista_filtrada
 
         self.assertEqual(len(resultado), 1)
         self.assertEqual(resultado[0]["id"], 1)
 
-    def test_tesis_visibles_muestra_privadas_solo_del_usuario(self):
+    def test_trabajos_de_grado_visibles_muestra_privadas_solo_del_usuario(self):
         estado = EstadoBoveda()
-        estado.lista_tesis = [
+        estado.lista_trabajos_de_grado = [
             {"id": 1, "publico": False, "usuario_id": 9},
             {"id": 2, "publico": False, "usuario_id": 1},
             {"id": 3, "publico": True, "usuario_id": 2},
         ]
         estado.usuario_actual_id = 1
 
-        visibles = estado.tesis_visibles
+        visibles = estado.trabajos_de_grado_visibles
         self.assertEqual({t["id"] for t in visibles}, {2, 3})
 
     def test_opciones_carreras_agrega_todas_las_carreras(self):
@@ -121,21 +121,21 @@ class TestEstadoBoveda(unittest.TestCase):
             estado.opciones_carreras, ["Todas las carreras", "Sistemas", "Derecho"]
         )
 
-    def test_balance_privacidad_tesis_calcuala_correctamente(self):
+    def test_balance_privacidad_trabajos_de_grado_calcuala_correctamente(self):
         estado = EstadoBoveda()
-        estado.lista_tesis = [{"publico": True}, {"publico": False}, {"publico": False}]
-        balance = estado.balance_privacidad_tesis
+        estado.lista_trabajos_de_grado = [{"publico": True}, {"publico": False}, {"publico": False}]
+        balance = estado.balance_privacidad_trabajos_de_grado
         self.assertEqual(balance[0]["valor"], 1)
         self.assertEqual(balance[1]["valor"], 2)
 
-    def test_generar_reporte_tesis_sin_datos_devuelve_warning(self):
+    def test_generar_reporte_trabajos_de_grado_sin_datos_devuelve_warning(self):
         estado = EstadoBoveda()
-        estado.lista_tesis = []
+        estado.lista_trabajos_de_grado = []
         with patch(
             "sistema_gestion_trabajo_grado.estado.estado_boveda.rx.toast.warning",
             return_value="warning",
         ):
-            self.assertEqual(estado.generar_reporte_tesis(), "warning")
+            self.assertEqual(estado.generar_reporte_trabajos_de_grado(), "warning")
 
     def test_abrir_modal_confirmacion_y_cerrar(self):
         estado = EstadoBoveda()
@@ -208,7 +208,7 @@ class TestEstadoBoveda(unittest.TestCase):
                     ):
                         with patch.object(
                             EstadoBoveda,
-                            "cargar_tesis",
+                            "cargar_trabajos_de_grado",
                             new=AsyncMock(return_value=None),
                         ):
                             resultado = asyncio.run(
@@ -217,10 +217,10 @@ class TestEstadoBoveda(unittest.TestCase):
         self.assertEqual(resultado, "success")
         self.assertFalse(estado.mostrar_modal_confirmacion)
 
-    def test_registrar_tesis_sin_permiso_devuelve_error(self):
+    def test_registrar_trabajo_de_grado_sin_permiso_devuelve_error(self):
         estado = EstadoBoveda()
         estado.cedula_busqueda = "12345678"
-        estado.titulo_tesis = "Mi tesis"
+        estado.titulo_trabajo_de_grado = "Mi tesis"
         estado.nombre_encontrado = "Juan"
         estado.en_edicion = False
 
@@ -233,14 +233,14 @@ class TestEstadoBoveda(unittest.TestCase):
                 return_value="error_perm",
             ):
                 resultado = asyncio.run(
-                    estado.registrar_tesis([FakeUploadFile("tesis.pdf", b"%PDF-1.4")])
+                    estado.registrar_trabajo_de_grado([FakeUploadFile("tesis.pdf", b"%PDF-1.4")])
                 )
         self.assertEqual(resultado, "error_perm")
 
-    def test_registrar_tesis_sin_estudiante_registrado(self):
+    def test_registrar_trabajo_de_grado_sin_estudiante_registrado(self):
         estado = EstadoBoveda()
         estado.cedula_busqueda = "12345678"
-        estado.titulo_tesis = "Mi tesis"
+        estado.titulo_trabajo_de_grado = "Mi tesis"
         estado.nombre_encontrado = "Juan"
 
         fake_auth = FakeAuthState(usuario_id=1, rol_usuario="administrador")
@@ -257,16 +257,16 @@ class TestEstadoBoveda(unittest.TestCase):
                     return_value="error_student",
                 ):
                     resultado = asyncio.run(
-                        estado.registrar_tesis(
+                        estado.registrar_trabajo_de_grado(
                             [FakeUploadFile("tesis.pdf", b"%PDF-1.4")]
                         )
                     )
         self.assertEqual(resultado, "error_student")
 
-    def test_registrar_tesis_exitoso_almacena_bd(self):
+    def test_registrar_trabajo_de_grado_exitoso_almacena_bd(self):
         estado = EstadoBoveda()
         estado.cedula_busqueda = "12345678"
-        estado.titulo_tesis = "Mi tesis"
+        estado.titulo_trabajo_de_grado = "Mi tesis"
         estado.nombre_encontrado = "Juan"
 
         fake_auth = FakeAuthState(usuario_id=1, rol_usuario="administrador")
@@ -289,11 +289,11 @@ class TestEstadoBoveda(unittest.TestCase):
                         ):
                             with patch.object(
                                 EstadoBoveda,
-                                "cargar_tesis",
+                                "cargar_trabajos_de_grado",
                                 new=AsyncMock(return_value=None),
                             ):
                                 resultado = asyncio.run(
-                                    estado.registrar_tesis(
+                                    estado.registrar_trabajo_de_grado(
                                         [FakeUploadFile("tesis.pdf", b"%PDF-1.4")]
                                     )
                                 )

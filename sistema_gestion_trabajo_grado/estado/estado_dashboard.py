@@ -48,7 +48,7 @@ def _fetch_dashboard_data():
                 sin_pasantia = int(conteo_general[2] or 0)
 
                 cursor.execute("SELECT COUNT(*) FROM trabajo_de_grado")
-                total_tesis = int((cursor.fetchone() or (0,))[0] or 0)
+                total_trabajos_de_grado = int((cursor.fetchone() or (0,))[0] or 0)
 
                 cursor.execute("""
                     SELECT
@@ -130,7 +130,7 @@ def _fetch_dashboard_data():
             "total": total,
             "con_pasantia": con_pasantia,
             "sin_pasantia": sin_pasantia,
-            "total_tesis": total_tesis,
+            "total_trabajos_de_grado": total_trabajos_de_grado,
             "publicas": publicas,
             "privadas": privadas,
             "estudiantes_por_carrera": estudiantes_por_carrera,
@@ -149,9 +149,9 @@ class EstadoDashboard(rx.State):
     _total_estudiantes: int = 0
     _estudiantes_en_pasantia: int = 0
     _estudiantes_sin_pasantia: int = 0
-    _total_tesis: int = 0
-    tesis_publicas: int = 0
-    tesis_privadas: int = 0
+    _total_trabajos_de_grado: int = 0
+    trabajos_de_grado_publicos: int = 0
+    trabajos_de_grado_privados: int = 0
     estudiantes_por_carrera: List[EstadisticaCarrera] = []
     lista_con_pasantia: List[EstudiantePasantia] = []
     lista_sin_pasantia: List[EstudiantePasantia] = []
@@ -185,8 +185,8 @@ class EstadoDashboard(rx.State):
         return int(self._estudiantes_sin_pasantia)
 
     @rx.var
-    def total_tesis(self) -> int:
-        return int(self._total_tesis)
+    def total_trabajos_de_grado(self) -> int:
+        return int(self._total_trabajos_de_grado)
 
     async def cargar_dashboard(self) -> None:
         """Carga todas las métricas del dashboard usando SQL puro y datos frescos."""
@@ -201,8 +201,8 @@ class EstadoDashboard(rx.State):
             self._total_estudiantes = data["total"]
             self._estudiantes_en_pasantia = data["con_pasantia"]
             self._estudiantes_sin_pasantia = data["sin_pasantia"]
-            self._total_tesis = data["total_tesis"]
-            self.tesis_publicas = data["publicas"]
-            self.tesis_privadas = data["privadas"]
+            self._total_trabajos_de_grado = data["total_trabajos_de_grado"]
+            self.trabajos_de_grado_publicos = data["publicas"]
+            self.trabajos_de_grado_privados = data["privadas"]
         except Exception as e:
             logger.exception("Error al cargar métricas del dashboard: %s", e)

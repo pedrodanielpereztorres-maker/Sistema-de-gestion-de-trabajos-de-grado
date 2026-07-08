@@ -62,7 +62,7 @@ class EstadoEstudiante(rx.State):
     direccion_empresa: str = ""
     correo_empresa: str = ""
     telefono_empresa: str = ""
-    haciendo_tesis: bool = False
+    haciendo_trabajo_de_grado: bool = False
     tutor_academico_seleccionado: str = ""
     tutores_disponibles: list[str] = []
     tutores_mapeo: list[dict] = []
@@ -386,7 +386,7 @@ class EstadoEstudiante(rx.State):
         self.direccion_empresa = ""
         self.correo_empresa = ""
         self.telefono_empresa = ""
-        self.haciendo_tesis = False
+        self.haciendo_trabajo_de_grado = False
         self.tutor_academico_seleccionado = ""
         self.tutores_mapeo = []
         self.usuario_encontrado = False
@@ -423,7 +423,7 @@ class EstadoEstudiante(rx.State):
         self.correo_empresa = getattr(est, "correo_empresa", "")
         self.telefono_empresa = getattr(est, "telefono_empresa", "")
 
-        self.haciendo_tesis = bool(self.nombre_tutor)
+        self.haciendo_trabajo_de_grado = bool(self.nombre_tutor)
         if self.carrera:
             await self.cargar_tutores_por_carrera(self.carrera)
             self.tutor_academico_seleccionado = self.nombre_tutor
@@ -538,10 +538,10 @@ class EstadoEstudiante(rx.State):
 
         if self.carrera:
             await self.cargar_tutores_por_carrera(self.carrera)
-            self.haciendo_tesis = bool(self.nombre_tutor)
+            self.haciendo_trabajo_de_grado = bool(self.nombre_tutor)
             self.tutor_academico_seleccionado = self.nombre_tutor
         else:
-            self.haciendo_tesis = False
+            self.haciendo_trabajo_de_grado = False
             self.tutor_academico_seleccionado = ""
 
     async def cargar_tutores_por_carrera(self, carrera: str = None) -> None:
@@ -793,7 +793,7 @@ class EstadoEstudiante(rx.State):
                                 carrera_id = r[0]
 
                         tutor_academico_id = None
-                        if self.haciendo_tesis and self.tutor_academico_seleccionado:
+                        if self.haciendo_trabajo_de_grado and self.tutor_academico_seleccionado:
                             for t in self.tutores_mapeo:
                                 if t["nombre"] == self.tutor_academico_seleccionado:
                                     tutor_academico_id = t["id"]
@@ -954,11 +954,11 @@ class EstadoEstudiante(rx.State):
         except Exception:
             self.periodo_cierre = str(val)
 
-    def fijar_haciendo_tesis(self, val) -> None:
+    def fijar_haciendo_trabajo_de_grado(self, val) -> None:
         try:
-            self.haciendo_tesis = bool(val)
+            self.haciendo_trabajo_de_grado = bool(val)
         except Exception:
-            self.haciendo_tesis = str(val).lower() in ("1", "true", "yes")
+            self.haciendo_trabajo_de_grado = str(val).lower() in ("1", "true", "yes")
 
     def fijar_tutor_academico_seleccionado(self, val: str) -> None:
         try:

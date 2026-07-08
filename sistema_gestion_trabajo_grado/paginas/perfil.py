@@ -419,7 +419,7 @@ def info_mantenimiento_admin() -> rx.Component:
                 "Como Administrador del sistema ",
                 rx.text.span("SGT", class_name="notranslate"),
                 ", tu cuenta posee privilegios elevados para gestionar expedientes, ",
-                "bóvedas de tesis e información de tutores académicos y empresariales.",
+                "bóvedas de trabajos de grado e información de tutores académicos y empresariales.",
                 size="2",
                 color="#475569",
                 line_height="1.6",

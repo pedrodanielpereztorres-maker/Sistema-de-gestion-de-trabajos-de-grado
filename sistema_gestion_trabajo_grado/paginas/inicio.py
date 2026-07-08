@@ -409,7 +409,7 @@ def panel_boveda() -> rx.Component:
                             "Públicas", size="2", color="#475569", font_weight="700"
                         ),
                         rx.text(
-                            EstadoDashboard.tesis_publicas.to(str),
+                            EstadoDashboard.trabajos_de_grado_publicos.to(str),
                             size="5",
                             weight="bold",
                             color=COLOR_TEXTO_BOLD,
@@ -440,7 +440,7 @@ def panel_boveda() -> rx.Component:
                             "Privadas", size="2", color="#475569", font_weight="700"
                         ),
                         rx.text(
-                            EstadoDashboard.tesis_privadas.to(str),
+                            EstadoDashboard.trabajos_de_grado_privados.to(str),
                             size="5",
                             weight="bold",
                             color=COLOR_TEXTO_BOLD,
@@ -638,7 +638,7 @@ def encabezado_bienvenida() -> rx.Component:
             on_click=[
                 EstadoEstudiante.cargar_estudiantes,
                 EstadoDashboard.cargar_dashboard,
-                EstadoBoveda.cargar_tesis,
+                EstadoBoveda.cargar_trabajos_de_grado,
             ],
         ),
         width="100%",
@@ -787,7 +787,7 @@ def panel_administrador() -> rx.Component:
             ),
             tarjeta_estadistica(
                 "Bóveda (Trabajo de grado)",
-                EstadoDashboard.total_tesis.to(str),
+                EstadoDashboard.total_trabajos_de_grado.to(str),
                 "library",
                 "linear-gradient(135deg, #8B5CF6, #7C3AED)",
             ),
@@ -850,7 +850,7 @@ def pagina_inicio() -> rx.Component:
                 on_mount=[
                     EstadoAutenticacion.verificar_acceso,
                     EstadoEstudiante.cargar_estudiantes,
-                    EstadoBoveda.cargar_tesis,
+                    EstadoBoveda.cargar_trabajos_de_grado,
                     EstadoDashboard.cargar_dashboard,
                     EstadoPerfil.cargar_datos_iniciales,
                 ],

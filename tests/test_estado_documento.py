@@ -84,7 +84,7 @@ class TestEstadoDocumento(unittest.TestCase):
         )
         doc2 = Documento(
             id=2,
-            titulo="Plan de tesis",
+            titulo="Plan de trabajo de grado",
             descripcion="Estructura",
             fecha_subida="02/01/2024",
             tipo="pdf",

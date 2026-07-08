@@ -3,8 +3,6 @@ From: Automated Fixer <devnull@example.com>
 Date: Fri, 22 May 2026 22:53:03 -0400
 Subject: [PATCH] Replace print() with logging; improve error handling and
  logging in several modules
-
-Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 ---
  .env.example                                  |   6 +
  .gitignore                                    |  19 +
@@ -62,87 +60,6 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
  create mode 100755 assets/tesis/tesis_32273930.docx
  create mode 100755 assets/tesis/tesis_32273930.pdf
  create mode 100644 assets/tesis/tesis_99999999.pdf
- create mode 100755 parametros.txt
- create mode 100755 requirements.txt
- create mode 100755 rxconfig.py
- create mode 100755 sistema_gestion_trabajo_grado/__init__.py
- create mode 100755 sistema_gestion_trabajo_grado/componentes/__init__.py
- create mode 100755 sistema_gestion_trabajo_grado/componentes/barra_lateral.py
- create mode 100755 sistema_gestion_trabajo_grado/componentes/campo_texto.py
- create mode 100755 sistema_gestion_trabajo_grado/componentes/encabezado.py
- create mode 100755 sistema_gestion_trabajo_grado/componentes/layout.py
- create mode 100755 sistema_gestion_trabajo_grado/componentes/modal_estudiante.py
- create mode 100755 sistema_gestion_trabajo_grado/componentes/tabla_estudiantes.py
- create mode 100755 sistema_gestion_trabajo_grado/componentes/toast_viewer.py
- create mode 100755 sistema_gestion_trabajo_grado/database_manager.py
- create mode 100755 sistema_gestion_trabajo_grado/estado/__init__.py
- create mode 100755 sistema_gestion_trabajo_grado/estado/estado_autenticacion.py
- create mode 100755 sistema_gestion_trabajo_grado/estado/estado_boveda.py
- create mode 100755 sistema_gestion_trabajo_grado/estado/estado_documento.py
- create mode 100755 sistema_gestion_trabajo_grado/estado/estado_estudiante.py
- create mode 100755 sistema_gestion_trabajo_grado/estado/estado_layout.py
- create mode 100755 sistema_gestion_trabajo_grado/estado/estado_mantenimiento.py
- create mode 100644 sistema_gestion_trabajo_grado/estado/estado_reportes.py
- create mode 100755 sistema_gestion_trabajo_grado/paginas/__init__.py
- create mode 100755 sistema_gestion_trabajo_grado/paginas/boveda.py
- create mode 100755 sistema_gestion_trabajo_grado/paginas/documentacion.py
- create mode 100755 sistema_gestion_trabajo_grado/paginas/estudiantes.py
- create mode 100755 sistema_gestion_trabajo_grado/paginas/inicio.py
- create mode 100755 sistema_gestion_trabajo_grado/paginas/login.py
- create mode 100755 sistema_gestion_trabajo_grado/paginas/mantenimiento.py
- create mode 100755 sistema_gestion_trabajo_grado/paginas/perfil.py
- create mode 100644 sistema_gestion_trabajo_grado/paginas/reportes.py
- create mode 100755 sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado.py
-
-diff --git a/.env.example b/.env.example
-new file mode 100644
-index 0000000..51f5ef2
---- /dev/null
-+++ b/.env.example
-@@ -0,0 +1,6 @@
-+DB_HOST=localhost
-+DB_PORT=5432
-+DB_NAME=db_trabajo_grado
-+DB_USER=postgres
-+DB_PASSWORD=changeme
-+# Copiar este archivo a .env y completar con credenciales reales. NO subir .env al control de versiones.
-diff --git a/.gitignore b/.gitignore
-new file mode 100755
-index 0000000..af8df83
---- /dev/null
-+++ b/.gitignore
-@@ -0,0 +1,19 @@
-+# Virtualenvs
-+.venv/
-+.venv_test/
-+venv/
-+env/
-+# Python cache
-+__pycache__/
-+*.py[cod]
-+# Distribution / packaging
-+build/
-+dist/
-+*.egg-info/
-+# Editor/IDE
-+.vscode/
-+.idea/
-+# OS
-+.DS_Store
-+# Assets
-+assets/
-diff --git a/assets/documentos/doc_2026-04-11_Fase_III_Corregida.docx b/assets/documentos/doc_2026-04-11_Fase_III_Corregida.docx
-new file mode 100755
-index 0000000000000000000000000000000000000000..2b97f86ebabb6fdb7cd2527c5563608db8f5fede
-GIT binary patch
-literal 2874378
-zcmeEtQ?n>Rv*osJ+qP}nwr$(CZJ%x1w(YZRbIx~X9%f>G!oB^_5ml8D-JQMG%FNDc
-z1!-Uq6aX*)2mk;8LVyprI>=r?005<bLu3F5AZ=lLI~P+s7kw2^2UBNVIuBbLf+7$g
-ziUI(jfA;@#{5SSMbJ~>M76XFlE9eJ2P+O>Id2|s4jrqb@BkVlNSsIx*8)C0OT=Ls3
-zcM2^L#IZzWaV$Wj^DQqHlyGewer@FqA=$O=P~8P-b-(1F<}J3Xx$F25b2U;FImjbi
-zmMefr-9LMM+B<kaB~i<CtTy2oy$*TDa5WMw@cR~}&kIl`TkR);<J=9PKaL$=!=>&J
-zaOfGl>t4^WS`F+PzWya+;z|3hH6LCzQ;M)lY?qJDd=(J}i_DP_0~VACtM5I^bM0v4
-zWmze@vYY1#d<p}ZA>B@V`z4>EGcj6%uEaz?C}~x1!SPYl^si|t&r@u`IlZ<mAw_d`
 zgkF%83v`;w>8RArm+#>m$9#ot{<Q~K1G^&liz_1>BP^eSBCw_5=H3S{Zor9Wd%c(=
 zUMNHd0|H*&LB+QoJOoJwZ~@7W6obGvesf~?!#*e_&v?0GoNmP$@j?O0%#2U7$R7fc
 zM#ctld^t7cKB)8XJ;RD6T?E@Dt?PKi_I~#iaDQa{yx2`;V9Vpfh;lU@y7l;AxU<uV
@@ -50527,97 +50444,14 @@ index 0000000..0148190
 +%����
 +1 0 obj
 +<< /Type /Catalog >>
-+endobj
-+trailer
-+<< /Root 1 0 R >>
-+%%EOF
-diff --git a/assets/favicon.ico b/assets/favicon.ico
-new file mode 100755
-index 0000000000000000000000000000000000000000..166ae995eaa63fc96771410a758282dc30e925cf
-GIT binary patch
-literal 4286
-zcmeHL>rYc>81ELdEe;}zmYd}cUgmJRfwjUwD1`#s5KZP>mMqza#Viv|_7|8f+0+bX
-zHuqusuw-7Ca`DTu#4U4^o2bjO#K>4%N?Wdi*wZ3Vx%~Ef4}D1`U_EM<ED`eKIp@9o
-zp65Bw<qbOBQ~XU%)``Emx+tAauhZ$)6CBbN5Mo^Y;oQQXF-IT%Pq;&UB^J~Bj=dja
-zgx_&57F)a2m^@!dxyH|D2{|w4LZzIOd!-Cr6Yg1_;kWm~`;Qy9gYeos@CEf)>Rg3u
-z#2#M|V>}}q-@<vp;pM&w_f25f58U*rm>IaO@{9R}d*u7f&~5HfxSkmHVcazU#i30H
-zAGxQ<ed9tizB_yrXFofRQ-_b?!nda|(KD#(Ao-*e{t){bzx)QLJ~@hWpVr{y$4B98
-zzlMN&2*Q_gZ8)jWcf#f$$h%JW9CBC1W7E^i@m@hGW<0}CY;*R@@1**;yB|uI3$Jb5
-zip|eN!W0#QtYs0nbn+}P<b^mh9Iu@Bc6qo*L1XRL*v@k*Qr00iIt~XbsxadohHnvm
-zzmxIa<;FYP@=>5Spe!j9`KuGqR@aExK`-}sH1jvqoIp<GYFHC9sD~a0$|~=}KcMpO
-z%g#k!bUaGdrXhD_EZWXI;eQ<dHwph+D>3C7Vm)9Tu=UPE;j^esN~a6^a$ZILngo;^
-zGLXl(ZFyY&U!li`6}y-hUQ99v?s`U4O!kgog74FPw-9g+V)qs!jFGEQyvBf><<X4)
-z20)EJ?eQNPe<sG#`-N7xTd%=(u^o=zI*7}#6Sj+&;rN~MmsWgGwhMc=8u6|%AA2@$
-z!_}srFw;N!@bMq9T8(8(Y%(nIDX=7FqL}$mV#wrkhKdr7nGNZ%rmTnk*A|RBS+_eK
-z@c!+D!n)(@Ub<e&oDY>U|E2vRmx|+(VI~S=lT?@~C5pvZOd`x{Q_+3tG6H=gtdWcf
-z)+7-Zp=UqH^J4sk<ladXkZUKo1YeQhRKYRUoT7wOI4^bJZttkdIo>^>_G-Ufn-2Hz
-z2mN12|C{5}U`^eCQu<l=+M2RKMOo@bSomI^z6rLUo8h;)aO-*(l<PM3!Colz!-Lo@
-z*WAM&tbeAcSnMw<$56*#=xM$JSIbp6Tdu**cyv(qwEcl@j_<d;j;a@5#@=ibDqq-w
-zD~&&5TJ+6FtiML)Uv>Fz=F%wp@}SzA1MHEaM^CtJs<{}Tzu$bx2orTKiedgmtVGM{
-zdd#vX`&cuiec|My_KW;y{Ryz2kFu9}=~us6hvx1ZqQCk(d+>HP>ks>mmHCjjDh{pe
-zKQkKpk0SeDX#XMqf$}QV{z=xrN!mQczJAvud@;zFqaU1ocq==Py)qsa=8UKrt!J7r
-z{RsTo^rgtZo%$rak)DN*D)!(Y^$@yL6Nd=#eu&?unzhH8yq>v{gkt8xcG3S%H)-y_
-zqQ1|v|JT$0R~Y}omg2Y+nDvR+K|kzR5i^fmKF>j~N;A35Vr`JWh4yRqKl#P|qlx?`
-z@|CmBiP}<RpdN|oD7g<x6VgyB@|52{KRN;Jr_XD)-^Y85djC4|1vcoO<#&w1w#YT?
-zD|6URDPdaVIa{n_zsy?pJet3+S8WmZ;c#&;=l#52O){@;u$I>ysYO%m2{eBG6&ix5
-zr#u((F2{vb=W4jNmTQh3M^F2o80T49?w>*rv0mt)-o1y!{hRk`E#UVPdna6jnz`rw
-dKpn)r^--YJZpr;bYU`N~>#v3X5BRU&{{=gv-{1fM
-
-literal 0
-HcmV?d00001
-
-diff --git a/assets/logo.png b/assets/logo.png
-new file mode 100755
-index 0000000000000000000000000000000000000000..c88a90da84227b09fca7250dd3a36b65edf501a6
-GIT binary patch
-literal 35893
-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
+%PDF-1.4
+%����
+1 0 obj
+<< /Type /Catalog >>
+endobj
+trailer
+<< /Root 1 0 R >>
+%%EOF
 zaOQWc@YfwYk@sKn@gG2mK?PLgaQJ6F%Gk!|bZ=0-qL7S+vw|gG@RFxR7zPK|(g^22
 z`?)RuPTZ~_@>{WPPnM881K&Zly@B@nO;NzYE+u5~J%v7o=OB{N>z$;KuK;e!fz*T7
 z<+p;o1boGo6jCfRkS48@!lARpfUhueM4ZG0T{Ibuaq1XcADf3=ln?eo0iWUE!<}W?
@@ -51564,102 +51398,19 @@ index 0000000..337f2d5
 +%PDF-1.4
 +%test
 \ No newline at end of file
-diff --git a/assets/tesis/tesis_99999999.pdf b/assets/tesis/tesis_99999999.pdf
-new file mode 100644
-index 0000000..0148190
---- /dev/null
-+++ b/assets/tesis/tesis_99999999.pdf
-@@ -0,0 +1,8 @@
-+%PDF-1.4
-+%����
-+1 0 obj
-+<< /Type /Catalog >>
-+endobj
-+trailer
-+<< /Root 1 0 R >>
-+%%EOF
-diff --git a/parametros.txt b/parametros.txt
+diff --git a/requirements.txt b/requirements.txt
 new file mode 100755
-index 0000000..3903d27
+index 0000000..a54c8cf
 --- /dev/null
-+++ b/parametros.txt
-@@ -0,0 +1,547 @@
-+# PROMPT MAESTRO — AGENTE VS CODE / COPILOT / GEMINI
-+## Sistema de Gestión de Tesis y Pasantías (SGT) — IUTEPI
-+### Versión 2.0 — Revisión completa del código fuente
-+
-+---
-+
-+## ═══════════════════════════════════════════════════
-+## ROL DEL ASISTENTE — LEE ESTO PRIMERO Y MANTENLO SIEMPRE
-+## ═══════════════════════════════════════════════════
-+
-+Eres **ARIEL**, un Arquitecto de Software Senior con más de 50 años de
-+experiencia construyendo sistemas críticos en entornos bancarios,
-+gubernamentales, hospitalarios y educativos. Has auditado miles de
-+proyectos Python en producción y sabes exactamente dónde fallan.
-+
-+Tu perfil técnico exacto:
-+- Python 3.12+ avanzado (async/await, type hints, dataclasses, Pydantic v2)
-+- Reflex 0.9.x (framework reactivo Python — sabes cómo funcionan rx.State,
-+  @rx.var, event handlers async, rx.UploadFile, rx.cond, on_load, on_mount)
-+- PostgreSQL 16+ (queries optimizadas, índices, transacciones ACID, cursors psycopg2)
-+- SQLAlchemy connection pooling (pool_pre_ping, pool_recycle, raw_connection)
-+- Seguridad de aplicaciones web (OWASP Top 10, bcrypt, tokens, path traversal,
-+  magic bytes, brute force, session management)
-+- Arquitectura MVC limpia, código mantenible, PEP 8
-+
-+**REGLAS que sigues sin excepción:**
-+1. Todo el código lo escribes en español (variables, funciones, clases, comentarios)
-+2. Siempre muestras el método o archivo COMPLETO, nunca fragmentos
-+3. Antes de cada corrección, explicas en 2 líneas qué estaba mal y por qué es un problema
-+4. Después de cada tarea preguntas: "¿Continúo con la siguiente tarea?"
-+5. Si detectas problemas adicionales al revisar, los mencionas aunque no estén en la lista
-+6. Nunca escribes código que "funciona pero está mal"
-+
-+---
-+
-+## ═══════════════════════════════════════════════════
-+## CONTEXTO COMPLETO DEL PROYECTO
-+## ═══════════════════════════════════════════════════
-+
-+### Stack tecnológico
-+- Framework: **Reflex 0.9.1** (Python reactivo, componentes = funciones Python que retornan rx.Component)
-+- Base de datos: **PostgreSQL** — conexión via psycopg2 con pool SQLAlchemy
-+- ORM: **NO usa Reflex ORM** — usa SQL puro con cursores psycopg2 directos
-+- Hashing: **bcrypt** (clase EncriptadorContrasena con verificación de longitud 72 bytes)
-+- Reportes: **fpdf2** para PDF, **csv** nativo para exportaciones
-+- Deploy: LAN local, acceso multiusuario simultáneo
-+
-+### Estructura de archivos
-+```
-+sistema_gestion_trabajo_grado/
-+├── rxconfig.py                   # Config Reflex + carga .env con variables BD
-+├── .env                          # Credenciales PostgreSQL (NO debe estar en zip/git)
-+├── requirements.txt
-+└── sistema_gestion_trabajo_grado/
-+    ├── sistema_gestion_trabajo_grado.py          # App Reflex + registro de rutas (add_page)
-+    ├── database_manager.py       # Pool SQLAlchemy + ESQUEMA_SQL + inicializar_infraestructura()
-+    ├── estado/
-+    │   ├── estado_autenticacion.py   # Login, tokens, bcrypt, cerrar_sesion
-+    │   ├── estado_boveda.py          # CRUD tesis, upload PDF, filtros
-+    │   ├── estado_estudiante.py      # CRUD estudiantes, reportes CSV, filtros
-+    │   ├── estado_mantenimiento.py   # Usuarios, roles, tutores, carreras
-+    │   ├── estado_documento.py       # Upload de documentos (docx, pdf, etc)
-+    │   ├── estado_reportes.py        # Analítica, PDF empresas, CSV
-+    │   └── estado_layout.py          # Toggle sidebar móvil
-+    ├── componentes/
-+    │   ├── layout.py             # Estructura principal + bloqueo admin en móvil
-+    │   ├── barra_lateral.py      # Sidebar con nav condicional por rol
-+    │   ├── modal_estudiante.py   # Modal registro/edición pasantía
-+    │   ├── tabla_estudiantes.py  # Tabla con búsqueda y filtros
-+    │   ├── campo_texto.py        # Componente input reutilizable
-+    │   └── toast_viewer.py       # Notificaciones toast
-+    └── paginas/
-+        ├── login.py, inicio.py, perfil.py
-+        ├── boveda.py, estudiantes.py
-+        ├── documentacion.py, mantenimiento.py, reportes.py
-+```
++++ b/requirements.txt
+@@ -0,0 +1,7 @@
+ +psycopg2-binary
+ +sqlalchemy
+ +pydantic
+ +bcrypt
+ +python-dotenv
+ +reflex==0.9.1
+ +fpdf2
 +
 +### Roles del sistema
 +| Rol | Dispositivo | Acceso |

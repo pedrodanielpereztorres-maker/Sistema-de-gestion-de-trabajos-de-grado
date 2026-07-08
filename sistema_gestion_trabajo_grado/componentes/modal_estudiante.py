@@ -324,8 +324,8 @@ def modal_registrar_estudiante() -> rx.Component:
                             ),
                             rx.hstack(
                                 rx.checkbox(
-                                    checked=EstadoEstudiante.haciendo_tesis,
-                                    on_change=EstadoEstudiante.fijar_haciendo_tesis,
+                                    checked=EstadoEstudiante.haciendo_trabajo_de_grado,
+                                    on_change=EstadoEstudiante.fijar_haciendo_trabajo_de_grado,
                                     color_scheme="indigo",
                                 ),
                                 rx.text(
@@ -339,7 +339,7 @@ def modal_registrar_estudiante() -> rx.Component:
                                 padding_y="0.5rem",
                             ),
                             rx.cond(
-                                EstadoEstudiante.haciendo_tesis,
+                                EstadoEstudiante.haciendo_trabajo_de_grado,
                                 rx.vstack(
                                     rx.text(
                                         "Seleccionar Tutor Académico",

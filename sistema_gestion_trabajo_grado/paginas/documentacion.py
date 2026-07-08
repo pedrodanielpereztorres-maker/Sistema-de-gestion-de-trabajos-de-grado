@@ -509,7 +509,7 @@ def contenido_documentacion() -> rx.Component:
     return rx.vstack(
         encabezado_pagina("Biblioteca de Documentos", "", None),
         rx.text(
-            "Repositorio oficial de formatos, guías y reglamentos de tesis.",
+            "Repositorio oficial de formatos, guías y reglamentos de trabajos de grado.",
             color="#334155",
             margin_bottom="4",
         ),

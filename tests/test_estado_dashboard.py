@@ -84,9 +84,9 @@ class TestEstadoDashboard(unittest.TestCase):
         self.assertEqual(estado.total_estudiantes, 504)
         self.assertEqual(estado.estudiantes_en_pasantia, 342)
         self.assertEqual(estado.estudiantes_sin_pasantia, 162)
-        self.assertEqual(estado.total_tesis, 24)
-        self.assertEqual(estado.tesis_publicas, 14)
-        self.assertEqual(estado.tesis_privadas, 10)
+        self.assertEqual(estado.total_trabajos_de_grado, 24)
+        self.assertEqual(estado.trabajos_de_grado_publicos, 14)
+        self.assertEqual(estado.trabajos_de_grado_privados, 10)
 
         self.assertEqual(len(estado.estudiantes_por_carrera), 3)
         self.assertEqual(estado.estudiantes_por_carrera[0].carrera, "Electrónica")

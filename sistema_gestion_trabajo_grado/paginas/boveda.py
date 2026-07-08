@@ -31,12 +31,12 @@ def valor_a_string(v):
 
 
 # ════════════════════════════════════════════════════════════
-#  COMPONENTE: TARJETA DE TESIS
+#  COMPONENTE: TARJETA DE TRABAJO DE GRADO
 # ════════════════════════════════════════════════════════════
 
 
-def tarjeta_tesis(tesis: rx.Var[dict]) -> rx.Component:
-    """Card individual con datos de una tesis registrada."""
+def tarjeta_trabajo_de_grado(tesis: rx.Var[dict]) -> rx.Component:
+    """Card individual con datos de un trabajo de grado registrado."""
     return rx.box(
         rx.vstack(
             # Encabezado: avatar + nombre + carrera
@@ -118,6 +118,7 @@ def tarjeta_tesis(tesis: rx.Var[dict]) -> rx.Component:
                 width="100%",
                 align="center",
                 spacing="3",
+                direction={"initial": "column", "md": "row"},
             ),
             # Título
             rx.box(
@@ -128,94 +129,113 @@ def tarjeta_tesis(tesis: rx.Var[dict]) -> rx.Component:
                     color=COLOR_TEXTO_TITULO,
                     line_height="1.4",
                     no_of_lines=3,
+                    style={"whiteSpace": "normal"},
                 ),
                 width="100%",
                 border_left="0.25rem solid #6366F1",
                 padding_left="0.875rem",
                 margin_y="2",
+                style={"min_width": "0"},
+            ),
+            # Fecha de subida
+            rx.box(
+                rx.text(
+                    rx.cond(
+                        tesis.get("fecha_registro_formateada") != "",
+                        "Subido: " + tesis["fecha_registro_formateada"].to(str),
+                        "",
+                    ),
+                    font_size="0.75rem",
+                    color=COLOR_TEXTO_MUY_SUAVE,
+                    font_weight="600",
+                ),
+                width="100%",
+                padding_bottom="0.5rem",
             ),
             # Información detallada: Tutores y Empresa (Diseño Vertical Mejorado)
             rx.vstack(
-                rx.vstack(
-                    rx.hstack(
-                        rx.icon(
-                            "user", size=15, color=COLOR_PRIMARIO, stroke_width=2.5
+                rx.hstack(
+                    rx.vstack(
+                        rx.hstack(
+                            rx.icon("user", size=15, color=COLOR_PRIMARIO, stroke_width=2.5),
+                            rx.text(
+                                "Tutor Académico",
+                                font_size="0.75rem",
+                                font_weight="800",
+                                color=COLOR_TEXTO_MUY_SUAVE,
+                                text_transform="uppercase",
+                            ),
+                            spacing="1",
+                            align="center",
                         ),
                         rx.text(
-                            "Tutor Académico",
-                            font_size="0.75rem",
-                            font_weight="800",
-                            color=COLOR_TEXTO_MUY_SUAVE,
-                            text_transform="uppercase",
+                            tesis["tutor_academico"].to(str),
+                            font_size="0.875rem",
+                            font_weight="600",
+                            color=COLOR_TEXTO_TITULO,
+                            no_of_lines=1,
+                            style={"overflow": "hidden", "text_overflow": "ellipsis"},
                         ),
                         spacing="1",
-                        align="center",
+                        align="start",
+                        style={"min_width": "0", "flex": "1"},
                     ),
-                    rx.text(
-                        tesis["tutor_academico"].to(str),
-                        font_size="0.875rem",
-                        font_weight="600",
-                        color=COLOR_TEXTO_TITULO,
-                        no_of_lines=1,
-                    ),
-                    spacing="1",
-                    align="start",
-                ),
-                rx.vstack(
-                    rx.hstack(
-                        rx.icon(
-                            "user-check", size=15, color="#10B981", stroke_width=2.5
+                    rx.vstack(
+                        rx.hstack(
+                            rx.icon("user-check", size=15, color="#10B981", stroke_width=2.5),
+                            rx.text(
+                                "Tutor Empresarial",
+                                font_size="0.75rem",
+                                font_weight="800",
+                                color=COLOR_TEXTO_MUY_SUAVE,
+                                text_transform="uppercase",
+                            ),
+                            spacing="1",
+                            align="center",
                         ),
                         rx.text(
-                            "Tutor Empresarial",
-                            font_size="0.75rem",
-                            font_weight="800",
-                            color=COLOR_TEXTO_MUY_SUAVE,
-                            text_transform="uppercase",
+                            tesis["tutor_empresa"].to(str),
+                            font_size="0.875rem",
+                            font_weight="600",
+                            color=COLOR_TEXTO_TITULO,
+                            no_of_lines=1,
+                            style={"overflow": "hidden", "text_overflow": "ellipsis"},
                         ),
                         spacing="1",
-                        align="center",
+                        align="start",
+                        style={"min_width": "0", "flex": "1"},
                     ),
-                    rx.text(
-                        tesis["tutor_empresa"].to(str),
-                        font_size="0.875rem",
-                        font_weight="600",
-                        color=COLOR_TEXTO_TITULO,
-                        no_of_lines=1,
-                    ),
-                    spacing="1",
-                    align="start",
-                ),
-                rx.vstack(
-                    rx.hstack(
-                        rx.icon(
-                            "building-2", size=15, color="#0EA5E9", stroke_width=2.5
+                    rx.vstack(
+                        rx.hstack(
+                            rx.icon("building-2", size=15, color="#0EA5E9", stroke_width=2.5),
+                            rx.text(
+                                "Empresa",
+                                font_size="0.75rem",
+                                font_weight="800",
+                                color=COLOR_TEXTO_MUY_SUAVE,
+                                text_transform="uppercase",
+                            ),
+                            spacing="1",
+                            align="center",
                         ),
                         rx.text(
-                            "Empresa",
-                            font_size="0.75rem",
-                            font_weight="800",
-                            color=COLOR_TEXTO_MUY_SUAVE,
-                            text_transform="uppercase",
+                            tesis["nombre_empresa"].to(str),
+                            font_size="0.875rem",
+                            font_weight="600",
+                            color=COLOR_TEXTO_TITULO,
+                            no_of_lines=1,
+                            style={"overflow": "hidden", "text_overflow": "ellipsis"},
                         ),
                         spacing="1",
-                        align="center",
+                        align="start",
+                        style={"min_width": "0", "flex": "1"},
                     ),
-                    rx.text(
-                        tesis["nombre_empresa"].to(str),
-                        font_size="0.875rem",
-                        font_weight="600",
-                        color=COLOR_TEXTO_TITULO,
-                        no_of_lines=1,
-                    ),
-                    spacing="1",
+                    spacing="4",
+                    width="100%",
                     align="start",
+                    padding_top="0.875rem",
+                    border_top=f"1px solid {COLOR_BORDE}",
                 ),
-                spacing="4",
-                width="100%",
-                align="start",
-                padding_top="0.875rem",
-                border_top=f"1px solid {COLOR_BORDE}",
             ),
             # Botones de acción
             rx.hstack(
@@ -270,7 +290,7 @@ def tarjeta_tesis(tesis: rx.Var[dict]) -> rx.Component:
                             url=tesis["url"].to(str)
                             + "?token="
                             + EstadoAutenticacion.token_actual,
-                            filename=f"Tesis_{tesis['cedula_estudiante'].to(str)}.pdf",
+                            filename=f"TrabajoDeGrado_{tesis['cedula_estudiante'].to(str)}.pdf",
                         ),
                         variant="solid",
                         color_scheme="indigo",
@@ -288,14 +308,18 @@ def tarjeta_tesis(tesis: rx.Var[dict]) -> rx.Component:
                             "transform": "translateY(-0.0625rem)",
                             "box_shadow": "0 0.25rem 0.75rem rgba(99, 102, 241, 0.25)",
                         },
+                        width="100%",
                     ),
                 ),
                 width="100%",
                 padding_top="0.75rem",
                 spacing="3",
+                style={"flexWrap": "wrap", "gap": "0.5rem"},
+                direction={"initial": "column", "md": "row"},
             ),
             height="100%",
-            padding="1.5rem",
+            padding={"initial": "1rem", "md": "1.5rem"},
+            style={"overflowX": "hidden", "boxSizing": "border-box"},
             border_radius="1rem",
             background="white",
             border="1px solid " + COLOR_BORDE,
@@ -335,7 +359,7 @@ def estado_vacio_boveda() -> rx.Component:
                     text_align="center",
                 ),
                 rx.text(
-                    "Registra la primera tesis usando el botón de arriba.",
+                    "Registra el primer trabajo de grado usando el botón de arriba.",
                     font_size="0.84375rem",
                     color=COLOR_TEXTO_MUY_SUAVE,
                     text_align="center",
@@ -397,7 +421,7 @@ def seccion_modal(icono: str, titulo: str, *contenido, **estilos) -> rx.Componen
     )
 
 
-def modal_nueva_tesis() -> rx.Component:
+def modal_nuevo_trabajo_de_grado() -> rx.Component:
     return rx.cond(
         EstadoBoveda.mostrar_modal,
         rx.box(
@@ -430,8 +454,8 @@ def modal_nueva_tesis() -> rx.Component:
                             rx.text(
                                 rx.cond(
                                     EstadoBoveda.en_edicion,
-                                    "Editar Tesis",
-                                    "Registrar Nueva Tesis",
+                                    "Editar Trabajo de Grado",
+                                    "Registrar Nuevo Trabajo de Grado",
                                 ),
                                 font_size="1.125rem",
                                 font_weight="800",
@@ -584,15 +608,15 @@ def modal_nueva_tesis() -> rx.Component:
                                 "Trabajo de Grado",
                                 rx.vstack(
                                     rx.text(
-                                        "Título de la Tesis",
+                                        "Título del Trabajo de Grado",
                                         font_size="0.8125rem",
                                         font_weight="600",
                                         color=COLOR_TEXTO_TITULO,
                                     ),
                                     rx.text_area(
                                         placeholder="Ingrese el título completo...",
-                                        on_change=EstadoBoveda.fijar_titulo_tesis,
-                                        value=EstadoBoveda.titulo_tesis,
+                                        on_change=EstadoBoveda.fijar_titulo_trabajo_de_grado,
+                                        value=EstadoBoveda.titulo_trabajo_de_grado,
                                         width="100%",
                                         style={
                                             "min_height": "7.8125rem",
@@ -637,9 +661,9 @@ def modal_nueva_tesis() -> rx.Component:
                         ),
                         seccion_modal(
                             "upload",
-                            "Archivo de la Tesis",
+                            "Archivo del Trabajo de Grado",
                             rx.cond(
-                                rx.selected_files("upload_tesis"),
+                                rx.selected_files("upload_trabajo_de_grado"),
                                 rx.hstack(
                                     rx.center(
                                         rx.icon(
@@ -652,7 +676,7 @@ def modal_nueva_tesis() -> rx.Component:
                                     ),
                                     rx.vstack(
                                         rx.foreach(
-                                            rx.selected_files("upload_tesis"),
+                                            rx.selected_files("upload_trabajo_de_grado"),
                                             lambda f: rx.text(
                                                 f,
                                                 font_weight="bold",
@@ -674,7 +698,7 @@ def modal_nueva_tesis() -> rx.Component:
                                         rx.icon("trash-2", size=16),
                                         "Quitar",
                                         on_click=rx.clear_selected_files(
-                                            "upload_tesis"
+                                            "upload_trabajo_de_grado"
                                         ),
                                         color_scheme="red",
                                         variant="soft",
@@ -740,7 +764,7 @@ def modal_nueva_tesis() -> rx.Component:
                                                 "file-up", size=24, color="#94A3B8"
                                             ),
                                             rx.text(
-                                                "Arrastra el PDF de la tesis o haz clic",
+                                                "Arrastra el PDF del trabajo de grado o haz clic",
                                                 color="#64748B",
                                                 font_size="0.8125rem",
                                             ),
@@ -748,7 +772,7 @@ def modal_nueva_tesis() -> rx.Component:
                                             spacing="2",
                                         ),
                                     ),
-                                    id="upload_tesis",
+                                    id="upload_trabajo_de_grado",
                                     border="0.125rem dashed #CBD5E1",
                                     padding="1.25rem",
                                     border_radius="0.75rem",
@@ -804,12 +828,12 @@ def modal_nueva_tesis() -> rx.Component:
                                 rx.cond(
                                     EstadoBoveda.en_edicion,
                                     "Guardar Cambios",
-                                    "Registrar Tesis",
+                                    "Registrar Trabajo de Grado",
                                 ),
                                 font_weight="700",
                             ),
-                            on_click=lambda: EstadoBoveda.manejar_subida_tesis(
-                                rx.upload_files("upload_tesis")
+                            on_click=lambda: EstadoBoveda.manejar_subida_trabajo_de_grado(
+                                rx.upload_files("upload_trabajo_de_grado")
                             ),
                             size="3",
                             radius="large",
@@ -860,8 +884,8 @@ def modal_nueva_tesis() -> rx.Component:
     )
 
 
-def modal_confirmar_eliminacion_tesis() -> rx.Component:
-    """Modal de seguridad para confirmar la eliminación de una tesis."""
+def modal_confirmar_eliminacion_trabajo_de_grado() -> rx.Component:
+    """Modal de seguridad para confirmar la eliminación de un trabajo de grado."""
     return rx.cond(
         EstadoBoveda.mostrar_modal_confirmacion,
         rx.box(
@@ -1070,7 +1094,7 @@ def contenido_boveda() -> rx.Component:
                 rx.button(
                     rx.icon("file-spreadsheet", size=14),
                     "Descargar Reporte",
-                    on_click=EstadoBoveda.generar_reporte_tesis,
+                    on_click=EstadoBoveda.generar_reporte_trabajos_de_grado,
                     variant="soft",
                     color_scheme="green",
                     size="2",
@@ -1091,7 +1115,7 @@ def contenido_boveda() -> rx.Component:
                 ),
                 rx.vstack(
                     rx.heading(
-                        valor_a_string(EstadoBoveda.total_tesis_count),
+                        valor_a_string(EstadoBoveda.total_trabajos_de_grado_count),
                         size="5",
                         weight="bold",
                         color=COLOR_TEXTO_SUAVE,
@@ -1116,17 +1140,17 @@ def contenido_boveda() -> rx.Component:
             direction={"initial": "column", "md": "row"},
         ),
         rx.cond(
-            EstadoBoveda.total_tesis_count == 0,
+            EstadoBoveda.total_trabajos_de_grado_count == 0,
             estado_vacio_boveda(),
             rx.grid(
-                rx.foreach(EstadoBoveda.tesis_a_mostrar, tarjeta_tesis),
+                rx.foreach(EstadoBoveda.trabajos_de_grado_a_mostrar, tarjeta_trabajo_de_grado),
                 columns={"initial": "1", "sm": "2", "md": "2", "lg": "3"},
                 spacing="5",
                 width="100%",
             ),
         ),
-        modal_nueva_tesis(),
-        modal_confirmar_eliminacion_tesis(),
+        modal_nuevo_trabajo_de_grado(),
+        modal_confirmar_eliminacion_trabajo_de_grado(),
         toast_viewer(),
         padding=["1rem", "1.25rem", "1.5rem", "1.5rem"],
         width="100%",
@@ -1146,7 +1170,7 @@ def pagina_boveda() -> rx.Component:
                 height="100vh",
                 on_mount=[
                     EstadoAutenticacion.verificar_acceso,
-                    EstadoBoveda.cargar_tesis,
+                    EstadoBoveda.cargar_trabajos_de_grado,
                 ],
             ),
         ),

@@ -121,7 +121,7 @@ def fila_estudiante(estudiante) -> rx.Component:
             spacing="0",
             align="start",
         ),
-        style={"padding": f"{PAD_Y} {PAD_X}"},
+        style={"padding": f"{PAD_Y} {PAD_X}", "minWidth": "0"},
         white_space="normal",
     )
 
@@ -141,7 +141,7 @@ def fila_estudiante(estudiante) -> rx.Component:
                 "padding": "0.25rem 0.5rem",
             },
         ),
-        style={"padding": f"{PAD_Y} {PAD_X}"},
+        style={"padding": f"{PAD_Y} {PAD_X}", "minWidth": "0"},
         white_space="normal",
     )
 
@@ -186,6 +186,7 @@ def fila_estudiante(estudiante) -> rx.Component:
         py="2",
         px="1",
         white_space="normal",
+        style={"minWidth": "0"},
     )
 
     # Botón empresa → tarjeta flotante
@@ -231,7 +232,7 @@ def fila_estudiante(estudiante) -> rx.Component:
             ),
             rx.text("—", style={"color": "#CBD5E1", "font_size": FS_BODY}),
         ),
-        style={"padding": f"{PAD_Y} {PAD_X}"},
+        style={"padding": f"{PAD_Y} {PAD_X}", "minWidth": "0"},
     )
 
     # Fechas
@@ -380,7 +381,6 @@ def tarjeta_empresa() -> rx.Component:
                         "font_size": "0.93rem",
                         "font_weight": "600",
                         "color": "#0F172A",
-                        "word_break": "break-word",
                     },
                 ),
                 spacing="0",
@@ -662,18 +662,24 @@ def tabla_estudiantes() -> rx.Component:
                 width="100%",
                 max_width="100%",
                 # Font base para toda la tabla desde rem
-                style={"font_size": FS_BODY, "table-layout": "auto"},
+                style={
+                    "font_size": FS_BODY,
+                        "table-layout": "fixed",
+                },
             ),
             width="100%",
             max_width="100%",
-            overflow_x="hidden",
+            overflow_x="auto",
             background="white",
             style={
+                "WebkitOverflowScrolling": "touch",
                 "&::-webkit-scrollbar": {"height": "6px"},
                 "&::-webkit-scrollbar-thumb": {
                     "background": "#CBD5E1",
                     "border_radius": "6px",
                 },
+                "min_width": "0",
+                "boxSizing": "border-box",
             },
         ),
         # Paginación
