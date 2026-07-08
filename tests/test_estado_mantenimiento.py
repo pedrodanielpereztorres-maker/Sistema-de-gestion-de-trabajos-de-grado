@@ -10,7 +10,9 @@ sys.path.insert(0, str(ROOT))
 
 os.environ["PYTEST_CURRENT_TEST"] = "1"
 
-from sistema_tesis.estado.estado_mantenimiento import EstadoMantenimiento
+from sistema_gestion_trabajo_grado.estado.estado_mantenimiento import (
+    EstadoMantenimiento,
+)
 
 
 class FakeCursor:
@@ -80,8 +82,14 @@ class TestEstadoMantenimiento(unittest.TestCase):
     def test_eliminar_rol_con_usuarios_asignados_devuelve_error(self):
         estado = EstadoMantenimiento()
         conn = FakeConn(FakeCursor(fetchone_responses=[(True,)]))
-        with patch("sistema_tesis.estado.estado_mantenimiento.obtener_conexion", return_value=conn):
-            with patch("sistema_tesis.estado.estado_mantenimiento.rx.toast.error", return_value="error_has_users"):
+        with patch(
+            "sistema_gestion_trabajo_grado.estado.estado_mantenimiento.obtener_conexion",
+            return_value=conn,
+        ):
+            with patch(
+                "sistema_gestion_trabajo_grado.estado.estado_mantenimiento.rx.toast.error",
+                return_value="error_has_users",
+            ):
                 resultado = estado.eliminar_rol(5)
         self.assertEqual(resultado, "error_has_users")
         self.assertTrue(conn.committed)
@@ -89,7 +97,10 @@ class TestEstadoMantenimiento(unittest.TestCase):
     def test_eliminar_rol_sin_usuarios_elimina_rol(self):
         estado = EstadoMantenimiento()
         conn = FakeConn(FakeCursor(fetchone_responses=[(False,)]))
-        with patch("sistema_tesis.estado.estado_mantenimiento.obtener_conexion", return_value=conn):
+        with patch(
+            "sistema_gestion_trabajo_grado.estado.estado_mantenimiento.obtener_conexion",
+            return_value=conn,
+        ):
             with patch.object(EstadoMantenimiento, "cargar_datos", return_value=None):
                 resultado = estado.eliminar_rol(5)
         self.assertIsNone(resultado)
@@ -97,11 +108,15 @@ class TestEstadoMantenimiento(unittest.TestCase):
 
     def test_confirmar_eliminar_rol_sin_sesion(self):
         estado = EstadoMantenimiento()
+
         async def fake_get_state(_):
             return type("Auth", (), {"usuario": None})
 
         with patch.object(EstadoMantenimiento, "get_state", side_effect=fake_get_state):
-            with patch("sistema_tesis.estado.estado_mantenimiento.rx.redirect", return_value="redirect:/login"):
+            with patch(
+                "sistema_gestion_trabajo_grado.estado.estado_mantenimiento.rx.redirect",
+                return_value="redirect:/login",
+            ):
                 resultado = asyncio.run(estado.confirmar_eliminar_rol())
         self.assertEqual(resultado, "redirect:/login")
 
@@ -114,11 +129,22 @@ class TestEstadoMantenimiento(unittest.TestCase):
         async def fake_get_state(_):
             return fake_auth
 
-        with patch.object(EstadoMantenimiento, "get_state", new=AsyncMock(return_value=fake_auth)):
+        with patch.object(
+            EstadoMantenimiento, "get_state", new=AsyncMock(return_value=fake_auth)
+        ):
             conn = FakeConn(FakeCursor(fetchone_responses=[("hash",)]))
-            with patch("sistema_tesis.estado.estado_mantenimiento.obtener_conexion", return_value=conn):
-                with patch("sistema_tesis.estado.estado_autenticacion.EncriptadorContrasena.verificar", return_value=False):
-                    with patch("sistema_tesis.estado.estado_mantenimiento.rx.toast.error", return_value="error_bad_password"):
+            with patch(
+                "sistema_gestion_trabajo_grado.estado.estado_mantenimiento.obtener_conexion",
+                return_value=conn,
+            ):
+                with patch(
+                    "sistema_gestion_trabajo_grado.estado.estado_autenticacion.EncriptadorContrasena.verificar",
+                    return_value=False,
+                ):
+                    with patch(
+                        "sistema_gestion_trabajo_grado.estado.estado_mantenimiento.rx.toast.error",
+                        return_value="error_bad_password",
+                    ):
                         resultado = asyncio.run(estado.confirmar_eliminar_rol())
         self.assertEqual(resultado, "error_bad_password")
 
@@ -131,12 +157,25 @@ class TestEstadoMantenimiento(unittest.TestCase):
         async def fake_get_state(_):
             return fake_auth
 
-        with patch.object(EstadoMantenimiento, "get_state", new=AsyncMock(return_value=fake_auth)):
+        with patch.object(
+            EstadoMantenimiento, "get_state", new=AsyncMock(return_value=fake_auth)
+        ):
             conn = FakeConn(FakeCursor(fetchone_responses=[("hash",)]))
-            with patch("sistema_tesis.estado.estado_mantenimiento.obtener_conexion", return_value=conn):
-                with patch("sistema_tesis.estado.estado_autenticacion.EncriptadorContrasena.verificar", return_value=True):
-                    with patch.object(EstadoMantenimiento, "eliminar_rol", return_value=None):
-                        with patch("sistema_tesis.estado.estado_mantenimiento.rx.toast.success", return_value="success"):
+            with patch(
+                "sistema_gestion_trabajo_grado.estado.estado_mantenimiento.obtener_conexion",
+                return_value=conn,
+            ):
+                with patch(
+                    "sistema_gestion_trabajo_grado.estado.estado_autenticacion.EncriptadorContrasena.verificar",
+                    return_value=True,
+                ):
+                    with patch.object(
+                        EstadoMantenimiento, "eliminar_rol", return_value=None
+                    ):
+                        with patch(
+                            "sistema_gestion_trabajo_grado.estado.estado_mantenimiento.rx.toast.success",
+                            return_value="success",
+                        ):
                             resultado = asyncio.run(estado.confirmar_eliminar_rol())
         self.assertEqual(resultado, "success")
         self.assertFalse(estado.modal_confirmar_rol_abierto)

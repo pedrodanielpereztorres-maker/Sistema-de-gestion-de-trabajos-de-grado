@@ -34,16 +34,14 @@ def _fetch_dashboard_data():
     try:
         with conn:
             with conn.cursor() as cursor:
-                cursor.execute(
-                    """
+                cursor.execute("""
                     SELECT
                         COUNT(*) AS total,
                         COUNT(*) FILTER (WHERE tutor_academico_id IS NOT NULL) AS con_pasantia,
                         COUNT(*) FILTER (WHERE tutor_academico_id IS NULL) AS sin_pasantia
                     FROM estudiante
                     WHERE esta_activo = TRUE
-                    """
-                )
+                    """)
                 conteo_general = cursor.fetchone() or (0, 0, 0)
                 total = int(conteo_general[0] or 0)
                 con_pasantia = int(conteo_general[1] or 0)
@@ -52,20 +50,17 @@ def _fetch_dashboard_data():
                 cursor.execute("SELECT COUNT(*) FROM trabajo_de_grado")
                 total_tesis = int((cursor.fetchone() or (0,))[0] or 0)
 
-                cursor.execute(
-                    """
+                cursor.execute("""
                     SELECT
                         COUNT(*) FILTER (WHERE es_publica = TRUE) AS publicas,
                         COUNT(*) FILTER (WHERE es_publica = FALSE) AS privadas
                     FROM trabajo_de_grado
-                    """
-                )
+                    """)
                 publicas_privadas = cursor.fetchone() or (0, 0)
                 publicas = int(publicas_privadas[0] or 0)
                 privadas = int(publicas_privadas[1] or 0)
 
-                cursor.execute(
-                    """
+                cursor.execute("""
                     SELECT c.nombre, COUNT(e.id) AS cantidad
                     FROM carrera c
                     LEFT JOIN estudiante e
@@ -74,15 +69,16 @@ def _fetch_dashboard_data():
                     WHERE c.esta_activa = TRUE
                     GROUP BY c.nombre
                     ORDER BY cantidad DESC, c.nombre ASC
-                    """
-                )
+                    """)
                 filas_carreras = cursor.fetchall() or []
                 filas_carreras_ordenadas = sorted(
                     filas_carreras,
                     key=lambda fila: (int(fila[1] or 0), str(fila[0] or "")),
                     reverse=True,
                 )
-                max_cantidad = max((int(fila[1] or 0) for fila in filas_carreras_ordenadas), default=1)
+                max_cantidad = max(
+                    (int(fila[1] or 0) for fila in filas_carreras_ordenadas), default=1
+                )
                 estudiantes_por_carrera = [
                     EstadisticaCarrera(
                         carrera=fila[0] or "Sin Carrera",
@@ -92,16 +88,14 @@ def _fetch_dashboard_data():
                     for fila in filas_carreras_ordenadas
                 ]
 
-                cursor.execute(
-                    """
+                cursor.execute("""
                     SELECT e.cedula, e.nombre, e.apellido, COALESCE(c.nombre, 'Sin Carrera')
                     FROM estudiante e
                     LEFT JOIN carrera c ON c.id = e.carrera_id
                     WHERE e.esta_activo = TRUE AND e.tutor_academico_id IS NOT NULL
                     ORDER BY e.id ASC
                     LIMIT 10
-                    """
-                )
+                    """)
                 filas_con_pasantia = cursor.fetchall() or []
                 lista_con_pasantia = [
                     EstudiantePasantia(
@@ -113,16 +107,14 @@ def _fetch_dashboard_data():
                     for fila in filas_con_pasantia
                 ]
 
-                cursor.execute(
-                    """
+                cursor.execute("""
                     SELECT e.cedula, e.nombre, e.apellido, COALESCE(c.nombre, 'Sin Carrera')
                     FROM estudiante e
                     LEFT JOIN carrera c ON c.id = e.carrera_id
                     WHERE e.esta_activo = TRUE AND e.tutor_academico_id IS NULL
                     ORDER BY e.id ASC
                     LIMIT 10
-                    """
-                )
+                    """)
                 filas_sin_pasantia = cursor.fetchall() or []
                 lista_sin_pasantia = [
                     EstudiantePasantia(
@@ -176,7 +168,11 @@ class EstadoDashboard(rx.State):
         `rx.foreach(EstadoDashboard.top_carreras, ...)`.
         """
         try:
-            return sorted(self.estudiantes_por_carrera or [], key=lambda x: getattr(x, "cantidad", 0), reverse=True)
+            return sorted(
+                self.estudiantes_por_carrera or [],
+                key=lambda x: getattr(x, "cantidad", 0),
+                reverse=True,
+            )
         except Exception:
             return self.estudiantes_por_carrera or []
 

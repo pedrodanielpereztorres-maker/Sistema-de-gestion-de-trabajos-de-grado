@@ -12,6 +12,7 @@ from ..database_manager import obtener_conexion
 # Nunca configures basicConfig con DEBUG en el servidor
 logger = logging.getLogger(__name__)
 
+
 class EncriptadorContrasena:
     MAX_BYTES_CONTRASENA = 72
 
@@ -33,12 +34,12 @@ class EncriptadorContrasena:
                 return False
             EncriptadorContrasena._verificar_longitud(contrasena)
             return bcrypt.checkpw(
-                contrasena.encode("utf-8"),
-                hash_almacenado.strip().encode("utf-8")
+                contrasena.encode("utf-8"), hash_almacenado.strip().encode("utf-8")
             )
         except Exception:
             logger.error("Error en verificación de hash.")
             return False
+
 
 class Usuario(BaseModel):
     id: int | None = None
@@ -49,15 +50,16 @@ class Usuario(BaseModel):
     correo: str = ""
     token_sesion: str | None = None
 
+
 class EstadoAutenticacion(rx.State):
     usuario: Usuario | None = None
     entrada_usuario: str = ""
     entrada_contrasena: str = ""
     token_cookie: Cookie | str = ""
-    
+
     # Rate Limiting (Tarea 5)
     intentos_fallidos: int = 0
-    bloqueado_hasta: str = ""  # ISO datetime string
+    bloqueado_hasta: str = ""  # Cadena datetime en formato ISO
     mostrar_contrasena: bool = False
 
     def alternar_mostrar_contrasena(self):
@@ -77,7 +79,9 @@ class EstadoAutenticacion(rx.State):
 
     @rx.var
     def usuario_id(self) -> int:
-        return int(self.usuario.id) if self.usuario and self.usuario.id is not None else 0
+        return (
+            int(self.usuario.id) if self.usuario and self.usuario.id is not None else 0
+        )
 
     @rx.var
     def token_actual(self) -> str:
@@ -140,7 +144,9 @@ class EstadoAutenticacion(rx.State):
             ahora = datetime.now(timezone.utc)
             if ahora < limite:
                 segundos = int((limite - ahora).total_seconds())
-                return rx.toast.error(f"⚠️ Acceso Bloqueado: Has realizado demasiados intentos de inicio de sesión. Por motivos de seguridad, por favor espera {segundos} segundos antes de volver a intentar.")
+                return rx.toast.error(
+                    f"⚠️ Acceso Bloqueado: Has realizado demasiados intentos de inicio de sesión. Por motivos de seguridad, por favor espera {segundos} segundos antes de volver a intentar."
+                )
             else:
                 self.bloqueado_hasta = ""
                 self.intentos_fallidos = 0
@@ -154,14 +160,20 @@ class EstadoAutenticacion(rx.State):
         if resultado:
             u_id, u_ced, u_nom, u_ape, u_cor, u_hash, u_act, u_rol = resultado
             if not u_act:
-                return rx.toast.error("🔒 Cuenta Desactivada: Su cuenta de usuario ha sido desactivada por el administrador del sistema. Por favor, solicite asistencia para reactivarla.")
+                return rx.toast.error(
+                    "🔒 Cuenta Desactivada: Su cuenta de usuario ha sido desactivada por el administrador del sistema. Por favor, solicite asistencia para reactivarla."
+                )
 
             if EncriptadorContrasena.verificar(self.entrada_contrasena, u_hash):
                 token = secrets.token_urlsafe(64)
                 ahora_utc = datetime.now(timezone.utc)
 
-                if not self._create_session(u_id, token, ahora_utc, ahora_utc + timedelta(hours=24)):
-                    return rx.toast.error("💥 Error Crítico: No se pudo iniciar la sesión en el servidor. Reintente más tarde.")
+                if not self._create_session(
+                    u_id, token, ahora_utc, ahora_utc + timedelta(hours=24)
+                ):
+                    return rx.toast.error(
+                        "💥 Error Crítico: No se pudo iniciar la sesión en el servidor. Reintente más tarde."
+                    )
 
                 self.intentos_fallidos = 0
                 self.bloqueado_hasta = ""
@@ -181,46 +193,66 @@ class EstadoAutenticacion(rx.State):
 
         self.intentos_fallidos += 1
         if self.intentos_fallidos >= 5:
-            self.bloqueado_hasta = (datetime.now(timezone.utc) + timedelta(minutes=5)).isoformat()
-            return rx.toast.error("⚠️ Seguridad: Demasiados intentos fallidos consecutivos. Su cuenta ha sido bloqueada temporalmente por un lapso de 5 minutos.")
-        return rx.toast.error("❌ Credenciales Incorrectas: El correo electrónico o la contraseña ingresados no coinciden con ningún registro activo.")
+            self.bloqueado_hasta = (
+                datetime.now(timezone.utc) + timedelta(minutes=5)
+            ).isoformat()
+            return rx.toast.error(
+                "⚠️ Seguridad: Demasiados intentos fallidos consecutivos. Su cuenta ha sido bloqueada temporalmente por un lapso de 5 minutos."
+            )
+        return rx.toast.error(
+            "❌ Credenciales Incorrectas: El correo electrónico o la contraseña ingresados no coinciden con ningún registro activo."
+        )
 
     def _fetch_user_by_email(self, email: str):
         conn2 = obtener_conexion()
         if conn2 is None:
-            return None, "🔌 Fallo de Conexión: No se pudo establecer comunicación con el servidor de la base de datos. Compruebe su conexión de red o contacte al administrador."
+            return (
+                None,
+                "🔌 Fallo de Conexión: No se pudo establecer comunicación con el servidor de la base de datos. Compruebe su conexión de red o contacte al administrador.",
+            )
         try:
             with conn2:
                 with conn2.cursor() as cursor:
                     logger.debug("Intento de login recibido.")
-                    cursor.execute("""
+                    cursor.execute(
+                        """
                         SELECT u.id, u.cedula, u.nombre, u.apellido, u.correo, u.contrasena_hash, u.esta_activo, r.nombre
                         FROM usuario u
                         LEFT JOIN rol r ON u.rol_id = r.id
                         WHERE LOWER(TRIM(u.correo)) = %s;
-                    """, (email,))
+                    """,
+                        (email,),
+                    )
                     resultado = cursor.fetchone()
                     return resultado, ""
         except Exception as exc:
             logger.error(f"Error en login: {exc}", exc_info=True)
-            return None, "💥 Error Crítico: Ocurrió una anomalía interna en el sistema al intentar procesar su solicitud. Por favor, reintente más tarde o reporte este evento a soporte."
+            return (
+                None,
+                "💥 Error Crítico: Ocurrió una anomalía interna en el sistema al intentar procesar su solicitud. Por favor, reintente más tarde o reporte este evento a soporte.",
+            )
         finally:
             try:
                 conn2.close()
             except Exception:
                 pass
 
-    def _create_session(self, user_id: int, token_val: str, creado: datetime, expira: datetime):
+    def _create_session(
+        self, user_id: int, token_val: str, creado: datetime, expira: datetime
+    ):
         conn3 = obtener_conexion()
         if conn3 is None:
             return False
         try:
             with conn3:
                 with conn3.cursor() as cursor:
-                    cursor.execute("""
+                    cursor.execute(
+                        """
                         INSERT INTO sesion (usuario_id, token, creado_en, expira_en, esta_activa)
                         VALUES (%s, %s, %s, %s, TRUE);
-                    """, (user_id, token_val, creado, expira))
+                    """,
+                        (user_id, token_val, creado, expira),
+                    )
                 conn3.commit()
             return True
         except Exception as exc:
@@ -234,6 +266,7 @@ class EstadoAutenticacion(rx.State):
 
     async def cerrar_sesion(self):
         if self.usuario and self.usuario.token_sesion:
+
             def _deactivate_session(token: str):
                 conn2 = obtener_conexion()
                 if conn2 is None:
@@ -241,7 +274,10 @@ class EstadoAutenticacion(rx.State):
                 try:
                     with conn2:
                         with conn2.cursor() as cursor:
-                            cursor.execute("UPDATE sesion SET esta_activa = FALSE WHERE token = %s", (token,))
+                            cursor.execute(
+                                "UPDATE sesion SET esta_activa = FALSE WHERE token = %s",
+                                (token,),
+                            )
                         conn2.commit()
                     return True
                 except Exception as exc:
@@ -267,7 +303,7 @@ class EstadoAutenticacion(rx.State):
         await self.restaurar_sesion()
         if self.usuario is None:
             return rx.redirect("/login")
-        if self.rol_usuario != 'administrador':
+        if self.rol_usuario != "administrador":
             return rx.redirect("/")
 
     # Compatibilidad: alias de nombres históricos usados en las páginas
@@ -283,5 +319,8 @@ class EstadoAutenticacion(rx.State):
         """Alias histórico para verificar acceso de administrador."""
         await self.verificar_sesion_admin()
 
-    def fijar_entrada_usuario(self, val): self.entrada_usuario = val
-    def fijar_entrada_contrasena(self, val): self.entrada_contrasena = val
+    def fijar_entrada_usuario(self, val):
+        self.entrada_usuario = val
+
+    def fijar_entrada_contrasena(self, val):
+        self.entrada_contrasena = val

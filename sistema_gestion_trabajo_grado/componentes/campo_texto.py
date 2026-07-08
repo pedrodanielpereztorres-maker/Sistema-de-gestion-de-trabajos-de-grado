@@ -1,6 +1,7 @@
 import reflex as rx
+
 COLOR_TEXTO_BOLD = "black"  # Negro puro para máximo contraste
-COLOR_PLACEHOLDER = "#94A3B8" # Gris suave para máscaras de ejemplo
+COLOR_PLACEHOLDER = "#94A3B8"  # Gris suave para máscaras de ejemplo
 
 
 def campo_texto(
@@ -13,7 +14,7 @@ def campo_texto(
 ) -> rx.Component:
     # Extracción de placeholder o generación automática
     placeholder = props.pop("placeholder", f"Ingrese {label.lower()}")
-    
+
     input_editable = rx.input(
         placeholder=placeholder,
         value=valor,
@@ -30,16 +31,16 @@ def campo_texto(
             "font_size": "13.5px",
             "font_weight": "bold",
             "&::placeholder": {
-                                    "color": "#94A3B8",
-                                    "opacity": "0.85",
-                                    "font_weight": "500",
-                                    "letter_spacing": "0.01em",
-                                },
+                "color": "#94A3B8",
+                "opacity": "0.85",
+                "font_weight": "500",
+                "letter_spacing": "0.01em",
+            },
         },
         _focus={
             "border_color": "#3B82F6",
-            "box_shadow":   "0 0 0 3px rgba(59,130,246,0.15)",
-            "outline":      "none",
+            "box_shadow": "0 0 0 3px rgba(59,130,246,0.15)",
+            "outline": "none",
         },
         _hover={"border_color": "#60A5FA"},
         transition="border-color 0.15s ease, box-shadow 0.15s ease",

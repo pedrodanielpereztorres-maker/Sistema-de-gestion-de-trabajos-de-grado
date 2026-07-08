@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 class EstadoPerfil(EstadoAutenticacion):
     """Estado para la gestión del perfil de usuario."""
+
     nombre_edit: str = ""
     apellido_edit: str = ""
     correo_edit: str = ""
@@ -59,12 +60,15 @@ class EstadoPerfil(EstadoAutenticacion):
             try:
                 conn = obtener_conexion()
                 if conn is None:
-                    logger.error("No hay conexión para cargar datos académicos de perfil.")
+                    logger.error(
+                        "No hay conexión para cargar datos académicos de perfil."
+                    )
                     return
 
                 with conn:
                     with conn.cursor() as cursor:
-                        cursor.execute("""
+                        cursor.execute(
+                            """
                             SELECT 
                                 ta.nombre || ' ' || ta.apellido, ta.correo, ta.telefono,
                                 te.nombre, te.correo, te.telefono,
@@ -75,7 +79,9 @@ class EstadoPerfil(EstadoAutenticacion):
                             LEFT JOIN tutor_empresarial te ON e.tutor_empresarial_id = te.id
                             LEFT JOIN empresa emp ON te.empresa_id = emp.id
                             WHERE e.usuario_id = %s
-                        """, (self.usuario.id,))
+                        """,
+                            (self.usuario.id,),
+                        )
                         res = cursor.fetchone()
                         if res:
                             self.tutor_nombre = res[0] or "Pendiente"
@@ -86,8 +92,12 @@ class EstadoPerfil(EstadoAutenticacion):
                             self.tutor_empresa_telefono = res[5] or "Pendiente"
                             self.empresa = res[6] or "Pendiente"
                             self.empresa_direccion = res[7] or "Pendiente"
-                            self.fecha_inicio = res[8].strftime("%d/%m/%Y") if res[8] else "Pendiente"
-                            self.fecha_cierre = res[9].strftime("%d/%m/%Y") if res[9] else "Pendiente"
+                            self.fecha_inicio = (
+                                res[8].strftime("%d/%m/%Y") if res[8] else "Pendiente"
+                            )
+                            self.fecha_cierre = (
+                                res[9].strftime("%d/%m/%Y") if res[9] else "Pendiente"
+                            )
             except Exception as e:
                 logger.exception("Error al cargar datos académicos de perfil: %s", e)
             finally:
@@ -104,28 +114,40 @@ class EstadoPerfil(EstadoAutenticacion):
         correo = self.correo_edit.strip().lower()
 
         if not nombre or not apellido or not correo:
-            return rx.toast.warning("⚠️ Campos Obligatorios: Nombre, apellido y correo electrónico son requeridos para actualizar su perfil.")
+            return rx.toast.warning(
+                "⚠️ Campos Obligatorios: Nombre, apellido y correo electrónico son requeridos para actualizar su perfil."
+            )
 
-        patron_correo = r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$'
+        patron_correo = r"^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
         if not re.match(patron_correo, correo):
-            return rx.toast.error("✉️ Formato Inválido: La dirección de correo electrónico no cumple con un formato válido.")
+            return rx.toast.error(
+                "✉️ Formato Inválido: La dirección de correo electrónico no cumple con un formato válido."
+            )
 
         if self.pass_nueva or self.pass_conf:
             if self.pass_nueva != self.pass_conf:
-                return rx.toast.error("🔒 Discrepancia de Clave: Las contraseñas ingresadas no coinciden. Por favor, verifíquelas.")
+                return rx.toast.error(
+                    "🔒 Discrepancia de Clave: Las contraseñas ingresadas no coinciden. Por favor, verifíquelas."
+                )
             if len(self.pass_nueva) < 8:
-                return rx.toast.error("🔒 Clave Débil: La nueva contraseña debe tener al menos 8 caracteres de longitud por seguridad.")
+                return rx.toast.error(
+                    "🔒 Clave Débil: La nueva contraseña debe tener al menos 8 caracteres de longitud por seguridad."
+                )
 
         conn = None
         try:
             conn = obtener_conexion()
             if conn is None:
-                return rx.toast.error("🔌 Sin Conexión: No se pudo establecer contacto con el servidor de base de datos.")
+                return rx.toast.error(
+                    "🔌 Sin Conexión: No se pudo establecer contacto con el servidor de base de datos."
+                )
 
             with conn:
                 with conn.cursor() as cursor:
                     if self.usuario is None or self.usuario.id is None:
-                        return rx.toast.error("⚠️ Sesión Inválida: No se pudo identificar una sesión activa de usuario.")
+                        return rx.toast.error(
+                            "⚠️ Sesión Inválida: No se pudo identificar una sesión activa de usuario."
+                        )
 
                     if self.pass_nueva:
                         nuevo_hash = EncriptadorContrasena.encriptar(self.pass_nueva)
@@ -135,7 +157,7 @@ class EstadoPerfil(EstadoAutenticacion):
                             SET nombre = %s, apellido = %s, correo = %s, contrasena_hash = %s
                             WHERE id = %s;
                             """,
-                            (nombre, apellido, correo, nuevo_hash, self.usuario.id)
+                            (nombre, apellido, correo, nuevo_hash, self.usuario.id),
                         )
                     else:
                         cursor.execute(
@@ -144,7 +166,7 @@ class EstadoPerfil(EstadoAutenticacion):
                             SET nombre = %s, apellido = %s, correo = %s
                             WHERE id = %s;
                             """,
-                            (nombre, apellido, correo, self.usuario.id)
+                            (nombre, apellido, correo, self.usuario.id),
                         )
                 conn.commit()
 
@@ -154,11 +176,15 @@ class EstadoPerfil(EstadoAutenticacion):
 
             self.pass_nueva = ""
             self.pass_conf = ""
-            return rx.toast.success("🎉 Perfil Actualizado: Sus datos personales y de seguridad se han guardado con éxito.")
+            return rx.toast.success(
+                "🎉 Perfil Actualizado: Sus datos personales y de seguridad se han guardado con éxito."
+            )
 
         except Exception as e:
             logger.exception("Error al actualizar el perfil: %s", e)
-            return rx.toast.error("💥 Error Crítico: Se presentó una falla interna al procesar la actualización del perfil.")
+            return rx.toast.error(
+                "💥 Error Crítico: Se presentó una falla interna al procesar la actualización del perfil."
+            )
         finally:
             if conn:
                 try:
@@ -179,11 +205,20 @@ def banner_perfil_usuario() -> rx.Component:
                     "border": "3px solid white",
                     "box_shadow": "0 4px 14px rgba(0,0,0,0.18)",
                     "flex_shrink": "0",
-                }
+                },
             ),
             rx.vstack(
-                rx.heading(EstadoPerfil.nombre_usuario, size="6", color="white", weight="bold",
-                           style={"overflow_wrap": "break-word", "word_break": "break-word", "width": "100%"}),
+                rx.heading(
+                    EstadoPerfil.nombre_usuario,
+                    size="6",
+                    color="white",
+                    weight="bold",
+                    style={
+                        "overflow_wrap": "break-word",
+                        "word_break": "break-word",
+                        "width": "100%",
+                    },
+                ),
                 rx.flex(
                     rx.badge(
                         EstadoPerfil.rol_usuario.to(str).upper(),
@@ -195,7 +230,7 @@ def banner_perfil_usuario() -> rx.Component:
                             "font_weight": "800",
                             "padding_x": "12px",
                             "white_space": "nowrap",
-                        }
+                        },
                     ),
                     rx.badge(
                         EstadoPerfil.correo_edit,
@@ -209,7 +244,7 @@ def banner_perfil_usuario() -> rx.Component:
                             "overflow_wrap": "break-word",
                             "word_break": "break-all",
                             "max_width": "100%",
-                        }
+                        },
                     ),
                     wrap="wrap",
                     align="center",
@@ -235,7 +270,9 @@ def banner_perfil_usuario() -> rx.Component:
     )
 
 
-def tarjeta_detalle_academico(titulo: str, valor: str, icono: str, color: str) -> rx.Component:
+def tarjeta_detalle_academico(
+    titulo: str, valor: str, icono: str, color: str
+) -> rx.Component:
     """Componente reutilizable para presentar detalles con iconos y estilos refinados."""
     return rx.box(
         rx.hstack(
@@ -247,7 +284,14 @@ def tarjeta_detalle_academico(titulo: str, valor: str, icono: str, color: str) -
                 border_radius="8px",
             ),
             rx.vstack(
-                rx.text(titulo, size="1", font_weight="700", color="#64748B", text_transform="uppercase", letter_spacing="0.05em"),
+                rx.text(
+                    titulo,
+                    size="1",
+                    font_weight="700",
+                    color="#64748B",
+                    text_transform="uppercase",
+                    letter_spacing="0.05em",
+                ),
                 rx.text(valor, size="2", font_weight="600", color="#1E293B"),
                 spacing="0",
                 align="start",
@@ -269,29 +313,74 @@ def info_academica() -> rx.Component:
         rx.vstack(
             rx.hstack(
                 rx.icon("graduation-cap", size=22, color="#6366F1"),
-                rx.heading("Información Académica", size="4", color="#0F172A", weight="bold"),
+                rx.heading(
+                    "Información Académica", size="4", color="#0F172A", weight="bold"
+                ),
                 spacing="2",
                 align="center",
             ),
             rx.divider(),
-            
             rx.grid(
-                tarjeta_detalle_academico("Tutor Académico", EstadoPerfil.tutor_nombre, "user-check", "#6366F1"),
-                tarjeta_detalle_academico("Correo Tutor Acad.", EstadoPerfil.tutor_correo, "mail", "#6366F1"),
-                tarjeta_detalle_academico("Teléfono Tutor Acad.", EstadoPerfil.tutor_telefono, "phone", "#6366F1"),
-                tarjeta_detalle_academico("Tutor Empresarial", EstadoPerfil.tutor_empresa_nombre, "user-check", "#10B981"),
-                tarjeta_detalle_academico("Correo Tutor Emp.", EstadoPerfil.tutor_empresa_correo, "mail", "#10B981"),
-                tarjeta_detalle_academico("Teléfono Tutor Emp.", EstadoPerfil.tutor_empresa_telefono, "phone", "#10B981"),
+                tarjeta_detalle_academico(
+                    "Tutor Académico",
+                    EstadoPerfil.tutor_nombre,
+                    "user-check",
+                    "#6366F1",
+                ),
+                tarjeta_detalle_academico(
+                    "Correo Tutor Acad.", EstadoPerfil.tutor_correo, "mail", "#6366F1"
+                ),
+                tarjeta_detalle_academico(
+                    "Teléfono Tutor Acad.",
+                    EstadoPerfil.tutor_telefono,
+                    "phone",
+                    "#6366F1",
+                ),
+                tarjeta_detalle_academico(
+                    "Tutor Empresarial",
+                    EstadoPerfil.tutor_empresa_nombre,
+                    "user-check",
+                    "#10B981",
+                ),
+                tarjeta_detalle_academico(
+                    "Correo Tutor Emp.",
+                    EstadoPerfil.tutor_empresa_correo,
+                    "mail",
+                    "#10B981",
+                ),
+                tarjeta_detalle_academico(
+                    "Teléfono Tutor Emp.",
+                    EstadoPerfil.tutor_empresa_telefono,
+                    "phone",
+                    "#10B981",
+                ),
                 columns={"initial": "1", "sm": "2"},
                 spacing="3",
                 width="100%",
             ),
             rx.divider(),
             rx.grid(
-                tarjeta_detalle_academico("Empresa Asignada", EstadoPerfil.empresa, "building-2", "#0EA5E9"),
-                tarjeta_detalle_academico("Dirección Empresa", EstadoPerfil.empresa_direccion, "map-pin", "#0EA5E9"),
-                tarjeta_detalle_academico("Fecha de Inicio", EstadoPerfil.fecha_inicio, "calendar-days", "#10B981"),
-                tarjeta_detalle_academico("Fecha de Cierre", EstadoPerfil.fecha_cierre, "calendar-check", "#F59E0B"),
+                tarjeta_detalle_academico(
+                    "Empresa Asignada", EstadoPerfil.empresa, "building-2", "#0EA5E9"
+                ),
+                tarjeta_detalle_academico(
+                    "Dirección Empresa",
+                    EstadoPerfil.empresa_direccion,
+                    "map-pin",
+                    "#0EA5E9",
+                ),
+                tarjeta_detalle_academico(
+                    "Fecha de Inicio",
+                    EstadoPerfil.fecha_inicio,
+                    "calendar-days",
+                    "#10B981",
+                ),
+                tarjeta_detalle_academico(
+                    "Fecha de Cierre",
+                    EstadoPerfil.fecha_cierre,
+                    "calendar-check",
+                    "#F59E0B",
+                ),
                 columns={"initial": "1", "sm": "2"},
                 spacing="3",
                 width="100%",
@@ -316,45 +405,78 @@ def info_mantenimiento_admin() -> rx.Component:
         rx.vstack(
             rx.hstack(
                 rx.icon("shield-alert", size=22, color="#6366F1"),
-                rx.heading("Políticas de Administración y Seguridad", size="4", color="#0F172A", weight="bold"),
+                rx.heading(
+                    "Políticas de Administración y Seguridad",
+                    size="4",
+                    color="#0F172A",
+                    weight="bold",
+                ),
                 spacing="2",
                 align="center",
             ),
             rx.divider(),
             rx.text(
-                "Como Administrador del sistema ", rx.text.span("SGT", class_name="notranslate"), ", tu cuenta posee privilegios elevados para gestionar expedientes, ",
+                "Como Administrador del sistema ",
+                rx.text.span("SGT", class_name="notranslate"),
+                ", tu cuenta posee privilegios elevados para gestionar expedientes, ",
                 "bóvedas de tesis e información de tutores académicos y empresariales.",
-                size="2", color="#475569", line_height="1.6"
+                size="2",
+                color="#475569",
+                line_height="1.6",
             ),
             rx.box(
                 rx.vstack(
                     rx.hstack(
                         rx.icon("key-round", size=18, color="#F59E0B"),
-                        rx.text("Claves de Acceso Robustas", font_weight="700", size="2", color="#1E293B"),
-                        spacing="2", align="center"
+                        rx.text(
+                            "Claves de Acceso Robustas",
+                            font_weight="700",
+                            size="2",
+                            color="#1E293B",
+                        ),
+                        spacing="2",
+                        align="center",
                     ),
                     rx.text(
                         "Se recomienda cambiar tu contraseña periódicamente y utilizar combinaciones de letras, números y caracteres especiales.",
-                        size="2", color="#64748B"
+                        size="2",
+                        color="#64748B",
                     ),
-                    align_items="start", spacing="1"
+                    align_items="start",
+                    spacing="1",
                 ),
-                padding="0.75rem", background="#FFFBEB", border_left="4px solid #F59E0B", border_radius="0.25rem", width="100%"
+                padding="0.75rem",
+                background="#FFFBEB",
+                border_left="4px solid #F59E0B",
+                border_radius="0.25rem",
+                width="100%",
             ),
             rx.box(
                 rx.vstack(
                     rx.hstack(
                         rx.icon("file-lock-2", size=18, color="#10B981"),
-                        rx.text("Privacidad de Datos", font_weight="700", size="2", color="#1E293B"),
-                        spacing="2", align="center"
+                        rx.text(
+                            "Privacidad de Datos",
+                            font_weight="700",
+                            size="2",
+                            color="#1E293B",
+                        ),
+                        spacing="2",
+                        align="center",
                     ),
                     rx.text(
                         "Evite compartir capturas de pantalla de la bóveda o de estudiantes con datos sensibles. El sistema encripta los hashes y protege los logs.",
-                        size="2", color="#64748B"
+                        size="2",
+                        color="#64748B",
                     ),
-                    align_items="start", spacing="1"
+                    align_items="start",
+                    spacing="1",
                 ),
-                padding="0.75rem", background="#ECFDF5", border_left="4px solid #10B981", border_radius="0.25rem", width="100%"
+                padding="0.75rem",
+                background="#ECFDF5",
+                border_left="4px solid #10B981",
+                border_radius="0.25rem",
+                width="100%",
             ),
             spacing="4",
             width="100%",
@@ -376,13 +498,18 @@ def tarjeta_datos_personales() -> rx.Component:
         rx.vstack(
             rx.hstack(
                 rx.icon("user", size=20, color="#6366F1"),
-                rx.heading("Datos Personales", size="4", color="#0F172A", weight="bold"),
+                rx.heading(
+                    "Datos Personales", size="4", color="#0F172A", weight="bold"
+                ),
                 spacing="2",
                 align="center",
             ),
-            rx.text("Actualiza la información básica vinculada a tu cuenta académica.", size="2", color="#64748B"),
+            rx.text(
+                "Actualiza la información básica vinculada a tu cuenta académica.",
+                size="2",
+                color="#64748B",
+            ),
             rx.divider(),
-            
             rx.vstack(
                 rx.text("Nombre", size="2", font_weight="700", color="#334155"),
                 rx.input(
@@ -398,17 +525,18 @@ def tarjeta_datos_personales() -> rx.Component:
                         "border_radius": "10px",
                         "font_weight": "600",
                         "&::placeholder": {
-                                    "color": "#94A3B8",
-                                    "opacity": "0.85",
-                                    "font_weight": "500",
-                                    "letter_spacing": "0.01em",
-                                },
+                            "color": "#94A3B8",
+                            "opacity": "0.85",
+                            "font_weight": "500",
+                            "letter_spacing": "0.01em",
+                        },
                     },
-                    _focus={"border_color": "#6366F1"}
+                    _focus={"border_color": "#6366F1"},
                 ),
-                width="100%", align="start", spacing="1"
+                width="100%",
+                align="start",
+                spacing="1",
             ),
-            
             rx.vstack(
                 rx.text("Apellido", size="2", font_weight="700", color="#334155"),
                 rx.input(
@@ -424,19 +552,22 @@ def tarjeta_datos_personales() -> rx.Component:
                         "border_radius": "10px",
                         "font_weight": "600",
                         "&::placeholder": {
-                                    "color": "#94A3B8",
-                                    "opacity": "0.85",
-                                    "font_weight": "500",
-                                    "letter_spacing": "0.01em",
-                                },
+                            "color": "#94A3B8",
+                            "opacity": "0.85",
+                            "font_weight": "500",
+                            "letter_spacing": "0.01em",
+                        },
                     },
-                    _focus={"border_color": "#6366F1"}
+                    _focus={"border_color": "#6366F1"},
                 ),
-                width="100%", align="start", spacing="1"
+                width="100%",
+                align="start",
+                spacing="1",
             ),
-            
             rx.vstack(
-                rx.text("Correo Electrónico", size="2", font_weight="700", color="#334155"),
+                rx.text(
+                    "Correo Electrónico", size="2", font_weight="700", color="#334155"
+                ),
                 rx.input(
                     placeholder="ejemplo@correo.com",
                     value=EstadoPerfil.correo_edit,
@@ -450,21 +581,21 @@ def tarjeta_datos_personales() -> rx.Component:
                         "border_radius": "10px",
                         "font_weight": "600",
                         "&::placeholder": {
-                                    "color": "#94A3B8",
-                                    "opacity": "0.85",
-                                    "font_weight": "500",
-                                    "letter_spacing": "0.01em",
-                                },
+                            "color": "#94A3B8",
+                            "opacity": "0.85",
+                            "font_weight": "500",
+                            "letter_spacing": "0.01em",
+                        },
                     },
-                    _focus={"border_color": "#6366F1"}
+                    _focus={"border_color": "#6366F1"},
                 ),
-                width="100%", align="start", spacing="1"
+                width="100%",
+                align="start",
+                spacing="1",
             ),
-            
             rx.button(
                 rx.hstack(
-                    rx.icon("save", size=16),
-                    rx.text("Guardar Cambios", weight="bold")
+                    rx.icon("save", size=16), rx.text("Guardar Cambios", weight="bold")
                 ),
                 on_click=EstadoPerfil.actualizar_datos,
                 width="100%",
@@ -479,7 +610,7 @@ def tarjeta_datos_personales() -> rx.Component:
                 },
                 _hover={
                     "box_shadow": "0 6px 16px rgba(99, 102, 241, 0.3)",
-                }
+                },
             ),
             spacing="4",
             width="100%",
@@ -501,15 +632,22 @@ def tarjeta_seguridad() -> rx.Component:
         rx.vstack(
             rx.hstack(
                 rx.icon("lock", size=20, color="#7C3AED"),
-                rx.heading("Seguridad de la Cuenta", size="4", color="#0F172A", weight="bold"),
+                rx.heading(
+                    "Seguridad de la Cuenta", size="4", color="#0F172A", weight="bold"
+                ),
                 spacing="2",
                 align="center",
             ),
-            rx.text("Mantén tu cuenta protegida actualizando tu contraseña con regularidad.", size="2", color="#64748B"),
+            rx.text(
+                "Mantén tu cuenta protegida actualizando tu contraseña con regularidad.",
+                size="2",
+                color="#64748B",
+            ),
             rx.divider(),
-            
             rx.vstack(
-                rx.text("Nueva Contraseña", size="2", font_weight="700", color="#334155"),
+                rx.text(
+                    "Nueva Contraseña", size="2", font_weight="700", color="#334155"
+                ),
                 rx.input(
                     type="password",
                     placeholder="••••••••",
@@ -524,19 +662,25 @@ def tarjeta_seguridad() -> rx.Component:
                         "border_radius": "10px",
                         "font_weight": "600",
                         "&::placeholder": {
-                                    "color": "#94A3B8",
-                                    "opacity": "0.85",
-                                    "font_weight": "500",
-                                    "letter_spacing": "0.01em",
-                                },
+                            "color": "#94A3B8",
+                            "opacity": "0.85",
+                            "font_weight": "500",
+                            "letter_spacing": "0.01em",
+                        },
                     },
-                    _focus={"border_color": "#7C3AED"}
+                    _focus={"border_color": "#7C3AED"},
                 ),
-                width="100%", align="start", spacing="1"
+                width="100%",
+                align="start",
+                spacing="1",
             ),
-            
             rx.vstack(
-                rx.text("Confirmar Nueva Contraseña", size="2", font_weight="700", color="#334155"),
+                rx.text(
+                    "Confirmar Nueva Contraseña",
+                    size="2",
+                    font_weight="700",
+                    color="#334155",
+                ),
                 rx.input(
                     type="password",
                     placeholder="••••••••",
@@ -551,21 +695,21 @@ def tarjeta_seguridad() -> rx.Component:
                         "border_radius": "10px",
                         "font_weight": "600",
                         "&::placeholder": {
-                                    "color": "#94A3B8",
-                                    "opacity": "0.85",
-                                    "font_weight": "500",
-                                    "letter_spacing": "0.01em",
-                                },
+                            "color": "#94A3B8",
+                            "opacity": "0.85",
+                            "font_weight": "500",
+                            "letter_spacing": "0.01em",
+                        },
                     },
-                    _focus={"border_color": "#7C3AED"}
+                    _focus={"border_color": "#7C3AED"},
                 ),
-                width="100%", align="start", spacing="1"
+                width="100%",
+                align="start",
+                spacing="1",
             ),
-            
             rx.button(
                 rx.hstack(
-                    rx.icon("key", size=16),
-                    rx.text("Actualizar Clave", weight="bold")
+                    rx.icon("key", size=16), rx.text("Actualizar Clave", weight="bold")
                 ),
                 on_click=EstadoPerfil.actualizar_datos,
                 width="100%",
@@ -575,7 +719,7 @@ def tarjeta_seguridad() -> rx.Component:
                 style={
                     "border_radius": "10px",
                     "cursor": "pointer",
-                }
+                },
             ),
             spacing="4",
             width="100%",
@@ -600,7 +744,7 @@ def pagina_perfil() -> rx.Component:
                 rx.cond(
                     EstadoPerfil.rol_usuario == "estudiante",
                     info_academica(),
-                    info_mantenimiento_admin()
+                    info_mantenimiento_admin(),
                 ),
                 rx.vstack(
                     tarjeta_datos_personales(),

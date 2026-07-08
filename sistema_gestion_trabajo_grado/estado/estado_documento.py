@@ -38,6 +38,7 @@ class EstadoDocumento(rx.State):
 
     async def cargar_documentos(self):
         """Carga la lista de documentos desde la base de datos."""
+
         def _fetch_documentos():
             conn = obtener_conexion()
             if conn is None:
@@ -71,8 +72,13 @@ class EstadoDocumento(rx.State):
                 tipo=fila[4],
                 tamano_kb=fila[5] or 0,
                 tamano=f"{fila[5]} KB" if fila[5] is not None else "0 KB",
-                url=f"{rx.config.get_config().api_url}/almacen/{fila[6].lstrip('/')}" if fila[6] else ""
-            ) for fila in resultados
+                url=(
+                    f"{rx.config.get_config().api_url}/almacen/{fila[6].lstrip('/')}"
+                    if fila[6]
+                    else ""
+                ),
+            )
+            for fila in resultados
         ]
 
     def fijar_titulo_nuevo(self, val: str) -> None:
@@ -93,11 +99,9 @@ class EstadoDocumento(rx.State):
 
         texto = self.busqueda_documento.strip().lower()
         return [
-            doc for doc in self.lista_documentos
-            if (
-                texto in doc.titulo.lower() or
-                texto in doc.descripcion.lower()
-            )
+            doc
+            for doc in self.lista_documentos
+            if (texto in doc.titulo.lower() or texto in doc.descripcion.lower())
         ]
 
     async def publicar_documento(self, archivos: List[rx.UploadFile]):
@@ -125,7 +129,9 @@ class EstadoDocumento(rx.State):
         self.procesando = True
         archivos_creados_bd_ids = []
 
-        async def _insert_registro_documento(titulo: str, descripcion: str, extension: str, tamano_kb: int, ruta_bd: str):
+        async def _insert_registro_documento(
+            titulo: str, descripcion: str, extension: str, tamano_kb: int, ruta_bd: str
+        ):
             def _insert():
                 conn2 = obtener_conexion()
                 if conn2 is None:
@@ -133,15 +139,14 @@ class EstadoDocumento(rx.State):
                 try:
                     with conn2:
                         with conn2.cursor() as cursor:
-                            cursor.execute("""
+                            cursor.execute(
+                                """
                                 INSERT INTO documento (titulo, descripcion, tipo, tamano_kb, ruta_archivo)
                                 VALUES (%s, %s, %s, %s, %s)
                                 RETURNING id;
-                            """, (
-                                titulo,
-                                descripcion,
-                                extension, tamano_kb, ruta_bd
-                            ))
+                            """,
+                                (titulo, descripcion, extension, tamano_kb, ruta_bd),
+                            )
                             nuevo_id = cursor.fetchone()[0]
                         conn2.commit()
                     return nuevo_id
@@ -163,7 +168,9 @@ class EstadoDocumento(rx.State):
             try:
                 with conn2:
                     with conn2.cursor() as c2:
-                        c2.execute("DELETE FROM documento WHERE id = %s", (documento_id,))
+                        c2.execute(
+                            "DELETE FROM documento WHERE id = %s", (documento_id,)
+                        )
                     conn2.commit()
                 return True
             except Exception as exc:
@@ -179,23 +186,34 @@ class EstadoDocumento(rx.State):
             for archivo in archivos:
                 datos_subida = await archivo.read()
                 if len(datos_subida) > MAX_TAMANO_BYTES:
-                    return rx.toast.error(f"El archivo {archivo.filename} supera el límite de 20MB.")
+                    return rx.toast.error(
+                        f"El archivo {archivo.filename} supera el límite de 20MB."
+                    )
 
                 # Determinar extensión y validar
-                extension = archivo.filename.split('.')[-1].lower() if '.' in archivo.filename else ""
+                extension = (
+                    archivo.filename.split(".")[-1].lower()
+                    if "." in archivo.filename
+                    else ""
+                )
                 if extension not in TIPOS_PERMITIDOS:
                     return rx.toast.error(f"Tipo de archivo no permitido: {extension}")
 
                 magic = TIPOS_PERMITIDOS[extension]
                 if not datos_subida.startswith(magic):
-                    return rx.toast.error(f"El archivo {archivo.filename} no cumple con los bytes mágicos esperados para .{extension}.")
+                    return rx.toast.error(
+                        f"El archivo {archivo.filename} no cumple con los bytes mágicos esperados para .{extension}."
+                    )
 
                 # Sanitizar nombre y preparar rutas
                 import re as _re
+
                 nombre_limpio = _re.sub(r"[^\w\.-]", "_", archivo.filename)
                 nombre_final = f"doc_{date.today().isoformat()}_{nombre_limpio}"
                 ruta_bd = f"documentos/{nombre_final}"
-                ruta_destino = os.path.join("almacen_privado", "documentos", nombre_final)
+                ruta_destino = os.path.join(
+                    "almacen_privado", "documentos", nombre_final
+                )
 
                 # Insertar registro en BD y obtener id
                 nuevo_id = await _insert_registro_documento(
@@ -206,7 +224,9 @@ class EstadoDocumento(rx.State):
                     ruta_bd,
                 )
                 if nuevo_id is None:
-                    return rx.toast.error("Error al guardar el registro del documento en la base de datos.")
+                    return rx.toast.error(
+                        "Error al guardar el registro del documento en la base de datos."
+                    )
 
                 # Escribir archivo en disco; si falla, eliminar registro BD creado
                 try:
@@ -217,7 +237,9 @@ class EstadoDocumento(rx.State):
                 except Exception as e:
                     logger.error("Error al escribir archivo en disco: %s", e)
                     await asyncio.to_thread(_delete_registro_documento, nuevo_id)
-                    return rx.toast.error(f"Error al guardar el archivo {archivo.filename} en el servidor.")
+                    return rx.toast.error(
+                        f"Error al guardar el archivo {archivo.filename} en el servidor."
+                    )
 
             # Si llegamos aquí, todos los archivos se procesaron correctamente
             self.titulo_nuevo = ""
@@ -234,11 +256,15 @@ class EstadoDocumento(rx.State):
                 try:
                     with conn2:
                         with conn2.cursor() as c2:
-                            c2.execute("DELETE FROM documento WHERE id = %s", (documento_id,))
+                            c2.execute(
+                                "DELETE FROM documento WHERE id = %s", (documento_id,)
+                            )
                         conn2.commit()
                     return True
                 except Exception as exc:
-                    logger.exception("Fallo en limpieza de BD durante la publicación: %s", exc)
+                    logger.exception(
+                        "Fallo en limpieza de BD durante la publicación: %s", exc
+                    )
                     return False
                 finally:
                     try:
@@ -246,7 +272,7 @@ class EstadoDocumento(rx.State):
                     except Exception:
                         pass
 
-            for (_id, ruta) in archivos_creados_bd_ids:
+            for _id, ruta in archivos_creados_bd_ids:
                 try:
                     if os.path.exists(ruta):
                         os.remove(ruta)
@@ -272,9 +298,14 @@ class EstadoDocumento(rx.State):
             try:
                 with conn2:
                     with conn2.cursor() as cursor:
-                        cursor.execute("SELECT ruta_archivo FROM documento WHERE id = %s;", (documento_id,))
+                        cursor.execute(
+                            "SELECT ruta_archivo FROM documento WHERE id = %s;",
+                            (documento_id,),
+                        )
                         res_archivo = cursor.fetchone()
-                        cursor.execute("DELETE FROM documento WHERE id = %s;", (documento_id,))
+                        cursor.execute(
+                            "DELETE FROM documento WHERE id = %s;", (documento_id,)
+                        )
                     conn2.commit()
                     return res_archivo[0] if res_archivo else None
             except Exception as exc:
@@ -296,7 +327,9 @@ class EstadoDocumento(rx.State):
                 try:
                     os.remove(ruta_fisica)
                 except Exception:
-                    logger.exception("Error al borrar archivo físico de documento: %s", ruta_fisica)
+                    logger.exception(
+                        "Error al borrar archivo físico de documento: %s", ruta_fisica
+                    )
 
         await self.cargar_documentos()
         return rx.toast.success("Documento eliminado correctamente.")
@@ -322,11 +355,18 @@ class EstadoDocumento(rx.State):
             try:
                 with conn2:
                     with conn2.cursor() as cursor:
-                        cursor.execute("""
+                        cursor.execute(
+                            """
                             UPDATE documento 
                             SET titulo = %s, descripcion = %s
                             WHERE id = %s;
-                        """, (self.titulo_edicion, self.descripcion_edicion, self.id_edicion))
+                        """,
+                            (
+                                self.titulo_edicion,
+                                self.descripcion_edicion,
+                                self.id_edicion,
+                            ),
+                        )
                     conn2.commit()
                 return True, ""
             except Exception as exc:
@@ -346,8 +386,11 @@ class EstadoDocumento(rx.State):
         self.mostrar_modal_edicion = False
         return rx.toast.success("Documento actualizado correctamente.")
 
-    def fijar_titulo_edicion(self, val: str) -> None: self.titulo_edicion = val
-    def fijar_descripcion_edicion(self, val: str) -> None: self.descripcion_edicion = val
+    def fijar_titulo_edicion(self, val: str) -> None:
+        self.titulo_edicion = val
+
+    def fijar_descripcion_edicion(self, val: str) -> None:
+        self.descripcion_edicion = val
 
     @rx.var
     def total_documentos(self) -> int:

@@ -1,6 +1,6 @@
 {
-  "name": "SGTG IUTEPI",
-  "short_name": "SGTG",
+  "name": "S.G.T.G. IUTEPI",
+  "short_name": "S.G.T.G.",
   "description": "Sistema de Gestión de Trabajo de Grado - IUTEPI",
   "start_url": "/",
   "display": "standalone",

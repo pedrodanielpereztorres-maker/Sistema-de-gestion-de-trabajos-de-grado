@@ -21,34 +21,34 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
  parametros.txt                                | 547 +++++++++++
  requirements.txt                              |   7 +
  rxconfig.py                                   |  21 +
- sistema_tesis/__init__.py                     |   0
- sistema_tesis/componentes/__init__.py         |   0
- sistema_tesis/componentes/barra_lateral.py    | 314 +++++++
- sistema_tesis/componentes/campo_texto.py      |  65 ++
- sistema_tesis/componentes/encabezado.py       |  45 +
- sistema_tesis/componentes/layout.py           | 213 +++++
- sistema_tesis/componentes/modal_estudiante.py | 414 ++++++++
+ sistema_gestion_trabajo_grado/__init__.py                     |   0
+ sistema_gestion_trabajo_grado/componentes/__init__.py         |   0
+ sistema_gestion_trabajo_grado/componentes/barra_lateral.py    | 314 +++++++
+ sistema_gestion_trabajo_grado/componentes/campo_texto.py      |  65 ++
+ sistema_gestion_trabajo_grado/componentes/encabezado.py       |  45 +
+ sistema_gestion_trabajo_grado/componentes/layout.py           | 213 +++++
+ sistema_gestion_trabajo_grado/componentes/modal_estudiante.py | 414 ++++++++
  .../componentes/tabla_estudiantes.py          |  68 ++
- sistema_tesis/componentes/toast_viewer.py     |   5 +
- sistema_tesis/database_manager.py             | 176 ++++
- sistema_tesis/estado/__init__.py              |   0
- sistema_tesis/estado/estado_autenticacion.py  | 207 ++++
- sistema_tesis/estado/estado_boveda.py         | 459 +++++++++
- sistema_tesis/estado/estado_documento.py      | 299 ++++++
- sistema_tesis/estado/estado_estudiante.py     | 568 +++++++++++
- sistema_tesis/estado/estado_layout.py         |  15 +
- sistema_tesis/estado/estado_mantenimiento.py  | 598 ++++++++++++
- sistema_tesis/estado/estado_reportes.py       | 212 +++++
- sistema_tesis/paginas/__init__.py             |   0
- sistema_tesis/paginas/boveda.py               | 843 +++++++++++++++++
- sistema_tesis/paginas/documentacion.py        | 513 ++++++++++
- sistema_tesis/paginas/estudiantes.py          |  97 ++
- sistema_tesis/paginas/inicio.py               | 513 ++++++++++
- sistema_tesis/paginas/login.py                | 161 ++++
- sistema_tesis/paginas/mantenimiento.py        | 886 ++++++++++++++++++
- sistema_tesis/paginas/perfil.py               | 293 ++++++
- sistema_tesis/paginas/reportes.py             | 219 +++++
- sistema_tesis/sistema_tesis.py                |  42 +
+ sistema_gestion_trabajo_grado/componentes/toast_viewer.py     |   5 +
+ sistema_gestion_trabajo_grado/database_manager.py             | 176 ++++
+ sistema_gestion_trabajo_grado/estado/__init__.py              |   0
+ sistema_gestion_trabajo_grado/estado/estado_autenticacion.py  | 207 ++++
+ sistema_gestion_trabajo_grado/estado/estado_boveda.py         | 459 +++++++++
+ sistema_gestion_trabajo_grado/estado/estado_documento.py      | 299 ++++++
+ sistema_gestion_trabajo_grado/estado/estado_estudiante.py     | 568 +++++++++++
+ sistema_gestion_trabajo_grado/estado/estado_layout.py         |  15 +
+ sistema_gestion_trabajo_grado/estado/estado_mantenimiento.py  | 598 ++++++++++++
+ sistema_gestion_trabajo_grado/estado/estado_reportes.py       | 212 +++++
+ sistema_gestion_trabajo_grado/paginas/__init__.py             |   0
+ sistema_gestion_trabajo_grado/paginas/boveda.py               | 843 +++++++++++++++++
+ sistema_gestion_trabajo_grado/paginas/documentacion.py        | 513 ++++++++++
+ sistema_gestion_trabajo_grado/paginas/estudiantes.py          |  97 ++
+ sistema_gestion_trabajo_grado/paginas/inicio.py               | 513 ++++++++++
+ sistema_gestion_trabajo_grado/paginas/login.py                | 161 ++++
+ sistema_gestion_trabajo_grado/paginas/mantenimiento.py        | 886 ++++++++++++++++++
+ sistema_gestion_trabajo_grado/paginas/perfil.py               | 293 ++++++
+ sistema_gestion_trabajo_grado/paginas/reportes.py             | 219 +++++
+ sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado.py                |  42 +
  43 files changed, 7843 insertions(+)
  create mode 100644 .env.example
  create mode 100755 .gitignore
@@ -65,34 +65,34 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
  create mode 100755 parametros.txt
  create mode 100755 requirements.txt
  create mode 100755 rxconfig.py
- create mode 100755 sistema_tesis/__init__.py
- create mode 100755 sistema_tesis/componentes/__init__.py
- create mode 100755 sistema_tesis/componentes/barra_lateral.py
- create mode 100755 sistema_tesis/componentes/campo_texto.py
- create mode 100755 sistema_tesis/componentes/encabezado.py
- create mode 100755 sistema_tesis/componentes/layout.py
- create mode 100755 sistema_tesis/componentes/modal_estudiante.py
- create mode 100755 sistema_tesis/componentes/tabla_estudiantes.py
- create mode 100755 sistema_tesis/componentes/toast_viewer.py
- create mode 100755 sistema_tesis/database_manager.py
- create mode 100755 sistema_tesis/estado/__init__.py
- create mode 100755 sistema_tesis/estado/estado_autenticacion.py
- create mode 100755 sistema_tesis/estado/estado_boveda.py
- create mode 100755 sistema_tesis/estado/estado_documento.py
- create mode 100755 sistema_tesis/estado/estado_estudiante.py
- create mode 100755 sistema_tesis/estado/estado_layout.py
- create mode 100755 sistema_tesis/estado/estado_mantenimiento.py
- create mode 100644 sistema_tesis/estado/estado_reportes.py
- create mode 100755 sistema_tesis/paginas/__init__.py
- create mode 100755 sistema_tesis/paginas/boveda.py
- create mode 100755 sistema_tesis/paginas/documentacion.py
- create mode 100755 sistema_tesis/paginas/estudiantes.py
- create mode 100755 sistema_tesis/paginas/inicio.py
- create mode 100755 sistema_tesis/paginas/login.py
- create mode 100755 sistema_tesis/paginas/mantenimiento.py
- create mode 100755 sistema_tesis/paginas/perfil.py
- create mode 100644 sistema_tesis/paginas/reportes.py
- create mode 100755 sistema_tesis/sistema_tesis.py
+ create mode 100755 sistema_gestion_trabajo_grado/__init__.py
+ create mode 100755 sistema_gestion_trabajo_grado/componentes/__init__.py
+ create mode 100755 sistema_gestion_trabajo_grado/componentes/barra_lateral.py
+ create mode 100755 sistema_gestion_trabajo_grado/componentes/campo_texto.py
+ create mode 100755 sistema_gestion_trabajo_grado/componentes/encabezado.py
+ create mode 100755 sistema_gestion_trabajo_grado/componentes/layout.py
+ create mode 100755 sistema_gestion_trabajo_grado/componentes/modal_estudiante.py
+ create mode 100755 sistema_gestion_trabajo_grado/componentes/tabla_estudiantes.py
+ create mode 100755 sistema_gestion_trabajo_grado/componentes/toast_viewer.py
+ create mode 100755 sistema_gestion_trabajo_grado/database_manager.py
+ create mode 100755 sistema_gestion_trabajo_grado/estado/__init__.py
+ create mode 100755 sistema_gestion_trabajo_grado/estado/estado_autenticacion.py
+ create mode 100755 sistema_gestion_trabajo_grado/estado/estado_boveda.py
+ create mode 100755 sistema_gestion_trabajo_grado/estado/estado_documento.py
+ create mode 100755 sistema_gestion_trabajo_grado/estado/estado_estudiante.py
+ create mode 100755 sistema_gestion_trabajo_grado/estado/estado_layout.py
+ create mode 100755 sistema_gestion_trabajo_grado/estado/estado_mantenimiento.py
+ create mode 100644 sistema_gestion_trabajo_grado/estado/estado_reportes.py
+ create mode 100755 sistema_gestion_trabajo_grado/paginas/__init__.py
+ create mode 100755 sistema_gestion_trabajo_grado/paginas/boveda.py
+ create mode 100755 sistema_gestion_trabajo_grado/paginas/documentacion.py
+ create mode 100755 sistema_gestion_trabajo_grado/paginas/estudiantes.py
+ create mode 100755 sistema_gestion_trabajo_grado/paginas/inicio.py
+ create mode 100755 sistema_gestion_trabajo_grado/paginas/login.py
+ create mode 100755 sistema_gestion_trabajo_grado/paginas/mantenimiento.py
+ create mode 100755 sistema_gestion_trabajo_grado/paginas/perfil.py
+ create mode 100644 sistema_gestion_trabajo_grado/paginas/reportes.py
+ create mode 100755 sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado.py
 
 diff --git a/.env.example b/.env.example
 new file mode 100644
@@ -102,7 +102,7 @@ index 0000000..51f5ef2
 @@ -0,0 +1,6 @@
 +DB_HOST=localhost
 +DB_PORT=5432
-+DB_NAME=DB_TESIS
++DB_NAME=db_trabajo_grado
 +DB_USER=postgres
 +DB_PASSWORD=changeme
 +# Copiar este archivo a .env y completar con credenciales reales. NO subir .env al control de versiones.
@@ -50524,7 +50524,7 @@ index 0000000..0148190
 +++ b/assets/documentos/doc_test.pdf
 @@ -0,0 +1,8 @@
 +%PDF-1.4
-+%����
++%����
 +1 0 obj
 +<< /Type /Catalog >>
 +endobj
@@ -51571,7 +51571,7 @@ index 0000000..0148190
 +++ b/assets/tesis/tesis_99999999.pdf
 @@ -0,0 +1,8 @@
 +%PDF-1.4
-+%����
++%����
 +1 0 obj
 +<< /Type /Catalog >>
 +endobj
@@ -51633,12 +51633,12 @@ index 0000000..3903d27
 +
 +### Estructura de archivos
 +```
-+sistema_tesis/
++sistema_gestion_trabajo_grado/
 +├── rxconfig.py                   # Config Reflex + carga .env con variables BD
 +├── .env                          # Credenciales PostgreSQL (NO debe estar en zip/git)
 +├── requirements.txt
-+└── sistema_tesis/
-+    ├── sistema_tesis.py          # App Reflex + registro de rutas (add_page)
++└── sistema_gestion_trabajo_grado/
++    ├── sistema_gestion_trabajo_grado.py          # App Reflex + registro de rutas (add_page)
 +    ├── database_manager.py       # Pool SQLAlchemy + ESQUEMA_SQL + inicializar_infraestructura()
 +    ├── estado/
 +    │   ├── estado_autenticacion.py   # Login, tokens, bcrypt, cerrar_sesion
@@ -51839,7 +51839,7 @@ index 0000000..3903d27
 +
 +### TAREA 6 🔴 CRÍTICA — Rutas sin protección de autenticación
 +
-+**Archivo:** `sistema_tesis/sistema_tesis.py`
++**Archivo:** `sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado.py`
 +
 +**El problema exacto:**
 +```python
@@ -51870,7 +51870,7 @@ index 0000000..3903d27
 +       if self.rol_usuario != "administrador":
 +           return rx.redirect("/")
 +   ```
-+2. En `sistema_tesis.py`, agregar `on_load` a todas las rutas protegidas:
++2. En `sistema_gestion_trabajo_grado.py`, agregar `on_load` a todas las rutas protegidas:
 +   ```python
 +   app.add_page(pagina_inicio,        route="/",              on_load=EstadoAutenticacion.verificar_sesion)
 +   app.add_page(pagina_boveda,        route="/boveda",        on_load=EstadoAutenticacion.verificar_sesion)
@@ -52068,10 +52068,10 @@ index 0000000..3903d27
 +
 +**1. Archivo con nombre inválido como módulo Python:**
 +```
-+sistema_tesis/componentes.encabezado.py   ← nombre con punto, Python no puede importarlo
-+sistema_tesis/componentes/encabezado.py   ← este es el válido
++sistema_gestion_trabajo_grado/componentes.encabezado.py   ← nombre con punto, Python no puede importarlo
++sistema_gestion_trabajo_grado/componentes/encabezado.py   ← este es el válido
 +```
-+Acción: Eliminar `sistema_tesis/componentes.encabezado.py` y verificar que
++Acción: Eliminar `sistema_gestion_trabajo_grado/componentes.encabezado.py` y verificar que
 +nada en el proyecto lo importa.
 +
 +**2. Dependencia duplicada en requirements.txt:**
@@ -52167,25 +52167,25 @@ index 0000000..c134be2
 +URL_BASE_DATOS = f"postgresql+psycopg2://{USUARIO_BD}:{CLAVE_BD}@{HOST_BD}:{PUERTO_BD}/{NOMBRE_BD}"
 +
 +config = rx.Config(
-+    app_name="sistema_tesis",
++    app_name="sistema_gestion_trabajo_grado",
 +    env=rx.Env.PROD,
 +    db_url=URL_BASE_DATOS,
 +    disable_plugins=[SitemapPlugin],
 +)
-diff --git a/sistema_tesis/__init__.py b/sistema_tesis/__init__.py
+diff --git a/sistema_gestion_trabajo_grado/__init__.py b/sistema_gestion_trabajo_grado/__init__.py
 new file mode 100755
 index 0000000..e69de29
-diff --git a/sistema_tesis/componentes/__init__.py b/sistema_tesis/componentes/__init__.py
+diff --git a/sistema_gestion_trabajo_grado/componentes/__init__.py b/sistema_gestion_trabajo_grado/componentes/__init__.py
 new file mode 100755
 index 0000000..e69de29
-diff --git a/sistema_tesis/componentes/barra_lateral.py b/sistema_tesis/componentes/barra_lateral.py
+diff --git a/sistema_gestion_trabajo_grado/componentes/barra_lateral.py b/sistema_gestion_trabajo_grado/componentes/barra_lateral.py
 new file mode 100755
 index 0000000..fb8bc54
 --- /dev/null
-+++ b/sistema_tesis/componentes/barra_lateral.py
++++ b/sistema_gestion_trabajo_grado/componentes/barra_lateral.py
 @@ -0,0 +1,314 @@
 +import reflex as rx
-+from sistema_tesis.estado.estado_autenticacion import EstadoAutenticacion
++from sistema_gestion_trabajo_grado.estado.estado_autenticacion import EstadoAutenticacion
 +from ..estado.estado_layout import EstadoLayout
 +
 +
@@ -52498,11 +52498,11 @@ index 0000000..fb8bc54
 +        position="sticky",
 +        top="0",
 +    )
-diff --git a/sistema_tesis/componentes/campo_texto.py b/sistema_tesis/componentes/campo_texto.py
+diff --git a/sistema_gestion_trabajo_grado/componentes/campo_texto.py b/sistema_gestion_trabajo_grado/componentes/campo_texto.py
 new file mode 100755
 index 0000000..f3d9d28
 --- /dev/null
-+++ b/sistema_tesis/componentes/campo_texto.py
++++ b/sistema_gestion_trabajo_grado/componentes/campo_texto.py
 @@ -0,0 +1,65 @@
 +import reflex as rx
 +COLOR_TEXTO_BOLD = "black"  # Negro puro para máximo contraste
@@ -52569,11 +52569,11 @@ index 0000000..f3d9d28
 +        width="100%",
 +        align="start",
 +    )
-diff --git a/sistema_tesis/componentes/encabezado.py b/sistema_tesis/componentes/encabezado.py
+diff --git a/sistema_gestion_trabajo_grado/componentes/encabezado.py b/sistema_gestion_trabajo_grado/componentes/encabezado.py
 new file mode 100755
 index 0000000..f019313
 --- /dev/null
-+++ b/sistema_tesis/componentes/encabezado.py
++++ b/sistema_gestion_trabajo_grado/componentes/encabezado.py
 @@ -0,0 +1,45 @@
 +import reflex as rx
 +
@@ -52620,11 +52620,11 @@ index 0000000..f019313
 +        border_bottom="1px solid #E2E8F0",
 +        margin_bottom="28px",
 +    )
-diff --git a/sistema_tesis/componentes/layout.py b/sistema_tesis/componentes/layout.py
+diff --git a/sistema_gestion_trabajo_grado/componentes/layout.py b/sistema_gestion_trabajo_grado/componentes/layout.py
 new file mode 100755
 index 0000000..99e42fe
 --- /dev/null
-+++ b/sistema_tesis/componentes/layout.py
++++ b/sistema_gestion_trabajo_grado/componentes/layout.py
 @@ -0,0 +1,213 @@
 +import reflex as rx
 +from .barra_lateral import sidebar_contenido, ANCHO_BARRA, COLOR_BORDE
@@ -52839,11 +52839,11 @@ index 0000000..99e42fe
 +            key="layout-student"
 +        )
 +    )
-diff --git a/sistema_tesis/componentes/modal_estudiante.py b/sistema_tesis/componentes/modal_estudiante.py
+diff --git a/sistema_gestion_trabajo_grado/componentes/modal_estudiante.py b/sistema_gestion_trabajo_grado/componentes/modal_estudiante.py
 new file mode 100755
 index 0000000..de2950c
 --- /dev/null
-+++ b/sistema_tesis/componentes/modal_estudiante.py
++++ b/sistema_gestion_trabajo_grado/componentes/modal_estudiante.py
 @@ -0,0 +1,414 @@
 +from .campo_texto import campo_texto
 +from ..estado.estado_estudiante import EstadoEstudiante
@@ -53259,11 +53259,11 @@ index 0000000..de2950c
 +            ),
 +        ),
 +    )
-diff --git a/sistema_tesis/componentes/tabla_estudiantes.py b/sistema_tesis/componentes/tabla_estudiantes.py
+diff --git a/sistema_gestion_trabajo_grado/componentes/tabla_estudiantes.py b/sistema_gestion_trabajo_grado/componentes/tabla_estudiantes.py
 new file mode 100755
 index 0000000..ec95178
 --- /dev/null
-+++ b/sistema_tesis/componentes/tabla_estudiantes.py
++++ b/sistema_gestion_trabajo_grado/componentes/tabla_estudiantes.py
 @@ -0,0 +1,68 @@
 +import reflex as rx
 +from ..estado.estado_estudiante import EstadoEstudiante
@@ -53333,22 +53333,22 @@ index 0000000..ec95178
 +        ),
 +        width="100%",
 +    )
-diff --git a/sistema_tesis/componentes/toast_viewer.py b/sistema_tesis/componentes/toast_viewer.py
+diff --git a/sistema_gestion_trabajo_grado/componentes/toast_viewer.py b/sistema_gestion_trabajo_grado/componentes/toast_viewer.py
 new file mode 100755
 index 0000000..a9d48f3
 --- /dev/null
-+++ b/sistema_tesis/componentes/toast_viewer.py
++++ b/sistema_gestion_trabajo_grado/componentes/toast_viewer.py
 @@ -0,0 +1,5 @@
 +import reflex as rx
 +
 +
 +def toast_viewer() -> rx.Component:
 +    return rx.toast.provider(position="bottom-right")
-diff --git a/sistema_tesis/database_manager.py b/sistema_tesis/database_manager.py
+diff --git a/sistema_gestion_trabajo_grado/database_manager.py b/sistema_gestion_trabajo_grado/database_manager.py
 new file mode 100755
 index 0000000..24054e2
 --- /dev/null
-+++ b/sistema_tesis/database_manager.py
++++ b/sistema_gestion_trabajo_grado/database_manager.py
 @@ -0,0 +1,176 @@
 +import logging
 +import reflex as rx
@@ -53526,14 +53526,14 @@ index 0000000..24054e2
 +    finally:
 +        if conexion:
 +            conexion.close()
-diff --git a/sistema_tesis/estado/__init__.py b/sistema_tesis/estado/__init__.py
+diff --git a/sistema_gestion_trabajo_grado/estado/__init__.py b/sistema_gestion_trabajo_grado/estado/__init__.py
 new file mode 100755
 index 0000000..e69de29
-diff --git a/sistema_tesis/estado/estado_autenticacion.py b/sistema_tesis/estado/estado_autenticacion.py
+diff --git a/sistema_gestion_trabajo_grado/estado/estado_autenticacion.py b/sistema_gestion_trabajo_grado/estado/estado_autenticacion.py
 new file mode 100755
 index 0000000..19f1a2c
 --- /dev/null
-+++ b/sistema_tesis/estado/estado_autenticacion.py
++++ b/sistema_gestion_trabajo_grado/estado/estado_autenticacion.py
 @@ -0,0 +1,207 @@
 +import logging
 +import reflex as rx
@@ -53742,11 +53742,11 @@ index 0000000..19f1a2c
 +    @staticmethod
 +    def verificar_clave(clave: str, hash_db: str) -> bool:
 +        return EncriptadorContrasena.verificar(clave, hash_db)
-diff --git a/sistema_tesis/estado/estado_boveda.py b/sistema_tesis/estado/estado_boveda.py
+diff --git a/sistema_gestion_trabajo_grado/estado/estado_boveda.py b/sistema_gestion_trabajo_grado/estado/estado_boveda.py
 new file mode 100755
 index 0000000..45e4934
 --- /dev/null
-+++ b/sistema_tesis/estado/estado_boveda.py
++++ b/sistema_gestion_trabajo_grado/estado/estado_boveda.py
 @@ -0,0 +1,459 @@
 +import os
 +import csv
@@ -54207,11 +54207,11 @@ index 0000000..45e4934
 +        """Número total de tesis cargadas (activos)."""
 +        return len(self.lista_tesis)
 +
-diff --git a/sistema_tesis/estado/estado_documento.py b/sistema_tesis/estado/estado_documento.py
+diff --git a/sistema_gestion_trabajo_grado/estado/estado_documento.py b/sistema_gestion_trabajo_grado/estado/estado_documento.py
 new file mode 100755
 index 0000000..e9b5f3a
 --- /dev/null
-+++ b/sistema_tesis/estado/estado_documento.py
++++ b/sistema_gestion_trabajo_grado/estado/estado_documento.py
 @@ -0,0 +1,299 @@
 +import logging
 +import reflex as rx
@@ -54512,11 +54512,11 @@ index 0000000..e9b5f3a
 +    @rx.var
 +    def total_documentos(self) -> int:
 +        return len(self.lista_documentos)
-diff --git a/sistema_tesis/estado/estado_estudiante.py b/sistema_tesis/estado/estado_estudiante.py
+diff --git a/sistema_gestion_trabajo_grado/estado/estado_estudiante.py b/sistema_gestion_trabajo_grado/estado/estado_estudiante.py
 new file mode 100755
 index 0000000..b3aeba5
 --- /dev/null
-+++ b/sistema_tesis/estado/estado_estudiante.py
++++ b/sistema_gestion_trabajo_grado/estado/estado_estudiante.py
 @@ -0,0 +1,568 @@
 +import logging
 +import reflex as rx
@@ -55086,11 +55086,11 @@ index 0000000..b3aeba5
 +            logger.exception("Error al generar reporte de estudiantes: %s", e)
 +            return rx.toast.error(f"Error al generar reporte: {e}")
 +
-diff --git a/sistema_tesis/estado/estado_layout.py b/sistema_tesis/estado/estado_layout.py
+diff --git a/sistema_gestion_trabajo_grado/estado/estado_layout.py b/sistema_gestion_trabajo_grado/estado/estado_layout.py
 new file mode 100755
 index 0000000..6579af5
 --- /dev/null
-+++ b/sistema_tesis/estado/estado_layout.py
++++ b/sistema_gestion_trabajo_grado/estado/estado_layout.py
 @@ -0,0 +1,15 @@
 +import reflex as rx
 +
@@ -55107,11 +55107,11 @@ index 0000000..6579af5
 +
 +    def alternar_menu(self):
 +        self.menu_abierto = not self.menu_abierto
-diff --git a/sistema_tesis/estado/estado_mantenimiento.py b/sistema_tesis/estado/estado_mantenimiento.py
+diff --git a/sistema_gestion_trabajo_grado/estado/estado_mantenimiento.py b/sistema_gestion_trabajo_grado/estado/estado_mantenimiento.py
 new file mode 100755
 index 0000000..08adb24
 --- /dev/null
-+++ b/sistema_tesis/estado/estado_mantenimiento.py
++++ b/sistema_gestion_trabajo_grado/estado/estado_mantenimiento.py
 @@ -0,0 +1,598 @@
 +import logging
 +import reflex as rx
@@ -55711,11 +55711,11 @@ index 0000000..08adb24
 +            return rx.toast.error("Error al verificar credenciales.")
 +        finally:
 +            conn.close()
-diff --git a/sistema_tesis/estado/estado_reportes.py b/sistema_tesis/estado/estado_reportes.py
+diff --git a/sistema_gestion_trabajo_grado/estado/estado_reportes.py b/sistema_gestion_trabajo_grado/estado/estado_reportes.py
 new file mode 100644
 index 0000000..cae4ab5
 --- /dev/null
-+++ b/sistema_tesis/estado/estado_reportes.py
++++ b/sistema_gestion_trabajo_grado/estado/estado_reportes.py
 @@ -0,0 +1,212 @@
 +import logging
 +import reflex as rx
@@ -55930,14 +55930,14 @@ index 0000000..cae4ab5
 +            logger.exception("Error al generar PDF de reportes: %s", e)
 +            return rx.toast.error("Error técnico al generar el PDF.")
 \ No newline at end of file
-diff --git a/sistema_tesis/paginas/__init__.py b/sistema_tesis/paginas/__init__.py
+diff --git a/sistema_gestion_trabajo_grado/paginas/__init__.py b/sistema_gestion_trabajo_grado/paginas/__init__.py
 new file mode 100755
 index 0000000..e69de29
-diff --git a/sistema_tesis/paginas/boveda.py b/sistema_tesis/paginas/boveda.py
+diff --git a/sistema_gestion_trabajo_grado/paginas/boveda.py b/sistema_gestion_trabajo_grado/paginas/boveda.py
 new file mode 100755
 index 0000000..cdf5e6f
 --- /dev/null
-+++ b/sistema_tesis/paginas/boveda.py
++++ b/sistema_gestion_trabajo_grado/paginas/boveda.py
 @@ -0,0 +1,843 @@
 +import reflex as rx
 +from ..estado.estado_autenticacion import EstadoAutenticacion
@@ -56782,11 +56782,11 @@ index 0000000..cdf5e6f
 +        appearance="light",
 +        has_background=True,
 +    )
-diff --git a/sistema_tesis/paginas/documentacion.py b/sistema_tesis/paginas/documentacion.py
+diff --git a/sistema_gestion_trabajo_grado/paginas/documentacion.py b/sistema_gestion_trabajo_grado/paginas/documentacion.py
 new file mode 100755
 index 0000000..5b35d41
 --- /dev/null
-+++ b/sistema_tesis/paginas/documentacion.py
++++ b/sistema_gestion_trabajo_grado/paginas/documentacion.py
 @@ -0,0 +1,513 @@
 +import reflex as rx
 +from ..componentes.encabezado import encabezado_pagina
@@ -57301,11 +57301,11 @@ index 0000000..5b35d41
 +        appearance="light",
 +        has_background=True,
 +    )
-diff --git a/sistema_tesis/paginas/estudiantes.py b/sistema_tesis/paginas/estudiantes.py
+diff --git a/sistema_gestion_trabajo_grado/paginas/estudiantes.py b/sistema_gestion_trabajo_grado/paginas/estudiantes.py
 new file mode 100755
 index 0000000..a374830
 --- /dev/null
-+++ b/sistema_tesis/paginas/estudiantes.py
++++ b/sistema_gestion_trabajo_grado/paginas/estudiantes.py
 @@ -0,0 +1,97 @@
 +import reflex as rx
 +from ..componentes.encabezado import encabezado_pagina
@@ -57404,11 +57404,11 @@ index 0000000..a374830
 +        appearance="light",
 +        has_background=True,
 +    )
-diff --git a/sistema_tesis/paginas/inicio.py b/sistema_tesis/paginas/inicio.py
+diff --git a/sistema_gestion_trabajo_grado/paginas/inicio.py b/sistema_gestion_trabajo_grado/paginas/inicio.py
 new file mode 100755
 index 0000000..2422468
 --- /dev/null
-+++ b/sistema_tesis/paginas/inicio.py
++++ b/sistema_gestion_trabajo_grado/paginas/inicio.py
 @@ -0,0 +1,513 @@
 +import reflex as rx
 +from ..estado.estado_autenticacion import EstadoAutenticacion
@@ -57923,11 +57923,11 @@ index 0000000..2422468
 +        appearance="light",
 +        has_background=True,
 +    )
-diff --git a/sistema_tesis/paginas/login.py b/sistema_tesis/paginas/login.py
+diff --git a/sistema_gestion_trabajo_grado/paginas/login.py b/sistema_gestion_trabajo_grado/paginas/login.py
 new file mode 100755
 index 0000000..a819d82
 --- /dev/null
-+++ b/sistema_tesis/paginas/login.py
++++ b/sistema_gestion_trabajo_grado/paginas/login.py
 @@ -0,0 +1,161 @@
 +import reflex as rx
 +from ..estado.estado_autenticacion import EstadoAutenticacion
@@ -58090,11 +58090,11 @@ index 0000000..a819d82
 +        appearance="light",
 +        has_background=True,
 +    )
-diff --git a/sistema_tesis/paginas/mantenimiento.py b/sistema_tesis/paginas/mantenimiento.py
+diff --git a/sistema_gestion_trabajo_grado/paginas/mantenimiento.py b/sistema_gestion_trabajo_grado/paginas/mantenimiento.py
 new file mode 100755
 index 0000000..d7c1d67
 --- /dev/null
-+++ b/sistema_tesis/paginas/mantenimiento.py
++++ b/sistema_gestion_trabajo_grado/paginas/mantenimiento.py
 @@ -0,0 +1,886 @@
 +import reflex as rx
 +from ..componentes.encabezado import encabezado_pagina
@@ -58982,11 +58982,11 @@ index 0000000..d7c1d67
 +        appearance="light",
 +        has_background=True,
 +    )
-diff --git a/sistema_tesis/paginas/perfil.py b/sistema_tesis/paginas/perfil.py
+diff --git a/sistema_gestion_trabajo_grado/paginas/perfil.py b/sistema_gestion_trabajo_grado/paginas/perfil.py
 new file mode 100755
 index 0000000..838b837
 --- /dev/null
-+++ b/sistema_tesis/paginas/perfil.py
++++ b/sistema_gestion_trabajo_grado/paginas/perfil.py
 @@ -0,0 +1,293 @@
 +import logging
 +import re
@@ -59281,11 +59281,11 @@ index 0000000..838b837
 +
 +# El resto del archivo (formularios y pagina_perfil) se mantienen iguales a la versión previa en el repositorio,
 +# por brevedad no se duplican aquí. Mantener on_mount y llamadas a EstadoPerfil.cargar_datos_iniciales.
-diff --git a/sistema_tesis/paginas/reportes.py b/sistema_tesis/paginas/reportes.py
+diff --git a/sistema_gestion_trabajo_grado/paginas/reportes.py b/sistema_gestion_trabajo_grado/paginas/reportes.py
 new file mode 100644
 index 0000000..42a6867
 --- /dev/null
-+++ b/sistema_tesis/paginas/reportes.py
++++ b/sistema_gestion_trabajo_grado/paginas/reportes.py
 @@ -0,0 +1,219 @@
 +import reflex as rx
 +from ..componentes.encabezado import encabezado_pagina
@@ -59507,11 +59507,11 @@ index 0000000..42a6867
 +        has_background=True,
 +    )
 \ No newline at end of file
-diff --git a/sistema_tesis/sistema_tesis.py b/sistema_tesis/sistema_tesis.py
+diff --git a/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado.py b/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado.py
 new file mode 100755
 index 0000000..3995851
 --- /dev/null
-+++ b/sistema_tesis/sistema_tesis.py
++++ b/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado.py
 @@ -0,0 +1,42 @@
 +from .paginas.perfil import pagina_perfil
 +import reflex as rx

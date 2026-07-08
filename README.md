@@ -15,10 +15,10 @@ para ver su información y perfil.
 ## Instalación
 1. Clonar el repositorio
 2. Crear entorno virtual: `python -m venv .venv`
-3. Activar entorno: `.venv\Scripts\activate` (Windows)
-4. Instalar dependencias: `pip install -r requirements.txt`
-5. Copiar `.env.example` a `.env` y configurar con tus credenciales locales
-6. Crear la base de datos en PostgreSQL: `CREATE DATABASE DB_TRABAJO_GRADO;`
+4. Activar entorno: `.venv/bin/activate` (Linux/macOS) o `.venv\Scripts\activate` (Windows)
+5. Instalar dependencias: `pip install -r requirements.txt`
+6. Copiar `.env.example` a `.env` y configurar con tus credenciales locales
+7. Crear la base de datos en PostgreSQL: `CREATE DATABASE db_trabajo_grado;`
 7. Ejecutar: `reflex run` (desarrollo) o `reflex run --env prod` (producción)
 
 ## Configuración inicial
@@ -43,13 +43,13 @@ env PYTHONPATH=. .venv/bin/python -m unittest discover -s tests
 
 ## Estructura del proyecto
 ```
-sistema_tesis/
+sistema_gestion_trabajo_grado/
 ├── rxconfig.py
 ├── .env
 ├── .gitignore
 ├── requirements.txt
-└── sistema_tesis/
-    ├── sistema_tesis.py
+└── sistema_gestion_trabajo_grado/
+    ├── sistema_gestion_trabajo_grado.py
     ├── database_manager.py
     ├── estado/
     │   ├── estado_autenticacion.py

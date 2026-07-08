@@ -11,18 +11,68 @@ import psycopg2
 from rxconfig import URL_BASE_DATOS
 
 FIRST_NAMES = [
-    "Alejandro", "Camila", "Diego", "Valentina", "Santiago", "Isabella",
-    "Mateo", "María", "Lucas", "Sofía", "Daniel", "Victoria",
-    "Julián", "Gabriela", "Sebastián", "Natalia", "Andrés", "Camila",
-    "Nicolás", "Florencia", "José", "Laura", "Adrián", "Antonella",
-    "Cristian", "Paula", "Fernando", "Lucía", "Manuel", "Elena"
+    "Alejandro",
+    "Camila",
+    "Diego",
+    "Valentina",
+    "Santiago",
+    "Isabella",
+    "Mateo",
+    "María",
+    "Lucas",
+    "Sofía",
+    "Daniel",
+    "Victoria",
+    "Julián",
+    "Gabriela",
+    "Sebastián",
+    "Natalia",
+    "Andrés",
+    "Camila",
+    "Nicolás",
+    "Florencia",
+    "José",
+    "Laura",
+    "Adrián",
+    "Antonella",
+    "Cristian",
+    "Paula",
+    "Fernando",
+    "Lucía",
+    "Manuel",
+    "Elena",
 ]
 LAST_NAMES = [
-    "González", "Rodríguez", "Pérez", "Martínez", "Gómez", "Díaz",
-    "Fernández", "López", "Hernández", "Jiménez", "Sánchez", "Ramírez",
-    "Torres", "Flores", "Rivera", "Castro", "Ortiz", "Ramos",
-    "Ruiz", "Vargas", "Mendoza", "Cruz", "Rojas", "Núñez",
-    "Silva", "Guerrero", "Cárdenas", "Herrera", "Arias", "Navarro"
+    "González",
+    "Rodríguez",
+    "Pérez",
+    "Martínez",
+    "Gómez",
+    "Díaz",
+    "Fernández",
+    "López",
+    "Hernández",
+    "Jiménez",
+    "Sánchez",
+    "Ramírez",
+    "Torres",
+    "Flores",
+    "Rivera",
+    "Castro",
+    "Ortiz",
+    "Ramos",
+    "Ruiz",
+    "Vargas",
+    "Mendoza",
+    "Cruz",
+    "Rojas",
+    "Núñez",
+    "Silva",
+    "Guerrero",
+    "Cárdenas",
+    "Herrera",
+    "Arias",
+    "Navarro",
 ]
 
 EMAIL_DOMAIN = "example.com"
@@ -70,16 +120,24 @@ def main():
     if not carreras:
         raise SystemExit("No se encontraron carreras activas en la base de datos.")
 
-    cursor.execute("SELECT id FROM tutor_academico WHERE esta_activo = TRUE ORDER BY id;")
+    cursor.execute(
+        "SELECT id FROM tutor_academico WHERE esta_activo = TRUE ORDER BY id;"
+    )
     tutores_academicos = [row[0] for row in cursor.fetchall()]
 
-    password_hash = bcrypt.hashpw(PASSWORD.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+    password_hash = bcrypt.hashpw(PASSWORD.encode("utf-8"), bcrypt.gensalt()).decode(
+        "utf-8"
+    )
 
     inserted = 0
     for i in range(TOTAL_STUDENTS):
-        cedula, nombre, apellido, correo, celular, inicio, cierre = build_student_data(i)
+        cedula, nombre, apellido, correo, celular, inicio, cierre = build_student_data(
+            i
+        )
         carrera_id = random.choice(carreras)
-        tutor_academico_id = random.choice(tutores_academicos) if tutores_academicos else None
+        tutor_academico_id = (
+            random.choice(tutores_academicos) if tutores_academicos else None
+        )
 
         cursor.execute(
             "SELECT 1 FROM usuario WHERE cedula = %s OR correo = %s;",

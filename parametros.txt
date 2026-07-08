@@ -63,14 +63,14 @@ para ver su información y perfil.
 
 ### Estructura completa de archivos
 ```
-sistema_tesis/
+sistema_gestion_trabajo_grado/
 ├── rxconfig.py                    # Config Reflex + carga .env
 ├── .env                           # Credenciales PostgreSQL
 ├── .gitignore                     # Ya incluye .env ✓
 ├── requirements.txt               # bcrypt, psycopg2-binary, sqlalchemy,
 │                                  # pydantic, python-dotenv, reflex==0.9.1, fpdf2
-└── sistema_tesis/
-    ├── sistema_tesis.py           # App + rutas protegidas con on_load
+└── sistema_gestion_trabajo_grado/
+    ├── sistema_gestion_trabajo_grado.py           # App + rutas protegidas con on_load
     ├── database_manager.py        # Pool + ESQUEMA_SQL + índices
     ├── estado/
     │   ├── estado_autenticacion.py   # Login, tokens, bcrypt, cerrar_sesion,
@@ -154,7 +154,7 @@ Estos problemas ya fueron resueltos en la versión actual. No los rehgas:
 ```
 DB_HOST=LOCALHOST
 DB_PORT=5432
-DB_NAME=DB_TESIS
+DB_NAME=db_trabajo_grado
 DB_USER=postgres
 DB_PASSWORD=V32273930   ← contraseña real de PostgreSQL en texto plano
 ```
@@ -485,7 +485,7 @@ Crear `README.md` en la raíz con estas secciones (en español, formato Markdown
 3. Activar entorno: `.venv\Scripts\activate` (Windows)
 4. Instalar dependencias: `pip install -r requirements.txt`
 5. Copiar `.env.example` a `.env` y configurar con tus credenciales
-6. Crear la base de datos en PostgreSQL: `CREATE DATABASE DB_TESIS;`
+6. Crear la base de datos en PostgreSQL: `CREATE DATABASE db_trabajo_grado;`
 7. Ejecutar: `reflex run` (desarrollo) o `reflex run --env prod` (producción)
 
 ## Configuración inicial

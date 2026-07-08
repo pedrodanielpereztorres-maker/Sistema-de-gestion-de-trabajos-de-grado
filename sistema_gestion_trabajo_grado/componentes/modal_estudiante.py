@@ -66,8 +66,10 @@ def selector_carrera() -> rx.Component:
             EstadoEstudiante.carreras_disponibles,
             value=EstadoEstudiante.carrera,
             placeholder="Selecciona una carrera",
-            on_change=[EstadoEstudiante.fijar_carrera,
-                       EstadoEstudiante.cargar_tutores_por_carrera],
+            on_change=[
+                EstadoEstudiante.fijar_carrera,
+                EstadoEstudiante.cargar_tutores_por_carrera,
+            ],
             size="3",
             width="100%",
             radius="large",
@@ -115,7 +117,7 @@ def cabecera_modal() -> rx.Component:
                 rx.cond(
                     EstadoEstudiante.en_edicion,
                     "Editar Estudiante",
-                    "Registrar Estudiante"
+                    "Registrar Estudiante",
                 ),
                 font_size="19px",
                 font_weight="800",
@@ -181,9 +183,9 @@ def pie_modal() -> rx.Component:
                 rx.cond(
                     EstadoEstudiante.en_edicion,
                     "Guardar Cambios",
-                    "Registrar Estudiante"
+                    "Registrar Estudiante",
                 ),
-                font_weight="700"
+                font_weight="700",
             ),
             on_click=EstadoEstudiante.guardar_estudiante,
             size="3",
@@ -236,26 +238,31 @@ def modal_registrar_estudiante() -> rx.Component:
                                         width="100%",
                                         radius="large",
                                         read_only=rx.cond(
-                                            EstadoEstudiante.en_edicion, True, False),
+                                            EstadoEstudiante.en_edicion, True, False
+                                        ),
                                         style={
-                                            "background":  "#FFFFFF",
-                                            "border":      "1.5px solid #CBD5E1",
-                                            "color":       "#0F172A",
-                                            "font_size":   "13.5px",
+                                            "background": "#FFFFFF",
+                                            "border": "1.5px solid #CBD5E1",
+                                            "color": "#0F172A",
+                                            "font_size": "13.5px",
                                             "font_weight": "bold",
-                                            "cursor": rx.cond(EstadoEstudiante.en_edicion, "not-allowed", "text"),
+                                            "cursor": rx.cond(
+                                                EstadoEstudiante.en_edicion,
+                                                "not-allowed",
+                                                "text",
+                                            ),
                                             "&::placeholder": {
-                                    "color": "#94A3B8",
-                                    "opacity": "0.85",
-                                    "font_weight": "500",
-                                    "letter_spacing": "0.01em",
-                                },
+                                                "color": "#94A3B8",
+                                                "opacity": "0.85",
+                                                "font_weight": "500",
+                                                "letter_spacing": "0.01em",
+                                            },
                                         },
                                         placeholder="Cédula de Identidad",  # Add placeholder for clarity
                                         _focus={
                                             "border_color": "#6366F1",
-                                            "box_shadow":   "0 0 0 3px rgba(99,102,241,0.15)",
-                                            "outline":      "none",
+                                            "box_shadow": "0 0 0 3px rgba(99,102,241,0.15)",
+                                            "outline": "none",
                                         },
                                         _hover={"border_color": "#A5B4FC"},
                                         transition="border-color 0.15s ease, box-shadow 0.15s ease",
@@ -268,20 +275,20 @@ def modal_registrar_estudiante() -> rx.Component:
                                     "Nombres",
                                     EstadoEstudiante.nombre,
                                     EstadoEstudiante.fijar_nombre,
-                                    solo_lectura=EstadoEstudiante.usuario_encontrado
+                                    solo_lectura=EstadoEstudiante.usuario_encontrado,
                                 ),
                                 campo_texto(
                                     "Apellidos",
                                     EstadoEstudiante.apellido,
                                     EstadoEstudiante.fijar_apellido,
-                                    solo_lectura=EstadoEstudiante.usuario_encontrado
+                                    solo_lectura=EstadoEstudiante.usuario_encontrado,
                                 ),
                                 campo_texto(
                                     "Correo Estudiante",
                                     EstadoEstudiante.correo,
                                     EstadoEstudiante.fijar_correo,
                                     solo_lectura=EstadoEstudiante.usuario_encontrado,
-                                    tipo="email"
+                                    tipo="email",
                                 ),
                                 campo_texto(
                                     "Teléfono Estudiante",
@@ -334,8 +341,12 @@ def modal_registrar_estudiante() -> rx.Component:
                             rx.cond(
                                 EstadoEstudiante.haciendo_tesis,
                                 rx.vstack(
-                                    rx.text("Seleccionar Tutor Académico", font_size="13px",
-                                            font_weight="600", color=COLOR_TEXTO_TITULO),
+                                    rx.text(
+                                        "Seleccionar Tutor Académico",
+                                        font_size="13px",
+                                        font_weight="600",
+                                        color=COLOR_TEXTO_TITULO,
+                                    ),
                                     rx.select(
                                         EstadoEstudiante.tutores_disponibles,
                                         value=EstadoEstudiante.tutor_academico_seleccionado,
@@ -356,7 +367,7 @@ def modal_registrar_estudiante() -> rx.Component:
                                     spacing="2",
                                     width="100%",
                                     align="start",
-                                )
+                                ),
                             ),
                         ),
                         bloque_seccion(
@@ -404,7 +415,8 @@ def modal_registrar_estudiante() -> rx.Component:
                     background="white",
                     border_radius="1.5rem",
                     padding="2.25rem",
-                    width="100%", max_width="96vw",
+                    width="100%",
+                    max_width="96vw",
                     max_height="95vh",
                     overflow_y="auto",
                     border=f"1px solid {COLOR_BORDE_SECCION}",
@@ -417,6 +429,6 @@ def modal_registrar_estudiante() -> rx.Component:
                 height="100vh",
                 z_index="200",
             ),
-            key="modal-registrar-estudiante"
+            key="modal-registrar-estudiante",
         ),
     )

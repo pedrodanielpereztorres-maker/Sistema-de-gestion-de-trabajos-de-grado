@@ -28,10 +28,21 @@ def pagina_login() -> rx.Component:
                         ),
                         # Cabecera / Títulos
                         rx.vstack(
-                            rx.heading("Acceso al Portal", size="7", align="center", weight="bold", color="#0F172A"),
-                            rx.text("Ingresa tus credenciales para acceder a la plataforma ",
-                                    rx.text.span("SGT", class_name="notranslate"),
-                                    color="#64748B", size="2", text_align="center", font_weight="500"),
+                            rx.heading(
+                                "Acceso al Portal",
+                                size="7",
+                                align="center",
+                                weight="bold",
+                                color="#0F172A",
+                            ),
+                            rx.text(
+                                "Ingresa tus credenciales para acceder a la plataforma ",
+                                rx.text.span("SGT", class_name="notranslate"),
+                                color="#64748B",
+                                size="2",
+                                text_align="center",
+                                font_weight="500",
+                            ),
                             spacing="1",
                             align="center",
                             width="100%",
@@ -39,12 +50,20 @@ def pagina_login() -> rx.Component:
                         ),
                         # Input: Usuario
                         rx.vstack(
-                            rx.text("Correo Electrónico", size="2", weight="bold", color="#1E293B"),
+                            rx.text(
+                                "Correo Electrónico",
+                                size="2",
+                                weight="bold",
+                                color="#1E293B",
+                            ),
                             rx.input(
                                 placeholder="ejemplo@correo.com",
                                 value=EstadoAutenticacion.entrada_usuario,
                                 on_change=EstadoAutenticacion.fijar_entrada_usuario,
-                                custom_attrs={"autoComplete": "username", "name": "username"},
+                                custom_attrs={
+                                    "autoComplete": "username",
+                                    "name": "username",
+                                },
                                 width="100%",
                                 variant="classic",
                                 size="3",
@@ -57,11 +76,11 @@ def pagina_login() -> rx.Component:
                                     "border_radius": "12px",
                                     "box_shadow": "inset 0 1px 2px rgba(0, 0, 0, 0.02)",
                                     "&::placeholder": {
-                                    "color": "#94A3B8",
-                                    "opacity": "0.85",
-                                    "font_weight": "500",
-                                    "letter_spacing": "0.01em",
-                                },
+                                        "color": "#94A3B8",
+                                        "opacity": "0.85",
+                                        "font_weight": "500",
+                                        "letter_spacing": "0.01em",
+                                    },
                                     "letter_spacing": "0.01em",
                                 },
                                 _focus={
@@ -69,26 +88,31 @@ def pagina_login() -> rx.Component:
                                     "box_shadow": "0 0 0 3px rgba(99, 102, 241, 0.15)",
                                     "outline": "none",
                                 },
-                                _hover={"border_color": "#94A3B8"}
+                                _hover={"border_color": "#94A3B8"},
                             ),
                             width="100%",
                             align_items="start",
-                            spacing="1"
+                            spacing="1",
                         ),
                         # Input: Contraseña
                         rx.vstack(
-                            rx.text("Contraseña", size="2", weight="bold", color="#1E293B"),
+                            rx.text(
+                                "Contraseña", size="2", weight="bold", color="#1E293B"
+                            ),
                             rx.box(
                                 rx.input(
                                     placeholder="••••••••",
                                     type=rx.cond(
                                         EstadoAutenticacion.mostrar_contrasena,
                                         "text",
-                                        "password"
+                                        "password",
                                     ),
                                     value=EstadoAutenticacion.entrada_contrasena,
                                     on_change=EstadoAutenticacion.fijar_entrada_contrasena,
-                                    custom_attrs={"autoComplete": "current-password", "name": "current-password"},
+                                    custom_attrs={
+                                        "autoComplete": "current-password",
+                                        "name": "current-password",
+                                    },
                                     width="100%",
                                     variant="classic",
                                     size="3",
@@ -102,11 +126,11 @@ def pagina_login() -> rx.Component:
                                         "padding_right": "45px",
                                         "box_shadow": "inset 0 1px 2px rgba(0, 0, 0, 0.02)",
                                         "&::placeholder": {
-                                    "color": "#94A3B8",
-                                    "opacity": "0.85",
-                                    "font_weight": "500",
-                                    "letter_spacing": "0.01em",
-                                },
+                                            "color": "#94A3B8",
+                                            "opacity": "0.85",
+                                            "font_weight": "500",
+                                            "letter_spacing": "0.01em",
+                                        },
                                         "letter_spacing": "0.01em",
                                     },
                                     _focus={
@@ -114,13 +138,16 @@ def pagina_login() -> rx.Component:
                                         "box_shadow": "0 0 0 3px rgba(99, 102, 241, 0.15)",
                                         "outline": "none",
                                     },
-                                    _hover={"border_color": "#94A3B8"}
+                                    _hover={"border_color": "#94A3B8"},
                                 ),
                                 rx.icon_button(
                                     rx.icon(
                                         rx.cond(
-                                            EstadoAutenticacion.mostrar_contrasena, "eye-off", "eye"),
-                                        size=18
+                                            EstadoAutenticacion.mostrar_contrasena,
+                                            "eye-off",
+                                            "eye",
+                                        ),
+                                        size=18,
                                     ),
                                     on_click=EstadoAutenticacion.alternar_mostrar_contrasena,
                                     variant="ghost",
@@ -143,7 +170,7 @@ def pagina_login() -> rx.Component:
                             ),
                             width="100%",
                             align_items="start",
-                            spacing="1"
+                            spacing="1",
                         ),
                         # Botón Iniciar Sesión con gradiente y sombra
                         rx.button(
@@ -151,7 +178,7 @@ def pagina_login() -> rx.Component:
                                 rx.icon("log-in", size=18),
                                 rx.text("Iniciar Sesión", weight="bold"),
                                 spacing="2",
-                                align="center"
+                                align="center",
                             ),
                             on_click=EstadoAutenticacion.iniciar_sesion,
                             width="100%",
@@ -167,9 +194,9 @@ def pagina_login() -> rx.Component:
                             },
                             _hover={
                                 "box_shadow": "0 12px 28px rgba(99, 102, 241, 0.3)",
-                                "transform": "translateY(-1px)"
+                                "transform": "translateY(-1px)",
                             },
-                            _active={"transform": "translateY(0)"}
+                            _active={"transform": "translateY(0)"},
                         ),
                         toast_viewer(),
                         spacing="4",

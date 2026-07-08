@@ -7,7 +7,7 @@ from unittest.mock import AsyncMock, patch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from sistema_tesis.estado.estado_dashboard import EstadoDashboard
+from sistema_gestion_trabajo_grado.estado.estado_dashboard import EstadoDashboard
 
 
 class FakeCursor:
@@ -56,8 +56,8 @@ class TestEstadoDashboard(unittest.TestCase):
         fake_cursor = FakeCursor(
             fetchone_responses=[
                 (504, 342, 162),  # resumen global
-                (24,),             # total tesis
-                (14, 10),          # públicas/privadas
+                (24,),  # total tesis
+                (14, 10),  # públicas/privadas
             ],
             fetchall_responses=[
                 [
@@ -71,11 +71,14 @@ class TestEstadoDashboard(unittest.TestCase):
                 [
                     ("V002", "Ana", "Gómez", "Electrónica"),
                 ],
-            ]
+            ],
         )
         fake_conn = FakeConn(fake_cursor)
 
-        with patch("sistema_tesis.estado.estado_dashboard.obtener_conexion", return_value=fake_conn):
+        with patch(
+            "sistema_gestion_trabajo_grado.estado.estado_dashboard.obtener_conexion",
+            return_value=fake_conn,
+        ):
             asyncio.run(estado.cargar_dashboard())
 
         self.assertEqual(estado.total_estudiantes, 504)
@@ -98,7 +101,10 @@ class TestEstadoDashboard(unittest.TestCase):
         estado._estudiantes_en_pasantia = 342
         estado._estudiantes_sin_pasantia = 162
 
-        self.assertEqual(estado.total_estudiantes, estado.estudiantes_en_pasantia + estado.estudiantes_sin_pasantia)
+        self.assertEqual(
+            estado.total_estudiantes,
+            estado.estudiantes_en_pasantia + estado.estudiantes_sin_pasantia,
+        )
 
 
 if __name__ == "__main__":

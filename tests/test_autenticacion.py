@@ -5,7 +5,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from sistema_tesis.estado.estado_autenticacion import EncriptadorContrasena
+from sistema_gestion_trabajo_grado.estado.estado_autenticacion import (
+    EncriptadorContrasena,
+)
 
 
 class TestAutenticacion(unittest.TestCase):
@@ -19,11 +21,14 @@ class TestAutenticacion(unittest.TestCase):
 
     def test_env_example_contiene_placeholders(self):
         archivo_ejemplo = ROOT / ".env.example"
-        self.assertTrue(archivo_ejemplo.exists(), ".env.example debe existir en la raíz del proyecto")
+        self.assertTrue(
+            archivo_ejemplo.exists(),
+            ".env.example debe existir en la raíz del proyecto",
+        )
 
         contenido = archivo_ejemplo.read_text(encoding="utf-8")
         self.assertIn("DB_HOST=localhost", contenido)
-        self.assertIn("DB_NAME=DB_TESIS", contenido)
+        self.assertIn("DB_NAME=db_trabajo_grado", contenido)
         self.assertIn("DB_USER=postgres", contenido)
         self.assertIn("DB_PASSWORD=tu_contraseña_aqui", contenido)
 

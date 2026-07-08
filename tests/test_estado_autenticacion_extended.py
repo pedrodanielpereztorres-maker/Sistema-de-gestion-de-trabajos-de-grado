@@ -10,7 +10,11 @@ sys.path.insert(0, str(ROOT))
 
 os.environ["PYTEST_CURRENT_TEST"] = "1"
 
-from sistema_tesis.estado.estado_autenticacion import EstadoAutenticacion, EncriptadorContrasena, Usuario
+from sistema_gestion_trabajo_grado.estado.estado_autenticacion import (
+    EstadoAutenticacion,
+    EncriptadorContrasena,
+    Usuario,
+)
 
 
 class FakeCursor:
@@ -67,8 +71,14 @@ class TestEstadoAutenticacionExtended(unittest.TestCase):
         estado.entrada_usuario = "user@example.com"
         estado.entrada_contrasena = "secret"
 
-        with patch("sistema_tesis.estado.estado_autenticacion.obtener_conexion", return_value=None):
-            with patch("sistema_tesis.estado.estado_autenticacion.rx.toast.error", return_value="error_conn"):
+        with patch(
+            "sistema_gestion_trabajo_grado.estado.estado_autenticacion.obtener_conexion",
+            return_value=None,
+        ):
+            with patch(
+                "sistema_gestion_trabajo_grado.estado.estado_autenticacion.rx.toast.error",
+                return_value="error_conn",
+            ):
                 result = estado.iniciar_sesion()
 
         self.assertEqual(result, "error_conn")
@@ -79,12 +89,31 @@ class TestEstadoAutenticacionExtended(unittest.TestCase):
         estado.entrada_usuario = "usuario@test.com"
         estado.entrada_contrasena = "wrongpass"
 
-        cursor = FakeCursor(responses=[(1, "123456", "Juan", "Perez", "usuario@test.com", "hash", True, "Admin")])
+        cursor = FakeCursor(
+            responses=[
+                (
+                    1,
+                    "123456",
+                    "Juan",
+                    "Perez",
+                    "usuario@test.com",
+                    "hash",
+                    True,
+                    "Admin",
+                )
+            ]
+        )
         conn = FakeConn(cursor)
 
-        with patch("sistema_tesis.estado.estado_autenticacion.obtener_conexion", return_value=conn):
+        with patch(
+            "sistema_gestion_trabajo_grado.estado.estado_autenticacion.obtener_conexion",
+            return_value=conn,
+        ):
             with patch.object(EncriptadorContrasena, "verificar", return_value=False):
-                with patch("sistema_tesis.estado.estado_autenticacion.rx.toast.error", return_value="error_invalid"):
+                with patch(
+                    "sistema_gestion_trabajo_grado.estado.estado_autenticacion.rx.toast.error",
+                    return_value="error_invalid",
+                ):
                     result = estado.iniciar_sesion()
 
         self.assertEqual(result, "error_invalid")
@@ -96,12 +125,31 @@ class TestEstadoAutenticacionExtended(unittest.TestCase):
         estado.entrada_usuario = "usuario@test.com"
         estado.entrada_contrasena = "secret"
 
-        cursor = FakeCursor(responses=[(1, "123456", "Juan", "Perez", "usuario@test.com", "hash", False, "Admin")])
+        cursor = FakeCursor(
+            responses=[
+                (
+                    1,
+                    "123456",
+                    "Juan",
+                    "Perez",
+                    "usuario@test.com",
+                    "hash",
+                    False,
+                    "Admin",
+                )
+            ]
+        )
         conn = FakeConn(cursor)
 
-        with patch("sistema_tesis.estado.estado_autenticacion.obtener_conexion", return_value=conn):
+        with patch(
+            "sistema_gestion_trabajo_grado.estado.estado_autenticacion.obtener_conexion",
+            return_value=conn,
+        ):
             with patch.object(EncriptadorContrasena, "verificar", return_value=True):
-                with patch("sistema_tesis.estado.estado_autenticacion.rx.toast.error", return_value="error_inactive"):
+                with patch(
+                    "sistema_gestion_trabajo_grado.estado.estado_autenticacion.rx.toast.error",
+                    return_value="error_inactive",
+                ):
                     result = estado.iniciar_sesion()
 
         self.assertEqual(result, "error_inactive")
@@ -113,13 +161,35 @@ class TestEstadoAutenticacionExtended(unittest.TestCase):
         estado.entrada_usuario = "usuario@test.com"
         estado.entrada_contrasena = "secret"
 
-        cursor = FakeCursor(responses=[(1, "123456", "Juan", "Perez", "usuario@test.com", "hash", True, "Admin")])
+        cursor = FakeCursor(
+            responses=[
+                (
+                    1,
+                    "123456",
+                    "Juan",
+                    "Perez",
+                    "usuario@test.com",
+                    "hash",
+                    True,
+                    "Admin",
+                )
+            ]
+        )
         conn = FakeConn(cursor)
 
-        with patch("sistema_tesis.estado.estado_autenticacion.obtener_conexion", return_value=conn):
+        with patch(
+            "sistema_gestion_trabajo_grado.estado.estado_autenticacion.obtener_conexion",
+            return_value=conn,
+        ):
             with patch.object(EncriptadorContrasena, "verificar", return_value=True):
-                with patch("sistema_tesis.estado.estado_autenticacion.secrets.token_urlsafe", return_value="fixed-token"):
-                    with patch("sistema_tesis.estado.estado_autenticacion.rx.redirect", return_value="redirect_home"):
+                with patch(
+                    "sistema_gestion_trabajo_grado.estado.estado_autenticacion.secrets.token_urlsafe",
+                    return_value="fixed-token",
+                ):
+                    with patch(
+                        "sistema_gestion_trabajo_grado.estado.estado_autenticacion.rx.redirect",
+                        return_value="redirect_home",
+                    ):
                         result = estado.iniciar_sesion()
 
         self.assertEqual(result, "redirect_home")
@@ -135,12 +205,31 @@ class TestEstadoAutenticacionExtended(unittest.TestCase):
         estado.entrada_usuario = "usuario@test.com"
         estado.entrada_contrasena = "wrong"
 
-        cursor = FakeCursor(responses=[(1, "123456", "Juan", "Perez", "usuario@test.com", "hash", True, "Admin")])
+        cursor = FakeCursor(
+            responses=[
+                (
+                    1,
+                    "123456",
+                    "Juan",
+                    "Perez",
+                    "usuario@test.com",
+                    "hash",
+                    True,
+                    "Admin",
+                )
+            ]
+        )
         conn = FakeConn(cursor)
 
-        with patch("sistema_tesis.estado.estado_autenticacion.obtener_conexion", return_value=conn):
+        with patch(
+            "sistema_gestion_trabajo_grado.estado.estado_autenticacion.obtener_conexion",
+            return_value=conn,
+        ):
             with patch.object(EncriptadorContrasena, "verificar", return_value=False):
-                with patch("sistema_tesis.estado.estado_autenticacion.rx.toast.error", return_value="error_invalid"):
+                with patch(
+                    "sistema_gestion_trabajo_grado.estado.estado_autenticacion.rx.toast.error",
+                    return_value="error_invalid",
+                ):
                     for _ in range(4):
                         estado.iniciar_sesion()
                     resultado = estado.iniciar_sesion()
@@ -157,8 +246,14 @@ class TestEstadoAutenticacionExtended(unittest.TestCase):
         conn = FakeConn(cursor)
 
         async def run_close():
-            with patch("sistema_tesis.estado.estado_autenticacion.obtener_conexion", return_value=conn):
-                with patch("sistema_tesis.estado.estado_autenticacion.rx.redirect", return_value="redirect_login"):
+            with patch(
+                "sistema_gestion_trabajo_grado.estado.estado_autenticacion.obtener_conexion",
+                return_value=conn,
+            ):
+                with patch(
+                    "sistema_gestion_trabajo_grado.estado.estado_autenticacion.rx.redirect",
+                    return_value="redirect_login",
+                ):
                     return await estado.cerrar_sesion()
 
         resultado = asyncio.run(run_close())

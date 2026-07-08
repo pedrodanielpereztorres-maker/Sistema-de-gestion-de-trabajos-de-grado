@@ -11,7 +11,10 @@ sys.path.insert(0, str(ROOT))
 
 os.environ["PYTEST_CURRENT_TEST"] = "1"
 
-from sistema_tesis.estado.estado_documento import EstadoDocumento, Documento
+from sistema_gestion_trabajo_grado.estado.estado_documento import (
+    EstadoDocumento,
+    Documento,
+)
 
 
 class FakeUploadFile:
@@ -69,8 +72,26 @@ class FakeConn:
 class TestEstadoDocumento(unittest.TestCase):
 
     def test_documentos_filtrados_devuelve_resultados(self):
-        doc1 = Documento(id=1, titulo="Informe final", descripcion="Resumen", fecha_subida="01/01/2024", tipo="pdf", tamano_kb=42, tamano="42 KB", url="/doc1")
-        doc2 = Documento(id=2, titulo="Plan de tesis", descripcion="Estructura", fecha_subida="02/01/2024", tipo="pdf", tamano_kb=10, tamano="10 KB", url="/doc2")
+        doc1 = Documento(
+            id=1,
+            titulo="Informe final",
+            descripcion="Resumen",
+            fecha_subida="01/01/2024",
+            tipo="pdf",
+            tamano_kb=42,
+            tamano="42 KB",
+            url="/doc1",
+        )
+        doc2 = Documento(
+            id=2,
+            titulo="Plan de tesis",
+            descripcion="Estructura",
+            fecha_subida="02/01/2024",
+            tipo="pdf",
+            tamano_kb=10,
+            tamano="10 KB",
+            url="/doc2",
+        )
 
         estado = EstadoDocumento()
         estado.lista_documentos = [doc1, doc2]
@@ -86,7 +107,10 @@ class TestEstadoDocumento(unittest.TestCase):
         estado.titulo_nuevo = "Título"
         estado.descripcion_nueva = "Desc"
 
-        with patch("sistema_tesis.estado.estado_documento.rx.clear_selected_files", return_value="clear_called"):
+        with patch(
+            "sistema_gestion_trabajo_grado.estado.estado_documento.rx.clear_selected_files",
+            return_value="clear_called",
+        ):
             resultado = estado.cancelar_publicacion()
 
         self.assertEqual(resultado, "clear_called")
@@ -97,7 +121,10 @@ class TestEstadoDocumento(unittest.TestCase):
         estado = EstadoDocumento()
         archivo = FakeUploadFile("doc.pdf", b"%PDF-1.4")
 
-        with patch("sistema_tesis.estado.estado_documento.rx.toast.error", return_value="error_title"):
+        with patch(
+            "sistema_gestion_trabajo_grado.estado.estado_documento.rx.toast.error",
+            return_value="error_title",
+        ):
             resultado = asyncio.run(estado.publicar_documento([archivo]))
 
         self.assertEqual(resultado, "error_title")
@@ -107,7 +134,10 @@ class TestEstadoDocumento(unittest.TestCase):
         estado.titulo_nuevo = "Informe"
         archivo = FakeUploadFile("archivo.exe", b"MZ...")
 
-        with patch("sistema_tesis.estado.estado_documento.rx.toast.error", return_value="error_type"):
+        with patch(
+            "sistema_gestion_trabajo_grado.estado.estado_documento.rx.toast.error",
+            return_value="error_type",
+        ):
             resultado = asyncio.run(estado.publicar_documento([archivo]))
 
         self.assertEqual(resultado, "error_type")
@@ -117,7 +147,10 @@ class TestEstadoDocumento(unittest.TestCase):
         estado.titulo_nuevo = "Informe"
         archivo = FakeUploadFile("archivo.pdf", b"GIF89a")
 
-        with patch("sistema_tesis.estado.estado_documento.rx.toast.error", return_value="error_magic"):
+        with patch(
+            "sistema_gestion_trabajo_grado.estado.estado_documento.rx.toast.error",
+            return_value="error_magic",
+        ):
             resultado = asyncio.run(estado.publicar_documento([archivo]))
 
         self.assertEqual(resultado, "error_magic")
@@ -127,7 +160,10 @@ class TestEstadoDocumento(unittest.TestCase):
         estado.titulo_nuevo = "Informe"
         archivo = FakeUploadFile("archivo.pdf", b"%PDF" + b"A" * (20 * 1024 * 1024 + 1))
 
-        with patch("sistema_tesis.estado.estado_documento.rx.toast.error", return_value="error_size"):
+        with patch(
+            "sistema_gestion_trabajo_grado.estado.estado_documento.rx.toast.error",
+            return_value="error_size",
+        ):
             resultado = asyncio.run(estado.publicar_documento([archivo]))
 
         self.assertEqual(resultado, "error_size")
@@ -144,12 +180,27 @@ class TestEstadoDocumento(unittest.TestCase):
         async def dummy_cargar_documentos():
             return None
 
-        with patch("sistema_tesis.estado.estado_documento.obtener_conexion", return_value=conn):
-            with patch("sistema_tesis.estado.estado_documento.rx.toast.success", return_value="success"):
-                with patch("sistema_tesis.estado.estado_documento.os.makedirs", return_value=None):
+        with patch(
+            "sistema_gestion_trabajo_grado.estado.estado_documento.obtener_conexion",
+            return_value=conn,
+        ):
+            with patch(
+                "sistema_gestion_trabajo_grado.estado.estado_documento.rx.toast.success",
+                return_value="success",
+            ):
+                with patch(
+                    "sistema_gestion_trabajo_grado.estado.estado_documento.os.makedirs",
+                    return_value=None,
+                ):
                     with patch("builtins.open", mock_open()):
-                        with patch.object(EstadoDocumento, "cargar_documentos", dummy_cargar_documentos):
-                            resultado = asyncio.run(estado.publicar_documento([archivo]))
+                        with patch.object(
+                            EstadoDocumento,
+                            "cargar_documentos",
+                            dummy_cargar_documentos,
+                        ):
+                            resultado = asyncio.run(
+                                estado.publicar_documento([archivo])
+                            )
 
         self.assertEqual(resultado, "success")
         self.assertEqual(estado.titulo_nuevo, "")

@@ -1,16 +1,17 @@
 import reflex as rx
-from sistema_tesis.estado.estado_autenticacion import EstadoAutenticacion
+from sistema_gestion_trabajo_grado.estado.estado_autenticacion import (
+    EstadoAutenticacion,
+)
 from ..estado.estado_layout import EstadoLayout
-
 
 # ════════════════════════════════════════════════════════════
 #  CONSTANTES DE DISEÑO
 #  Centralizadas aquí para cambiar colores fácilmente.
 # ════════════════════════════════════════════════════════════
 
-COLOR_PRIMARIO = "#3B82F6"   # Azul brillante para buen contraste
-COLOR_PRIMARIO_OSCURO = "#1E40AF"   # Azul oscuro
-COLOR_SECUNDARIO = "#8B5CF6"   # Violeta
+COLOR_PRIMARIO = "#3B82F6"  # Azul brillante para buen contraste
+COLOR_PRIMARIO_OSCURO = "#1E40AF"  # Azul oscuro
+COLOR_SECUNDARIO = "#8B5CF6"  # Violeta
 COLOR_ACTIVO_FONDO = "rgba(59,130,246,0.15)"
 COLOR_HOVER_FONDO = "rgba(59,130,246,0.10)"
 COLOR_TEXTO_PRINCIPAL = "#0F172A"  # Slate 900 (Máximo contraste)
@@ -48,50 +49,65 @@ def etiqueta_seccion(titulo: str) -> rx.Component:
 
 
 def _generar_contenido_enlace(
-    texto: str,
-    nombre_icono: str,
-    ruta: str,
-    es_admin_only: bool = False
+    texto: str, nombre_icono: str, ruta: str, es_admin_only: bool = False
 ) -> rx.Component:
     """Función interna para evitar duplicación de estilos en los enlaces."""
     esta_activo = rx.State.router.page.path == ruta
 
     return rx.hstack(
         rx.center(
-            rx.icon(nombre_icono, size=TAMANO_ICONO,
-                    stroke_width=1.8,
-                    color=rx.cond(esta_activo, "white", COLOR_TEXTO_TENUE)),
-            width="2.125rem", height="2.125rem", border_radius=RADIO_ICONO,
+            rx.icon(
+                nombre_icono,
+                size=TAMANO_ICONO,
+                stroke_width=1.8,
+                color=rx.cond(esta_activo, "white", COLOR_TEXTO_TENUE),
+            ),
+            width="2.125rem",
+            height="2.125rem",
+            border_radius=RADIO_ICONO,
             background=rx.cond(esta_activo, COLOR_PRIMARIO, "transparent"),
             box_shadow=rx.cond(
-                esta_activo, "0 0.1875rem 0.625rem rgba(99,102,241,0.35)", "none"),
+                esta_activo, "0 0.1875rem 0.625rem rgba(99,102,241,0.35)", "none"
+            ),
             flex_shrink="0",
             transition="all 0.18s ease",
         ),
         rx.text(
-            texto, font_size="0.9375rem",
+            texto,
+            font_size="0.9375rem",
             font_weight=rx.cond(esta_activo, "600", "500"),
-            color=rx.cond(esta_activo, COLOR_PRIMARIO_OSCURO,
-                          COLOR_TEXTO_SECUNDARIO),
-            transition="color 0.16s", flex="1",
+            color=rx.cond(esta_activo, COLOR_PRIMARIO_OSCURO, COLOR_TEXTO_SECUNDARIO),
+            transition="color 0.16s",
+            flex="1",
         ),
         rx.cond(
             es_admin_only,
             rx.badge(
-                "Admin", color_scheme="indigo", variant="soft", radius="full", size="1",
+                "Admin",
+                color_scheme="indigo",
+                variant="soft",
+                radius="full",
+                size="1",
                 style={
                     "color": "#3730A3",  # Indigo oscuro
                     "background_color": "#E0E7FF",  # Indigo muy claro
                     "font_weight": "bold",
-                }
+                },
             ),
-            rx.fragment()
+            rx.fragment(),
         ),
-        spacing="3", align="center", width="100%", padding_x="0.625rem", padding_y="0.5625rem",
+        spacing="3",
+        align="center",
+        width="100%",
+        padding_x="0.625rem",
+        padding_y="0.5625rem",
         border_radius=RADIO_ITEM,
         background=rx.cond(esta_activo, COLOR_ACTIVO_FONDO, "transparent"),
         border_left=rx.cond(
-            esta_activo, f"0.1875rem solid {COLOR_PRIMARIO}", "0.1875rem solid transparent"),
+            esta_activo,
+            f"0.1875rem solid {COLOR_PRIMARIO}",
+            "0.1875rem solid transparent",
+        ),
         transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
         _hover={
             "background": COLOR_HOVER_FONDO,
@@ -115,9 +131,10 @@ def enlace_solo_administrador(texto: str, nombre_icono: str, ruta: str) -> rx.Co
     return rx.cond(
         EstadoAutenticacion.rol_usuario == "administrador",
         rx.link(
-            _generar_contenido_enlace(
-                texto, nombre_icono, ruta, es_admin_only=True),
-            href=ruta, underline="none", width="100%"
+            _generar_contenido_enlace(texto, nombre_icono, ruta, es_admin_only=True),
+            href=ruta,
+            underline="none",
+            width="100%",
         ),
         rx.fragment(),
     )
@@ -126,6 +143,7 @@ def enlace_solo_administrador(texto: str, nombre_icono: str, ruta: str) -> rx.Co
 # ════════════════════════════════════════════════════════════
 #  COMPONENTE: ENCABEZADO DE LA BARRA
 # ════════════════════════════════════════════════════════════
+
 
 def encabezado_barra() -> rx.Component:
     """
@@ -226,8 +244,10 @@ def pie_usuario() -> rx.Component:
             width="100%",
         ),
         rx.button(
-            rx.hstack(rx.icon("log-out", size=14, stroke_width=2),
-                      rx.text("Cerrar sesión", font_size="0.75rem", font_weight="600")),
+            rx.hstack(
+                rx.icon("log-out", size=14, stroke_width=2),
+                rx.text("Cerrar sesión", font_size="0.75rem", font_weight="600"),
+            ),
             variant="surface",
             color_scheme="red",
             size="2",
@@ -275,8 +295,7 @@ def sidebar_contenido() -> rx.Component:
             etiqueta_seccion("Académico"),
             enlace_navegacion("Documentación", "file-text", "/documentacion"),
             etiqueta_seccion("Sistema"),
-            enlace_solo_administrador(
-                "Mantenimiento", "settings-2", "/mantenimiento"),
+            enlace_solo_administrador("Mantenimiento", "settings-2", "/mantenimiento"),
             enlace_navegacion("Mi Perfil", "circle-user-round", "/perfil"),
             spacing="1",
             width="100%",
@@ -300,7 +319,7 @@ def sidebar_contenido() -> rx.Component:
 
 def barra_lateral() -> rx.Component:
     """
-    Componente de compatibilidad. 
+    Componente de compatibilidad.
     Permite que las páginas que aún no usan 'layout_principal' sigan funcionando
     mientras se completa la migración.
     """

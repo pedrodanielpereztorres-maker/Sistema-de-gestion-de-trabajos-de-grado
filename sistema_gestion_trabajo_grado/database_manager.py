@@ -133,6 +133,55 @@ CREATE INDEX IF NOT EXISTS idx_sesion_activa ON sesion(esta_activa, expira_en);
 # Esto mejora drásticamente el rendimiento y evita errores de "Too many clients".
 _motor = None
 
+
+class ConnectionProxy:
+    """Proxy para que los objetos de raw_connection sean usados como context managers."""
+
+    def __init__(self, conn: Any):
+        self._conn = getattr(conn, "connection", conn)
+        self._closed = False
+
+    def __enter__(self):
+        return self._conn
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        try:
+            if exc_type is None:
+                self._conn.commit()
+            else:
+                self._conn.rollback()
+        except Exception:
+            pass
+        finally:
+            try:
+                self._conn.close()
+            except Exception:
+                pass
+            self._closed = True
+        return False
+
+    def cursor(self, *args, **kwargs):
+        return self._conn.cursor(*args, **kwargs)
+
+    def commit(self):
+        return self._conn.commit()
+
+    def rollback(self):
+        return self._conn.rollback()
+
+    def close(self):
+        if self._closed:
+            return
+        try:
+            self._conn.close()
+        except Exception:
+            pass
+        self._closed = True
+
+    def __getattr__(self, name: str):
+        return getattr(self._conn, name)
+
+
 def obtener_conexion() -> Any:
     """
     Establece y retorna una conexión a la base de datos PostgreSQL.
@@ -148,13 +197,22 @@ def obtener_conexion() -> Any:
             pool_pre_ping=True,
             pool_recycle=3600,
             pool_size=10,
-            max_overflow=20
+            max_overflow=20,
         )
     try:
-        return _motor.raw_connection()
+        raw_conn = _motor.raw_connection()
+        driver_conn = getattr(raw_conn, "driver_connection", None)
+        if driver_conn is not None:
+            raw_conn = driver_conn
+        else:
+            raw_conn = getattr(raw_conn, "connection", raw_conn)
+        return ConnectionProxy(raw_conn)
     except Exception as e:
-        logger.critical("--- ERROR CRÍTICO DE CONEXIÓN A POSTGRES --- %s", e, exc_info=True)
+        logger.critical(
+            "--- ERROR CRÍTICO DE CONEXIÓN A POSTGRES --- %s", e, exc_info=True
+        )
         return None
+
 
 def inicializar_infraestructura() -> None:
     """Crea la estructura de la base de datos si no existe."""
@@ -167,7 +225,10 @@ def inicializar_infraestructura() -> None:
             with conexion.cursor() as cursor:
                 cursor.execute(ESQUEMA_SQL)
             conexion.commit()
-        logger.info("Éxito: infraestructura verificada en %s", rx.config.get_config().db_url.split('@')[-1])
+        logger.info(
+            "Éxito: infraestructura verificada en %s",
+            rx.config.get_config().db_url.split("@")[-1],
+        )
     except Exception as e:
         logger.error("Error al inicializar las tablas: %s", e, exc_info=True)
     finally:

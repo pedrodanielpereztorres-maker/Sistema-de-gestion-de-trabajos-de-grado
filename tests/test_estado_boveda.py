@@ -10,7 +10,7 @@ sys.path.insert(0, str(ROOT))
 
 os.environ["PYTEST_CURRENT_TEST"] = "1"
 
-from sistema_tesis.estado.estado_boveda import EstadoBoveda
+from sistema_gestion_trabajo_grado.estado.estado_boveda import EstadoBoveda
 
 
 class FakeCursor:
@@ -79,8 +79,20 @@ class TestEstadoBoveda(unittest.TestCase):
     def test_lista_filtrada_filtra_por_carrera_y_busqueda(self):
         estado = EstadoBoveda()
         estado.lista_tesis = [
-            {"id": 1, "carrera": "Sistemas", "titulo": "Tesis A", "nombre_estudiante": "Juan", "cedula_estudiante": "123"},
-            {"id": 2, "carrera": "Administración", "titulo": "Gestión B", "nombre_estudiante": "Ana", "cedula_estudiante": "456"},
+            {
+                "id": 1,
+                "carrera": "Sistemas",
+                "titulo": "Tesis A",
+                "nombre_estudiante": "Juan",
+                "cedula_estudiante": "123",
+            },
+            {
+                "id": 2,
+                "carrera": "Administración",
+                "titulo": "Gestión B",
+                "nombre_estudiante": "Ana",
+                "cedula_estudiante": "456",
+            },
         ]
         estado.filtro_carrera = "Sistemas"
         estado.busqueda_dinamica = "tesis"
@@ -105,13 +117,13 @@ class TestEstadoBoveda(unittest.TestCase):
     def test_opciones_carreras_agrega_todas_las_carreras(self):
         estado = EstadoBoveda()
         estado.carreras_disponibles = ["Sistemas", "Derecho"]
-        self.assertEqual(estado.opciones_carreras, ["Todas las carreras", "Sistemas", "Derecho"])
+        self.assertEqual(
+            estado.opciones_carreras, ["Todas las carreras", "Sistemas", "Derecho"]
+        )
 
     def test_balance_privacidad_tesis_calcuala_correctamente(self):
         estado = EstadoBoveda()
-        estado.lista_tesis = [
-            {"publico": True}, {"publico": False}, {"publico": False}
-        ]
+        estado.lista_tesis = [{"publico": True}, {"publico": False}, {"publico": False}]
         balance = estado.balance_privacidad_tesis
         self.assertEqual(balance[0]["valor"], 1)
         self.assertEqual(balance[1]["valor"], 2)
@@ -119,7 +131,10 @@ class TestEstadoBoveda(unittest.TestCase):
     def test_generar_reporte_tesis_sin_datos_devuelve_warning(self):
         estado = EstadoBoveda()
         estado.lista_tesis = []
-        with patch("sistema_tesis.estado.estado_boveda.rx.toast.warning", return_value="warning"):
+        with patch(
+            "sistema_gestion_trabajo_grado.estado.estado_boveda.rx.toast.warning",
+            return_value="warning",
+        ):
             self.assertEqual(estado.generar_reporte_tesis(), "warning")
 
     def test_abrir_modal_confirmacion_y_cerrar(self):
@@ -135,7 +150,10 @@ class TestEstadoBoveda(unittest.TestCase):
     def test_buscar_estudiante_sin_cedula_devuelve_warning(self):
         estado = EstadoBoveda()
         estado.cedula_busqueda = ""
-        with patch("sistema_tesis.estado.estado_boveda.rx.toast.warning", return_value="warning"):
+        with patch(
+            "sistema_gestion_trabajo_grado.estado.estado_boveda.rx.toast.warning",
+            return_value="warning",
+        ):
             resultado = asyncio.run(estado.buscar_estudiante())
         self.assertEqual(resultado, "warning")
 
@@ -145,11 +163,24 @@ class TestEstadoBoveda(unittest.TestCase):
         estado.password_confirmacion = "wrongpass"
 
         fake_auth = FakeAuthState(usuario_id=1, rol_usuario="administrador")
-        with patch.object(EstadoBoveda, "get_state", new=AsyncMock(return_value=fake_auth)):
-            with patch("sistema_tesis.estado.estado_boveda.obtener_conexion", return_value=FakeConn(FakeCursor(fetchone_responses=[("hash",)]))):
-                with patch("sistema_tesis.estado.estado_boveda.EncriptadorContrasena.verificar", return_value=False):
-                    with patch("sistema_tesis.estado.estado_boveda.rx.toast.error", return_value="error_pass"):
-                        resultado = asyncio.run(estado.confirmar_eliminacion_trabajo_de_grado())
+        with patch.object(
+            EstadoBoveda, "get_state", new=AsyncMock(return_value=fake_auth)
+        ):
+            with patch(
+                "sistema_gestion_trabajo_grado.estado.estado_boveda.obtener_conexion",
+                return_value=FakeConn(FakeCursor(fetchone_responses=[("hash",)])),
+            ):
+                with patch(
+                    "sistema_gestion_trabajo_grado.estado.estado_boveda.EncriptadorContrasena.verificar",
+                    return_value=False,
+                ):
+                    with patch(
+                        "sistema_gestion_trabajo_grado.estado.estado_boveda.rx.toast.error",
+                        return_value="error_pass",
+                    ):
+                        resultado = asyncio.run(
+                            estado.confirmar_eliminacion_trabajo_de_grado()
+                        )
         self.assertEqual(resultado, "error_pass")
 
     def test_confirmar_eliminacion_trabajo_de_grado_exitoso(self):
@@ -158,14 +189,31 @@ class TestEstadoBoveda(unittest.TestCase):
         estado.password_confirmacion = "correctpass"
 
         fake_auth = FakeAuthState(usuario_id=1, rol_usuario="administrador")
-        with patch.object(EstadoBoveda, "get_state", new=AsyncMock(return_value=fake_auth)):
+        with patch.object(
+            EstadoBoveda, "get_state", new=AsyncMock(return_value=fake_auth)
+        ):
             cursor = FakeCursor(fetchone_responses=[("hash",)])
             conn = FakeConn(cursor)
-            with patch("sistema_tesis.estado.estado_boveda.obtener_conexion", return_value=conn):
-                with patch("sistema_tesis.estado.estado_boveda.EncriptadorContrasena.verificar", return_value=True):
-                    with patch("sistema_tesis.estado.estado_boveda.rx.toast.success", return_value="success"):
-                        with patch.object(EstadoBoveda, "cargar_tesis", new=AsyncMock(return_value=None)):
-                            resultado = asyncio.run(estado.confirmar_eliminacion_trabajo_de_grado())
+            with patch(
+                "sistema_gestion_trabajo_grado.estado.estado_boveda.obtener_conexion",
+                return_value=conn,
+            ):
+                with patch(
+                    "sistema_gestion_trabajo_grado.estado.estado_boveda.EncriptadorContrasena.verificar",
+                    return_value=True,
+                ):
+                    with patch(
+                        "sistema_gestion_trabajo_grado.estado.estado_boveda.rx.toast.success",
+                        return_value="success",
+                    ):
+                        with patch.object(
+                            EstadoBoveda,
+                            "cargar_tesis",
+                            new=AsyncMock(return_value=None),
+                        ):
+                            resultado = asyncio.run(
+                                estado.confirmar_eliminacion_trabajo_de_grado()
+                            )
         self.assertEqual(resultado, "success")
         self.assertFalse(estado.mostrar_modal_confirmacion)
 
@@ -177,9 +225,16 @@ class TestEstadoBoveda(unittest.TestCase):
         estado.en_edicion = False
 
         fake_auth = FakeAuthState(usuario_id=2, rol_usuario="estudiante")
-        with patch.object(EstadoBoveda, "get_state", new=AsyncMock(return_value=fake_auth)):
-            with patch("sistema_tesis.estado.estado_boveda.rx.toast.error", return_value="error_perm"):
-                resultado = asyncio.run(estado.registrar_tesis([FakeUploadFile("tesis.pdf", b"%PDF-1.4")]))
+        with patch.object(
+            EstadoBoveda, "get_state", new=AsyncMock(return_value=fake_auth)
+        ):
+            with patch(
+                "sistema_gestion_trabajo_grado.estado.estado_boveda.rx.toast.error",
+                return_value="error_perm",
+            ):
+                resultado = asyncio.run(
+                    estado.registrar_tesis([FakeUploadFile("tesis.pdf", b"%PDF-1.4")])
+                )
         self.assertEqual(resultado, "error_perm")
 
     def test_registrar_tesis_sin_estudiante_registrado(self):
@@ -189,11 +244,23 @@ class TestEstadoBoveda(unittest.TestCase):
         estado.nombre_encontrado = "Juan"
 
         fake_auth = FakeAuthState(usuario_id=1, rol_usuario="administrador")
-        with patch.object(EstadoBoveda, "get_state", new=AsyncMock(return_value=fake_auth)):
+        with patch.object(
+            EstadoBoveda, "get_state", new=AsyncMock(return_value=fake_auth)
+        ):
             conn = FakeConn(FakeCursor(fetchone_responses=[None]))
-            with patch("sistema_tesis.estado.estado_boveda.obtener_conexion", return_value=conn):
-                with patch("sistema_tesis.estado.estado_boveda.rx.toast.error", return_value="error_student"):
-                    resultado = asyncio.run(estado.registrar_tesis([FakeUploadFile("tesis.pdf", b"%PDF-1.4")]))
+            with patch(
+                "sistema_gestion_trabajo_grado.estado.estado_boveda.obtener_conexion",
+                return_value=conn,
+            ):
+                with patch(
+                    "sistema_gestion_trabajo_grado.estado.estado_boveda.rx.toast.error",
+                    return_value="error_student",
+                ):
+                    resultado = asyncio.run(
+                        estado.registrar_tesis(
+                            [FakeUploadFile("tesis.pdf", b"%PDF-1.4")]
+                        )
+                    )
         self.assertEqual(resultado, "error_student")
 
     def test_registrar_tesis_exitoso_almacena_bd(self):
@@ -203,14 +270,33 @@ class TestEstadoBoveda(unittest.TestCase):
         estado.nombre_encontrado = "Juan"
 
         fake_auth = FakeAuthState(usuario_id=1, rol_usuario="administrador")
-        with patch.object(EstadoBoveda, "get_state", new=AsyncMock(return_value=fake_auth)):
+        with patch.object(
+            EstadoBoveda, "get_state", new=AsyncMock(return_value=fake_auth)
+        ):
             conn = FakeConn(FakeCursor(fetchone_responses=[[42]]))
-            with patch("sistema_tesis.estado.estado_boveda.obtener_conexion", return_value=conn):
-                with patch("sistema_tesis.estado.estado_boveda.os.makedirs", return_value=None):
+            with patch(
+                "sistema_gestion_trabajo_grado.estado.estado_boveda.obtener_conexion",
+                return_value=conn,
+            ):
+                with patch(
+                    "sistema_gestion_trabajo_grado.estado.estado_boveda.os.makedirs",
+                    return_value=None,
+                ):
                     with patch("builtins.open", mock_open()):
-                        with patch("sistema_tesis.estado.estado_boveda.rx.toast.success", return_value="success"):
-                            with patch.object(EstadoBoveda, "cargar_tesis", new=AsyncMock(return_value=None)):
-                                resultado = asyncio.run(estado.registrar_tesis([FakeUploadFile("tesis.pdf", b"%PDF-1.4")]))
+                        with patch(
+                            "sistema_gestion_trabajo_grado.estado.estado_boveda.rx.toast.success",
+                            return_value="success",
+                        ):
+                            with patch.object(
+                                EstadoBoveda,
+                                "cargar_tesis",
+                                new=AsyncMock(return_value=None),
+                            ):
+                                resultado = asyncio.run(
+                                    estado.registrar_tesis(
+                                        [FakeUploadFile("tesis.pdf", b"%PDF-1.4")]
+                                    )
+                                )
         self.assertEqual(resultado, "success")
         self.assertTrue(conn.committed)
 

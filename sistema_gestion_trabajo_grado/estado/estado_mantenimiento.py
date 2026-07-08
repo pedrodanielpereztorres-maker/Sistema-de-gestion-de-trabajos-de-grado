@@ -6,6 +6,7 @@ import reflex as rx
 from pydantic import BaseModel, Field
 from ..database_manager import obtener_conexion
 from .estado_boveda import EstadoBoveda
+
 logger = logging.getLogger(__name__)
 
 
@@ -91,6 +92,7 @@ class EstadoMantenimiento(rx.State):
 
     async def cargar_datos(self):
         """Carga la configuración global del sistema usando SQL puro."""
+
         def _load_data():
             conn = obtener_conexion()
             if conn is None:
@@ -107,29 +109,54 @@ class EstadoMantenimiento(rx.State):
                             ORDER BY u.id;
                         """)
                         usuarios = [
-                            UsuarioSistema(id=u[0], cedula=u[1], nombre=u[2], apellido=u[3],
-                                           correo=u[4] or "", rol=u[5] or "Sin Rol", esta_activo=bool(u[6]), clave="")
+                            UsuarioSistema(
+                                id=u[0],
+                                cedula=u[1],
+                                nombre=u[2],
+                                apellido=u[3],
+                                correo=u[4] or "",
+                                rol=u[5] or "Sin Rol",
+                                esta_activo=bool(u[6]),
+                                clave="",
+                            )
                             for u in cursor.fetchall()
                         ]
                         # Roles
                         cursor.execute(
-                            "SELECT id, nombre, descripcion FROM rol ORDER BY nombre;")
-                        roles = [Rol(id=r[0], nombre=r[1], descripcion=r[2]
-                                      or f"Nivel {r[0]}") for r in cursor.fetchall()]
+                            "SELECT id, nombre, descripcion FROM rol ORDER BY nombre;"
+                        )
+                        roles = [
+                            Rol(
+                                id=r[0],
+                                nombre=r[1],
+                                descripcion=r[2] or f"Nivel {r[0]}",
+                            )
+                            for r in cursor.fetchall()
+                        ]
                         # Carreras
                         cursor.execute(
-                            "SELECT id, nombre, esta_activa FROM carrera ORDER BY nombre;")
+                            "SELECT id, nombre, esta_activa FROM carrera ORDER BY nombre;"
+                        )
                         res_c = cursor.fetchall()
                         carreras_nombres = [c[1] for c in res_c]
                         carreras_temp = []
                         for c_id, c_nom, c_act in res_c:
-                            cursor.execute("""
+                            cursor.execute(
+                                """
                                 SELECT EXISTS(SELECT 1 FROM estudiante WHERE carrera_id = %s) OR 
                                        EXISTS(SELECT 1 FROM tutor_academico WHERE carrera_id = %s);
-                            """, (c_id, c_id))
+                            """,
+                                (c_id, c_id),
+                            )
                             tiene_mov = cursor.fetchone()[0]
                             carreras_temp.append(
-                                Carrera(id=c_id, nombre=c_nom, esta_activa=bool(c_act), tiene_movimientos=bool(tiene_mov)))
+                                Carrera(
+                                    id=c_id,
+                                    nombre=c_nom,
+                                    esta_activa=bool(c_act),
+                                    tiene_movimientos=bool(tiene_mov),
+                                )
+                            )
                         # Tutores
                         cursor.execute("""
                             SELECT ta.id, COALESCE(u.nombre, ta.nombre), COALESCE(u.apellido, ta.apellido), 
@@ -143,18 +170,30 @@ class EstadoMantenimiento(rx.State):
                         res_tutores = cursor.fetchall()
                         tutores_temp = []
                         for t in res_tutores:
-                            cursor.execute("""
+                            cursor.execute(
+                                """
                                 SELECT EXISTS(
                                     SELECT 1 FROM trabajo_de_grado 
                                     JOIN estudiante ON trabajo_de_grado.estudiante_id = estudiante.id 
                                     WHERE estudiante.tutor_academico_id = %s
                                 );
-                            """, (t[0],))
+                            """,
+                                (t[0],),
+                            )
                             tesis_v = cursor.fetchone()[0]
-                            tutores_temp.append(TutorAcademico(
-                                id=t[0], nombre=f"{t[1]} {t[2]}", cedula=t[3], correo=t[4], telefono=t[8] or "",
-                                carrera=t[7], especialidad=t[5], activo=t[6], tiene_movimientos=bool(tesis_v)
-                            ))
+                            tutores_temp.append(
+                                TutorAcademico(
+                                    id=t[0],
+                                    nombre=f"{t[1]} {t[2]}",
+                                    cedula=t[3],
+                                    correo=t[4],
+                                    telefono=t[8] or "",
+                                    carrera=t[7],
+                                    especialidad=t[5],
+                                    activo=t[6],
+                                    tiene_movimientos=bool(tesis_v),
+                                )
+                            )
                 return {
                     "usuarios": usuarios,
                     "roles": roles,
@@ -210,22 +249,44 @@ class EstadoMantenimiento(rx.State):
         if not self.busqueda_usuarios:
             return self.usuarios
         termino = self.busqueda_usuarios.lower()
-        return [u for u in self.usuarios if termino in u.nombre.lower() or termino in u.apellido.lower() or termino in u.correo.lower()]
+        return [
+            u
+            for u in self.usuarios
+            if termino in u.nombre.lower()
+            or termino in u.apellido.lower()
+            or termino in u.correo.lower()
+        ]
 
     @rx.var
     def tutores_filtrados(self) -> list[TutorAcademico]:
         if not self.busqueda_tutores:
             return self.tutores
         termino = self.busqueda_tutores.lower()
-        return [t for t in self.tutores if termino in t.nombre.lower() or termino in t.especialidad.lower()]
+        return [
+            t
+            for t in self.tutores
+            if termino in t.nombre.lower() or termino in t.especialidad.lower()
+        ]
 
     @rx.var
     def roles_filtrados(self) -> list[Rol]:
-        return [r for r in self.roles if self.busqueda_roles.lower() in r.nombre.lower()] if self.busqueda_roles else self.roles
+        return (
+            [r for r in self.roles if self.busqueda_roles.lower() in r.nombre.lower()]
+            if self.busqueda_roles
+            else self.roles
+        )
 
     @rx.var
     def carreras_filtradas(self) -> list[Carrera]:
-        return [c for c in self.carreras if self.busqueda_carreras.lower() in c.nombre.lower()] if self.busqueda_carreras else self.carreras
+        return (
+            [
+                c
+                for c in self.carreras
+                if self.busqueda_carreras.lower() in c.nombre.lower()
+            ]
+            if self.busqueda_carreras
+            else self.carreras
+        )
 
     def abrir_modal_usuario(self):
         self.u_cedula, self.u_nombre, self.u_apellido = "", "", ""
@@ -236,47 +297,84 @@ class EstadoMantenimiento(rx.State):
         self.modal_usuario_abierto = False
 
     async def guardar_usuario(self):
-        if not self.u_nombre or not self.u_correo or not self.u_cedula or not self.u_clave:
-            return rx.toast.warning("⚠️ Campos Requeridos: Todos los campos del formulario son obligatorios. Por favor, asegúrese de ingresar cédula, nombre, apellido, correo y contraseña.")
+        if (
+            not self.u_nombre
+            or not self.u_correo
+            or not self.u_cedula
+            or not self.u_clave
+        ):
+            return rx.toast.warning(
+                "⚠️ Campos Requeridos: Todos los campos del formulario son obligatorios. Por favor, asegúrese de ingresar cédula, nombre, apellido, correo y contraseña."
+            )
 
         # Validar longitud mínima de contraseña
         if len(self.u_clave) < 8:
-            return rx.toast.error("🔒 Seguridad de Contraseña: La clave ingresada debe tener un mínimo de 8 caracteres para cumplir con las políticas de seguridad.")
+            return rx.toast.error(
+                "🔒 Seguridad de Contraseña: La clave ingresada debe tener un mínimo de 8 caracteres para cumplir con las políticas de seguridad."
+            )
 
         # Validar formato básico del correo
-        patron_correo = r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$'
+        patron_correo = r"^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
         if not re.match(patron_correo, self.u_correo.strip()):
-            return rx.toast.error("✉️ Correo Inválido: La dirección de correo electrónico provista no posee un formato estructuralmente válido (ejemplo: usuario@dominio.com).")
+            return rx.toast.error(
+                "✉️ Correo Inválido: La dirección de correo electrónico provista no posee un formato estructuralmente válido (ejemplo: usuario@dominio.com)."
+            )
 
         # Validar cédula (solo números, longitud razonable)
-        if not self.u_cedula.strip().isdigit() or not (6 <= len(self.u_cedula.strip()) <= 10):
-            return rx.toast.error("🪪 Cédula Incorrecta: El número de cédula de identidad debe contener únicamente caracteres numéricos y una longitud de entre 6 y 10 dígitos.")
+        if not self.u_cedula.strip().isdigit() or not (
+            6 <= len(self.u_cedula.strip()) <= 10
+        ):
+            return rx.toast.error(
+                "🪪 Cédula Incorrecta: El número de cédula de identidad debe contener únicamente caracteres numéricos y una longitud de entre 6 y 10 dígitos."
+            )
 
         def _insert_usuario():
             conn2 = obtener_conexion()
             if conn2 is None:
-                return False, "🔌 Fallo de Conexión: No se pudo establecer comunicación con el servidor. Verifique la base de datos."
+                return (
+                    False,
+                    "🔌 Fallo de Conexión: No se pudo establecer comunicación con el servidor. Verifique la base de datos.",
+                )
             try:
                 with conn2:
                     with conn2.cursor() as cursor:
                         cursor.execute(
-                            "SELECT id FROM rol WHERE nombre = %s", (self.u_rol,))
+                            "SELECT id FROM rol WHERE nombre = %s", (self.u_rol,)
+                        )
                         res_rol = cursor.fetchone()
                         if not res_rol:
-                            return False, "❌ Rol Inválido: El rol seleccionado para el nuevo usuario no existe en la base de datos."
+                            return (
+                                False,
+                                "❌ Rol Inválido: El rol seleccionado para el nuevo usuario no existe en la base de datos.",
+                            )
                         from .estado_autenticacion import EncriptadorContrasena
+
                         hash_clave = EncriptadorContrasena.encriptar(self.u_clave)
-                        cursor.execute("""
+                        cursor.execute(
+                            """
                             INSERT INTO usuario (cedula, nombre, apellido, correo, contrasena_hash, rol_id)
                             VALUES (%s, %s, %s, %s, %s, %s)
                             RETURNING id;
-                        """, (self.u_cedula, self.u_nombre, self.u_apellido, self.u_correo, hash_clave, res_rol[0]))
+                        """,
+                            (
+                                self.u_cedula,
+                                self.u_nombre,
+                                self.u_apellido,
+                                self.u_correo,
+                                hash_clave,
+                                res_rol[0],
+                            ),
+                        )
                         u_id = cursor.fetchone()[0]
                         conn2.commit()
                         cursor.execute(
-                            "UPDATE estudiante SET usuario_id = %s WHERE cedula = %s;", (u_id, self.u_cedula))
+                            "UPDATE estudiante SET usuario_id = %s WHERE cedula = %s;",
+                            (u_id, self.u_cedula),
+                        )
                         cursor.execute(
-                            "UPDATE tutor_academico SET usuario_id = %s WHERE cedula = %s;", (u_id, self.u_cedula))
+                            "UPDATE tutor_academico SET usuario_id = %s WHERE cedula = %s;",
+                            (u_id, self.u_cedula),
+                        )
                         conn2.commit()
                 return True, ""
             except Exception as exc:
@@ -298,7 +396,9 @@ class EstadoMantenimiento(rx.State):
         boveda = await self.get_state(EstadoBoveda)
         await boveda.cargar_tesis()
 
-        return rx.toast.success("🎉 Registro Exitoso: El nuevo usuario ha sido registrado y vinculado correctamente en el sistema.")
+        return rx.toast.success(
+            "🎉 Registro Exitoso: El nuevo usuario ha sido registrado y vinculado correctamente en el sistema."
+        )
 
     async def cargar_datos_usuario_tutor(self):
         if not self.t_cedula:
@@ -316,7 +416,9 @@ class EstadoMantenimiento(rx.State):
                 with conn2:
                     with conn2.cursor() as cursor:
                         cursor.execute(
-                            "SELECT nombre, apellido, correo FROM usuario WHERE cedula = %s;", (self.t_cedula,))
+                            "SELECT nombre, apellido, correo FROM usuario WHERE cedula = %s;",
+                            (self.t_cedula,),
+                        )
                         return cursor.fetchone()
             except Exception as exc:
                 logger.exception("Error al buscar usuario tutor: %s", exc)
@@ -340,11 +442,21 @@ class EstadoMantenimiento(rx.State):
     def abrir_modal_tutor(self, editar: bool = False, tutor: TutorAcademico = None):
         self.t_en_edicion = editar
         if editar and tutor:
-            self.t_id, self.t_nombre, self.t_cedula = tutor.id, tutor.nombre, tutor.cedula
-            self.t_correo, self.t_telefono, self.t_carrera = tutor.correo, tutor.telefono, tutor.carrera
+            self.t_id, self.t_nombre, self.t_cedula = (
+                tutor.id,
+                tutor.nombre,
+                tutor.cedula,
+            )
+            self.t_correo, self.t_telefono, self.t_carrera = (
+                tutor.correo,
+                tutor.telefono,
+                tutor.carrera,
+            )
             self.t_especialidad, self.t_usuario_encontrado = tutor.especialidad, True
         else:
-            self.t_nombre = self.t_cedula = self.t_correo = self.t_telefono = self.t_carrera = self.t_especialidad = ""
+            self.t_nombre = self.t_cedula = self.t_correo = self.t_telefono = (
+                self.t_carrera
+            ) = self.t_especialidad = ""
             self.t_usuario_encontrado = False
         self.modal_tutor_abierto = True
 
@@ -385,30 +497,61 @@ class EstadoMantenimiento(rx.State):
         self.busqueda_carreras = val
         self.carreras_pagina_actual = 1
 
-    def fijar_u_cedula(self, val: str) -> None: self.u_cedula = val
-    def fijar_u_nombre(self, val: str) -> None: self.u_nombre = val
-    def fijar_u_apellido(self, val: str) -> None: self.u_apellido = val
-    def fijar_u_correo(self, val: str) -> None: self.u_correo = val
-    def fijar_u_clave(self, val: str) -> None: self.u_clave = val
-    def fijar_u_rol(self, val: str) -> None: self.u_rol = val
-    def fijar_r_nombre(self, val: str) -> None: self.r_nombre = val
-    def fijar_r_descripcion(self, val: str) -> None: self.r_descripcion = val
-    def fijar_c_nombre(self, val: str) -> None: self.c_nombre = val
-    def fijar_t_nombre(self, val: str) -> None: self.t_nombre = val
-    def fijar_t_cedula(self, val: str) -> None: self.t_cedula = val
-    def fijar_t_correo(self, val: str) -> None: self.t_correo = val
-    def fijar_t_telefono(self, val: str) -> None: self.t_telefono = val
-    def fijar_t_carrera(self, val: str) -> None: self.t_carrera = val
-    def fijar_t_especialidad(self, val: str) -> None: self.t_especialidad = val
+    def fijar_u_cedula(self, val: str) -> None:
+        self.u_cedula = val
+
+    def fijar_u_nombre(self, val: str) -> None:
+        self.u_nombre = val
+
+    def fijar_u_apellido(self, val: str) -> None:
+        self.u_apellido = val
+
+    def fijar_u_correo(self, val: str) -> None:
+        self.u_correo = val
+
+    def fijar_u_clave(self, val: str) -> None:
+        self.u_clave = val
+
+    def fijar_u_rol(self, val: str) -> None:
+        self.u_rol = val
+
+    def fijar_r_nombre(self, val: str) -> None:
+        self.r_nombre = val
+
+    def fijar_r_descripcion(self, val: str) -> None:
+        self.r_descripcion = val
+
+    def fijar_c_nombre(self, val: str) -> None:
+        self.c_nombre = val
+
+    def fijar_t_nombre(self, val: str) -> None:
+        self.t_nombre = val
+
+    def fijar_t_cedula(self, val: str) -> None:
+        self.t_cedula = val
+
+    def fijar_t_correo(self, val: str) -> None:
+        self.t_correo = val
+
+    def fijar_t_telefono(self, val: str) -> None:
+        self.t_telefono = val
+
+    def fijar_t_carrera(self, val: str) -> None:
+        self.t_carrera = val
+
+    def fijar_t_especialidad(self, val: str) -> None:
+        self.t_especialidad = val
 
     @rx.var
     def usuarios_paginados(self) -> list[UsuarioSistema]:
         inicio = (self.usuarios_pagina_actual - 1) * self.registros_por_pagina
-        return self.usuarios_filtrados[inicio: inicio + self.registros_por_pagina]
+        return self.usuarios_filtrados[inicio : inicio + self.registros_por_pagina]
 
     @rx.var
     def usuarios_total_paginas(self) -> int:
-        return max(1, math.ceil(len(self.usuarios_filtrados) / self.registros_por_pagina))
+        return max(
+            1, math.ceil(len(self.usuarios_filtrados) / self.registros_por_pagina)
+        )
 
     @rx.var
     def usuarios_total_registros(self) -> int:
@@ -425,11 +568,13 @@ class EstadoMantenimiento(rx.State):
     @rx.var
     def tutores_paginados(self) -> list[TutorAcademico]:
         inicio = (self.tutores_pagina_actual - 1) * self.registros_por_pagina
-        return self.tutores_filtrados[inicio: inicio + self.registros_por_pagina]
+        return self.tutores_filtrados[inicio : inicio + self.registros_por_pagina]
 
     @rx.var
     def tutores_total_paginas(self) -> int:
-        return max(1, math.ceil(len(self.tutores_filtrados) / self.registros_por_pagina))
+        return max(
+            1, math.ceil(len(self.tutores_filtrados) / self.registros_por_pagina)
+        )
 
     @rx.var
     def tutores_total_registros(self) -> int:
@@ -446,7 +591,7 @@ class EstadoMantenimiento(rx.State):
     @rx.var
     def roles_paginados(self) -> list[Rol]:
         inicio = (self.roles_pagina_actual - 1) * self.registros_por_pagina
-        return self.roles_filtrados[inicio: inicio + self.registros_por_pagina]
+        return self.roles_filtrados[inicio : inicio + self.registros_por_pagina]
 
     @rx.var
     def roles_total_paginas(self) -> int:
@@ -467,11 +612,13 @@ class EstadoMantenimiento(rx.State):
     @rx.var
     def carreras_paginadas(self) -> list[Carrera]:
         inicio = (self.carreras_pagina_actual - 1) * self.registros_por_pagina
-        return self.carreras_filtradas[inicio: inicio + self.registros_por_pagina]
+        return self.carreras_filtradas[inicio : inicio + self.registros_por_pagina]
 
     @rx.var
     def carreras_total_paginas(self) -> int:
-        return max(1, math.ceil(len(self.carreras_filtradas) / self.registros_por_pagina))
+        return max(
+            1, math.ceil(len(self.carreras_filtradas) / self.registros_por_pagina)
+        )
 
     @rx.var
     def carreras_total_registros(self) -> int:
@@ -493,7 +640,9 @@ class EstadoMantenimiento(rx.State):
 
         nom_parts = self.t_nombre.strip().split(" ")
         if len(nom_parts) < 2:
-            return rx.toast.warning("Por favor, ingrese el nombre y el apellido del tutor en el campo Nombre Completo.")
+            return rx.toast.warning(
+                "Por favor, ingrese el nombre y el apellido del tutor en el campo Nombre Completo."
+            )
 
         def _upsert_tutor():
             conn2 = obtener_conexion()
@@ -503,10 +652,14 @@ class EstadoMantenimiento(rx.State):
                 with conn2:
                     with conn2.cursor() as cursor:
                         cursor.execute(
-                            "SELECT id, nombre, apellido FROM usuario WHERE cedula = %s", (self.t_cedula,))
+                            "SELECT id, nombre, apellido FROM usuario WHERE cedula = %s",
+                            (self.t_cedula,),
+                        )
                         u_id = cursor.fetchone()
                         cursor.execute(
-                            "SELECT id FROM carrera WHERE nombre = %s", (self.t_carrera,))
+                            "SELECT id FROM carrera WHERE nombre = %s",
+                            (self.t_carrera,),
+                        )
                         c_id = cursor.fetchone()
 
                         if not c_id:
@@ -516,19 +669,42 @@ class EstadoMantenimiento(rx.State):
                         apellido = u_id[2] if u_id else (" ".join(nom_parts[1:]))
 
                         if self.t_en_edicion:
-                            cursor.execute("""
+                            cursor.execute(
+                                """
                                 UPDATE tutor_academico SET 
                                 especialidad = %s, carrera_id = %s, usuario_id = %s,
                                 correo = %s, telefono = %s, cedula = %s, nombre = %s, apellido = %s
                                 WHERE id = %s;
-                            """, (self.t_especialidad, c_id[0], u_id[0] if u_id else None,
-                                  self.t_correo, self.t_telefono, self.t_cedula, nombre, apellido, self.t_id))
+                            """,
+                                (
+                                    self.t_especialidad,
+                                    c_id[0],
+                                    u_id[0] if u_id else None,
+                                    self.t_correo,
+                                    self.t_telefono,
+                                    self.t_cedula,
+                                    nombre,
+                                    apellido,
+                                    self.t_id,
+                                ),
+                            )
                         else:
-                            cursor.execute("""
+                            cursor.execute(
+                                """
                                 INSERT INTO tutor_academico (usuario_id, carrera_id, especialidad, esta_activo, correo, telefono, cedula, nombre, apellido)
                                 VALUES (%s, %s, %s, TRUE, %s, %s, %s, %s, %s);
-                            """, (u_id[0] if u_id else None, c_id[0], self.t_especialidad,
-                                  self.t_correo, self.t_telefono, self.t_cedula, nombre, apellido))
+                            """,
+                                (
+                                    u_id[0] if u_id else None,
+                                    c_id[0],
+                                    self.t_especialidad,
+                                    self.t_correo,
+                                    self.t_telefono,
+                                    self.t_cedula,
+                                    nombre,
+                                    apellido,
+                                ),
+                            )
                     conn2.commit()
                 return True, ""
             except Exception as exc:
@@ -561,7 +737,9 @@ class EstadoMantenimiento(rx.State):
                 with conn2:
                     with conn2.cursor() as cursor:
                         cursor.execute(
-                            "UPDATE tutor_academico SET esta_activo = NOT esta_activo WHERE id = %s;", (id_tutor,))
+                            "UPDATE tutor_academico SET esta_activo = NOT esta_activo WHERE id = %s;",
+                            (id_tutor,),
+                        )
                     conn2.commit()
                 return True, ""
             except Exception as exc:
@@ -592,11 +770,17 @@ class EstadoMantenimiento(rx.State):
                 with conn2:
                     with conn2.cursor() as cursor:
                         cursor.execute(
-                            "SELECT EXISTS(SELECT 1 FROM estudiante WHERE tutor_academico_id = %s)", (id_tutor,))
+                            "SELECT EXISTS(SELECT 1 FROM estudiante WHERE tutor_academico_id = %s)",
+                            (id_tutor,),
+                        )
                         if cursor.fetchone()[0]:
-                            return False, "No se puede eliminar: el tutor tiene estudiantes asignados."
+                            return (
+                                False,
+                                "No se puede eliminar: el tutor tiene estudiantes asignados.",
+                            )
                         cursor.execute(
-                            "DELETE FROM tutor_academico WHERE id = %s;", (id_tutor,))
+                            "DELETE FROM tutor_academico WHERE id = %s;", (id_tutor,)
+                        )
                     conn2.commit()
                 return True, ""
             except Exception as exc:
@@ -627,7 +811,9 @@ class EstadoMantenimiento(rx.State):
                 with conn2:
                     with conn2.cursor() as cursor:
                         cursor.execute(
-                            "INSERT INTO rol (nombre, descripcion) VALUES (%s, %s);", (nombre, descripcion))
+                            "INSERT INTO rol (nombre, descripcion) VALUES (%s, %s);",
+                            (nombre, descripcion),
+                        )
                     conn2.commit()
                 return True, ""
             except Exception as exc:
@@ -643,7 +829,9 @@ class EstadoMantenimiento(rx.State):
                 except Exception:
                     pass
 
-        ok, mensaje = await asyncio.to_thread(_insert_rol, self.r_nombre, self.r_descripcion)
+        ok, mensaje = await asyncio.to_thread(
+            _insert_rol, self.r_nombre, self.r_descripcion
+        )
         if not ok:
             return rx.toast.error(f"Error al guardar rol: {mensaje}")
 
@@ -660,10 +848,13 @@ class EstadoMantenimiento(rx.State):
                     with conn2.cursor() as cursor:
                         if en_edicion:
                             cursor.execute(
-                                "UPDATE carrera SET nombre = %s WHERE id = %s;", (nombre, carrera_id))
+                                "UPDATE carrera SET nombre = %s WHERE id = %s;",
+                                (nombre, carrera_id),
+                            )
                         else:
                             cursor.execute(
-                                "INSERT INTO carrera (nombre) VALUES (%s);", (nombre,))
+                                "INSERT INTO carrera (nombre) VALUES (%s);", (nombre,)
+                            )
                     conn2.commit()
                 return True, ""
             except Exception as exc:
@@ -679,7 +870,9 @@ class EstadoMantenimiento(rx.State):
                 except Exception:
                     pass
 
-        ok, mensaje = await asyncio.to_thread(_save_carrera, self.c_nombre, self.c_en_edicion, self.c_id)
+        ok, mensaje = await asyncio.to_thread(
+            _save_carrera, self.c_nombre, self.c_en_edicion, self.c_id
+        )
         if not ok:
             return rx.toast.error(f"Error al guardar carrera: {mensaje}")
 
@@ -695,14 +888,21 @@ class EstadoMantenimiento(rx.State):
             try:
                 with conn2:
                     with conn2.cursor() as cursor:
-                        cursor.execute("""
+                        cursor.execute(
+                            """
                             SELECT EXISTS(SELECT 1 FROM estudiante WHERE carrera_id = %s) OR 
                                    EXISTS(SELECT 1 FROM tutor_academico WHERE carrera_id = %s);
-                        """, (carrera_id, carrera_id))
+                        """,
+                            (carrera_id, carrera_id),
+                        )
                         if cursor.fetchone()[0]:
-                            return False, "No se puede eliminar: la carrera tiene registros asociados."
+                            return (
+                                False,
+                                "No se puede eliminar: la carrera tiene registros asociados.",
+                            )
                         cursor.execute(
-                            "DELETE FROM carrera WHERE id = %s;", (carrera_id,))
+                            "DELETE FROM carrera WHERE id = %s;", (carrera_id,)
+                        )
                     conn2.commit()
                 return True, ""
             except Exception as exc:
@@ -733,7 +933,9 @@ class EstadoMantenimiento(rx.State):
                 with conn2:
                     with conn2.cursor() as cursor:
                         cursor.execute(
-                            "UPDATE carrera SET esta_activa = NOT esta_activa WHERE id = %s;", (carrera_id,))
+                            "UPDATE carrera SET esta_activa = NOT esta_activa WHERE id = %s;",
+                            (carrera_id,),
+                        )
                     conn2.commit()
                 return True, ""
             except Exception as exc:
@@ -772,9 +974,14 @@ class EstadoMantenimiento(rx.State):
                 with conn2:
                     with conn2.cursor() as cursor:
                         cursor.execute(
-                            "SELECT EXISTS(SELECT 1 FROM usuario WHERE rol_id = %s);", (rol_id,))
+                            "SELECT EXISTS(SELECT 1 FROM usuario WHERE rol_id = %s);",
+                            (rol_id,),
+                        )
                         if cursor.fetchone()[0]:
-                            return False, "No se puede eliminar: hay usuarios asignados a este rol."
+                            return (
+                                False,
+                                "No se puede eliminar: hay usuarios asignados a este rol.",
+                            )
                         cursor.execute("DELETE FROM rol WHERE id = %s;", (rol_id,))
                     conn2.commit()
                 return True, ""
@@ -800,10 +1007,13 @@ class EstadoMantenimiento(rx.State):
 
     async def alternar_estado_usuario(self, id_usuario: int):
         from .estado_autenticacion import EstadoAutenticacion
+
         estado_auth = await self.get_state(EstadoAutenticacion)
 
         if estado_auth.usuario and estado_auth.usuario.id == id_usuario:
-            return rx.toast.warning("Por motivos de seguridad, no puedes desactivar tu propia cuenta administrativa.")
+            return rx.toast.warning(
+                "Por motivos de seguridad, no puedes desactivar tu propia cuenta administrativa."
+            )
 
         def _toggle_usuario(usuario_id: int):
             conn2 = obtener_conexion()
@@ -814,7 +1024,7 @@ class EstadoMantenimiento(rx.State):
                     with conn2.cursor() as cursor:
                         cursor.execute(
                             "UPDATE usuario SET esta_activo = NOT esta_activo WHERE id = %s;",
-                            (usuario_id,)
+                            (usuario_id,),
                         )
                     conn2.commit()
                 return True, ""
@@ -840,10 +1050,13 @@ class EstadoMantenimiento(rx.State):
 
     async def eliminar_usuario(self, id_usuario: int):
         from .estado_autenticacion import EstadoAutenticacion
+
         estado_auth = await self.get_state(EstadoAutenticacion)
 
         if estado_auth.usuario and estado_auth.usuario.id == id_usuario:
-            return rx.toast.warning("Por motivos de seguridad, no puedes eliminar tu propia cuenta administrativa.")
+            return rx.toast.warning(
+                "Por motivos de seguridad, no puedes eliminar tu propia cuenta administrativa."
+            )
 
         def _delete_usuario():
             conn2 = obtener_conexion()
@@ -855,11 +1068,16 @@ class EstadoMantenimiento(rx.State):
                     with conn2.cursor() as cursor:
                         cursor.execute(
                             "SELECT EXISTS(SELECT 1 FROM estudiante WHERE usuario_id = %s) OR EXISTS(SELECT 1 FROM tutor_academico WHERE usuario_id = %s);",
-                            (id_usuario, id_usuario)
+                            (id_usuario, id_usuario),
                         )
                         if cursor.fetchone()[0]:
-                            return False, "No se puede eliminar: cuenta con datos asociados. Desactívela en su lugar."
-                        cursor.execute("DELETE FROM usuario WHERE id = %s;", (id_usuario,))
+                            return (
+                                False,
+                                "No se puede eliminar: cuenta con datos asociados. Desactívela en su lugar.",
+                            )
+                        cursor.execute(
+                            "DELETE FROM usuario WHERE id = %s;", (id_usuario,)
+                        )
                     conn2.commit()
                 return True, ""
             except Exception as exc:
@@ -879,7 +1097,8 @@ class EstadoMantenimiento(rx.State):
         return rx.toast.success("Cuenta eliminada correctamente.")
 
     @rx.var
-    def nombres_roles(self) -> list[str]: return [r.nombre for r in self.roles]
+    def nombres_roles(self) -> list[str]:
+        return [r.nombre for r in self.roles]
 
     def abrir_confirmacion_rol(self, id_rol: int):
         self.id_rol_eliminar = id_rol
@@ -899,6 +1118,7 @@ class EstadoMantenimiento(rx.State):
         y garantizar que solo un administrador autenticado pueda eliminar roles.
         """
         from .estado_autenticacion import EstadoAutenticacion, EncriptadorContrasena
+
         auth_state = await self.get_state(EstadoAutenticacion)
         admin_id = auth_state.usuario.id if auth_state.usuario else None
         if admin_id is None:
@@ -912,7 +1132,10 @@ class EstadoMantenimiento(rx.State):
             try:
                 with conn2:
                     with conn2.cursor() as cursor:
-                        cursor.execute("SELECT contrasena_hash FROM usuario WHERE id = %s;", (admin_id,))
+                        cursor.execute(
+                            "SELECT contrasena_hash FROM usuario WHERE id = %s;",
+                            (admin_id,),
+                        )
                         fila = cursor.fetchone()
                         return fila[0] if fila and fila[0] else None
             except Exception as exc:
@@ -926,7 +1149,9 @@ class EstadoMantenimiento(rx.State):
 
         hash_almacenado = await asyncio.to_thread(_fetch_admin_hash, admin_id)
         if not hash_almacenado:
-            return rx.toast.error("No se pudo verificar la contraseña del administrador.")
+            return rx.toast.error(
+                "No se pudo verificar la contraseña del administrador."
+            )
 
         if EncriptadorContrasena.verificar(self.password_confirmacion, hash_almacenado):
             res = await self.eliminar_rol(self.id_rol_eliminar)

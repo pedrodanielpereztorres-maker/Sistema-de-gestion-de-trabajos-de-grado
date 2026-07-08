@@ -15,32 +15,102 @@ if str(ROOT_DIR) not in sys.path:
 from rxconfig import URL_BASE_DATOS
 
 COMPANY_NAMES = [
-    "InnovaTech", "AgroPlus", "EducaLab", "LogiSoft", "GlobalFoods",
-    "EcoEnergia", "MetaServicios", "BuildMax", "SaludVida", "TransaPro",
-    "AquaNova", "TecnoSol", "GreenLine", "Urbania", "SmartWare",
-    "MegaLogistics", "BioHealth", "CulturaLab", "DataConnect", "IntegraCorp"
+    "InnovaTech",
+    "AgroPlus",
+    "EducaLab",
+    "LogiSoft",
+    "GlobalFoods",
+    "EcoEnergia",
+    "MetaServicios",
+    "BuildMax",
+    "SaludVida",
+    "TransaPro",
+    "AquaNova",
+    "TecnoSol",
+    "GreenLine",
+    "Urbania",
+    "SmartWare",
+    "MegaLogistics",
+    "BioHealth",
+    "CulturaLab",
+    "DataConnect",
+    "IntegraCorp",
 ]
 COMPANY_CITIES = [
-    "Valencia", "Barinas", "Maracaibo", "Puerto Ordaz", "Barquisimeto",
-    "San Fernando", "Maturín", "Barcelona", "Ciudad Bolívar", "Cumana"
+    "Valencia",
+    "Barinas",
+    "Maracaibo",
+    "Puerto Ordaz",
+    "Barquisimeto",
+    "San Fernando",
+    "Maturín",
+    "Barcelona",
+    "Ciudad Bolívar",
+    "Cumana",
 ]
 FIRST_NAMES = [
-    "Alejandro", "Camila", "Diego", "Valentina", "Santiago", "Isabella",
-    "Mateo", "María", "Lucas", "Sofía", "Daniel", "Victoria",
-    "Julián", "Gabriela", "Sebastián", "Natalia", "Andrés", "Nicolás",
-    "Laura", "Fernando", "Mariana", "Pablo", "Carolina", "Jorge"
+    "Alejandro",
+    "Camila",
+    "Diego",
+    "Valentina",
+    "Santiago",
+    "Isabella",
+    "Mateo",
+    "María",
+    "Lucas",
+    "Sofía",
+    "Daniel",
+    "Victoria",
+    "Julián",
+    "Gabriela",
+    "Sebastián",
+    "Natalia",
+    "Andrés",
+    "Nicolás",
+    "Laura",
+    "Fernando",
+    "Mariana",
+    "Pablo",
+    "Carolina",
+    "Jorge",
 ]
 LAST_NAMES = [
-    "González", "Rodríguez", "Pérez", "Martínez", "Gómez", "Díaz",
-    "Fernández", "López", "Hernández", "Jiménez", "Sánchez", "Ramírez",
-    "Torres", "Flores", "Rivera", "Castro", "Ortiz", "Ramos",
-    "Ruiz", "Herrera", "Arias", "Medina", "Vargas", "Silva"
+    "González",
+    "Rodríguez",
+    "Pérez",
+    "Martínez",
+    "Gómez",
+    "Díaz",
+    "Fernández",
+    "López",
+    "Hernández",
+    "Jiménez",
+    "Sánchez",
+    "Ramírez",
+    "Torres",
+    "Flores",
+    "Rivera",
+    "Castro",
+    "Ortiz",
+    "Ramos",
+    "Ruiz",
+    "Herrera",
+    "Arias",
+    "Medina",
+    "Vargas",
+    "Silva",
 ]
 ACADEMIC_SPECIALTIES = [
-    "Análisis de Datos", "Seguridad Informática", "Gestión de Proyectos",
-    "Ingeniería de Software", "Redes y Telecomunicaciones",
-    "Desarrollo Web", "Inteligencia Artificial", "Bases de Datos",
-    "Sistemas Embebidos", "Arquitectura de Computadores"
+    "Análisis de Datos",
+    "Seguridad Informática",
+    "Gestión de Proyectos",
+    "Ingeniería de Software",
+    "Redes y Telecomunicaciones",
+    "Desarrollo Web",
+    "Inteligencia Artificial",
+    "Bases de Datos",
+    "Sistemas Embebidos",
+    "Arquitectura de Computadores",
 ]
 PHONE_PREFIXES = ["0412", "0414", "0416", "0424", "0426"]
 
@@ -99,17 +169,21 @@ def main():
     if not careers:
         raise SystemExit("No career records found.")
 
-    # Update existing companies to fill missing contact data
     cur.execute("SELECT id, nombre, correo, telefono FROM empresa ORDER BY id;")
     existing_companies = cur.fetchall()
     for company in existing_companies:
         company_id, name, correo, telefono = company
         if not correo or not telefono:
-            updated_email = correo or f"contacto{company_id}@{name.replace(' ', '').lower()}.com"
-            updated_phone = telefono or f"{random.choice(PHONE_PREFIXES)}{random.randint(1000000, 9999999)}"
+            updated_email = (
+                correo or f"contacto{company_id}@{name.replace(' ', '').lower()}.com"
+            )
+            updated_phone = (
+                telefono
+                or f"{random.choice(PHONE_PREFIXES)}{random.randint(1000000, 9999999)}"
+            )
             cur.execute(
                 "UPDATE empresa SET correo=%s, telefono=%s WHERE id=%s;",
-                (updated_email, updated_phone, company_id)
+                (updated_email, updated_phone, company_id),
             )
 
     num_new_companies = max(0, 15 - len(existing_companies))
@@ -129,7 +203,9 @@ def main():
     needed_te = max(0, 50 - len(existing_te))
     for i in range(needed_te):
         company_id = random.choice(company_ids)
-        nombre, correo, telefono, empresa_id = build_tutor_empresarial_data(i, company_id)
+        nombre, correo, telefono, empresa_id = build_tutor_empresarial_data(
+            i, company_id
+        )
         cur.execute(
             "INSERT INTO tutor_empresarial (nombre, correo, telefono, empresa_id) VALUES (%s, %s, %s, %s) RETURNING id;",
             (nombre, correo, telefono, empresa_id),
@@ -142,7 +218,9 @@ def main():
     needed_academic = max(0, 30 - len(academic_ids))
     for i in range(needed_academic):
         carrera_id = random.choice(careers)
-        nombre, apellido, correo, telefono, carrera_id, especialidad, cedula = build_academic_tutor_data(i, carrera_id)
+        nombre, apellido, correo, telefono, carrera_id, especialidad, cedula = (
+            build_academic_tutor_data(i, carrera_id)
+        )
         cur.execute(
             "INSERT INTO tutor_academico (usuario_id, cedula, nombre, apellido, correo, telefono, carrera_id, especialidad, esta_activo) VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, TRUE) RETURNING id;",
             (cedula, nombre, apellido, correo, telefono, carrera_id, especialidad),
