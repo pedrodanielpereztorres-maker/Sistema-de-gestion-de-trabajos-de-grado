@@ -1,9 +1,10 @@
 import reflex as rx
+
 from ..componentes.encabezado import encabezado_pagina
-from ..estado.estado_autenticacion import EstadoAutenticacion
-from ..estado.estado_documento import EstadoDocumento, Documento
-from ..componentes.toast_viewer import toast_viewer
 from ..componentes.layout import layout_principal
+from ..componentes.toast_viewer import toast_viewer
+from ..estado.estado_autenticacion import EstadoAutenticacion
+from ..estado.estado_documento import Documento, EstadoDocumento
 
 COLOR_ICONO_PDF = "#EF4444"
 COLOR_ICONO_WORD = "#3B82F6"
@@ -99,11 +100,7 @@ def tarjeta_documento(doc: Documento) -> rx.Component:
                             title="Abrir documento",
                             _disabled={"opacity": "0.45", "cursor": "not-allowed"},
                         ),
-                        href=rx.cond(
-                            doc.url != "",
-                            doc.url + "?token=" + EstadoAutenticacion.token_actual,
-                            "#",
-                        ),
+                        href=rx.cond(doc.url != "", doc.url, "#"),
                         target="_blank",
                         rel="noopener noreferrer",
                         style={"display": "inline-flex"},
@@ -113,10 +110,7 @@ def tarjeta_documento(doc: Documento) -> rx.Component:
                     rx.icon("download", size=18),
                     on_click=rx.cond(
                         doc.url != "",
-                        rx.download(
-                            url=doc.url + "?token=" + EstadoAutenticacion.token_actual,
-                            filename=f"{doc.titulo}.{doc.tipo}",
-                        ),
+                        rx.download(url=doc.url, filename=f"{doc.titulo}.{doc.tipo}"),
                         None,
                     ),
                     variant="solid",

@@ -1,10 +1,11 @@
 import reflex as rx
-from ..estado.estado_autenticacion import EstadoAutenticacion
-from ..estado.estado_boveda import EstadoBoveda
-from ..componentes.toast_viewer import toast_viewer
+
 from ..componentes.campo_texto import campo_texto
 from ..componentes.encabezado import encabezado_pagina
 from ..componentes.layout import layout_principal
+from ..componentes.toast_viewer import toast_viewer
+from ..estado.estado_autenticacion import EstadoAutenticacion
+from ..estado.estado_boveda import EstadoBoveda
 
 COLOR_PRIMARIO = "#6366F1"
 COLOR_FONDO_GLOBAL = "#F8F9FF"
@@ -37,300 +38,414 @@ def valor_a_string(v):
 
 def tarjeta_trabajo_de_grado(tesis: rx.Var[dict]) -> rx.Component:
     """Card individual con datos de un trabajo de grado registrado."""
-    return rx.box(
-        rx.vstack(
-            # Encabezado: avatar + nombre + carrera
-            rx.hstack(
-                rx.center(
-                    rx.text(
-                        # Usamos .to(str) para asegurar que podemos tratarlo como cadena
-                        tesis["nombre_estudiante"].to(str)[0],
-                        font_size="1.125rem",
-                        font_weight="800",
-                        color="white",
-                        text_transform="uppercase",
-                    ),
-                    width="2.75rem",
-                    height="2.75rem",
-                    border_radius="0.75rem",
-                    background=DEGRADADO_ICONO,
-                    box_shadow="0 0.1875rem 0.625rem rgba(99,102,241,0.30)",
-                    flex_shrink="0",
-                ),
-                rx.vstack(
-                    rx.text(
-                        # Concatenamos asegurando que son strings
-                        tesis["nombre_estudiante"].to(str)
-                        + " "
-                        + tesis["apellido_estudiante"].to(str),
-                        font_size="1rem",
-                        font_weight="800",
-                        color=COLOR_TEXTO_TITULO,
-                        no_of_lines=1,
-                    ),
-                    rx.cond(
-                        tesis["publico"].to(bool),
-                        rx.badge(
-                            "Pública",
-                            variant="soft",
-                            color_scheme="green",
-                            radius="full",
-                            font_size="0.6875rem",
-                            style={
-                                "color": "#065F46",  # Verde esmeralda oscuro
-                                "background_color": "#D1FAE5",  # Verde esmeralda claro
-                                "border": "1px solid #A7F3D0",
-                                "font_weight": "bold",
-                            },
-                        ),
-                        rx.badge(
-                            "Privada",
-                            variant="soft",
-                            color_scheme="gray",
-                            radius="full",
-                            font_size="0.6875rem",
-                            style={
-                                "color": "#1E293B",  # Slate oscuro
-                                "background_color": "#F1F5F9",  # Slate claro
-                                "border": "1px solid #E2E8F0",
-                                "font_weight": "bold",
-                            },
-                        ),
-                    ),
-                    align="start",
-                    spacing="1",
-                    flex="1",
-                ),
-                rx.badge(
-                    tesis["carrera"].to(str),
-                    variant="soft",
-                    color_scheme="indigo",
-                    radius="full",
-                    font_size="0.75rem",
-                    font_weight="700",
-                    padding_x="0.625rem",
-                    style={
-                        "color": "#3730A3",  # Indigo oscuro
-                        "background_color": "#E0E7FF",  # Indigo claro
-                        "border": "1px solid #C7D2FE",
-                    },
-                ),
-                width="100%",
-                align="center",
-                spacing="3",
-                direction={"initial": "column", "md": "row"},
+
+    # Avatar con gradiente moderno
+    avatar = rx.center(
+        rx.text(
+            (tesis["nombre_estudiante"].to(str) + " " + tesis["apellido_estudiante"].to(str))[0],
+            font_size={"initial": "1.4rem", "sm": "1.6rem"},
+            font_weight="800",
+            color="white",
+            text_transform="uppercase"
+        ),
+        width={"initial": "3.5rem", "sm": "4rem"},
+        height={"initial": "3.5rem", "sm": "4rem"},
+        border_radius="1rem",
+        background=DEGRADADO_ICONO,
+        box_shadow="0 4px 12px rgba(99,102,241,0.3)",
+        flex_shrink="0",
+    )
+
+    # Título con mejor tipografía
+    titulo = rx.text(
+        tesis["titulo"].to(str),
+        font_size={"initial": "1rem", "sm": "1.1rem"},
+        font_weight="700",
+        color=COLOR_TEXTO_TITULO,
+        line_height="1.4",
+        no_of_lines=2,
+        style={"whiteSpace": "normal"},
+    )
+
+    # Información del estudiante
+    info_estudiante = rx.vstack(
+        rx.hstack(
+            rx.icon("user", size=16, color=COLOR_PRIMARIO),
+            rx.text(
+                tesis["nombre_estudiante"].to(str) + " " + tesis["apellido_estudiante"].to(str),
+                font_size={"initial": "0.95rem", "sm": "1rem"},
+                font_weight="600",
+                color=COLOR_TEXTO_TITULO
             ),
-            # Título
-            rx.box(
-                rx.text(
-                    tesis["titulo"].to(str),
-                    font_size="0.9375rem",
-                    font_weight="700",
-                    color=COLOR_TEXTO_TITULO,
-                    line_height="1.4",
-                    no_of_lines=3,
-                    style={"whiteSpace": "normal"},
-                ),
-                width="100%",
-                border_left="0.25rem solid #6366F1",
-                padding_left="0.875rem",
-                margin_y="2",
-                style={"min_width": "0"},
+            spacing="2",
+            align="center"
+        ),
+        rx.hstack(
+            rx.icon("calendar", size=14, color=COLOR_TEXTO_MUY_SUAVE),
+            rx.text(
+                rx.cond(tesis.get("fecha_registro_formateada") != "", tesis["fecha_registro_formateada"].to(str), ""),
+                font_size="0.8rem",
+                color=COLOR_TEXTO_MUY_SUAVE,
+                font_weight="500"
             ),
-            # Fecha de subida
-            rx.box(
-                rx.text(
-                    rx.cond(
-                        tesis.get("fecha_registro_formateada") != "",
-                        "Subido: " + tesis["fecha_registro_formateada"].to(str),
-                        "",
-                    ),
-                    font_size="0.75rem",
-                    color=COLOR_TEXTO_MUY_SUAVE,
-                    font_weight="600",
-                ),
-                width="100%",
-                padding_bottom="0.5rem",
-            ),
-            # Información detallada: Tutores y Empresa (Diseño Vertical Mejorado)
+            spacing="2",
+            align="center"
+        ),
+        spacing="1",
+        align="start"
+    )
+
+    # Badges de información
+    badges_info = rx.hstack(
+        rx.badge(
+            tesis["carrera"].to(str),
+            variant="soft",
+            color_scheme="indigo",
+            radius="full"
+        ),
+        rx.cond(
+            tesis["publico"].to(bool),
+            rx.badge("Pública", variant="soft", color_scheme="green", radius="full"),
+            rx.badge("Privada", variant="soft", color_scheme="gray", radius="full")
+        ),
+        rx.badge("PDF", variant="solid", color_scheme="indigo", radius="full"),
+        spacing="2",
+        wrap="wrap"
+    )
+
+    # Información de tutores y empresa
+    info_meta = rx.grid(
+        rx.box(
             rx.vstack(
                 rx.hstack(
-                    rx.vstack(
-                        rx.hstack(
-                            rx.icon("user", size=15, color=COLOR_PRIMARIO, stroke_width=2.5),
-                            rx.text(
-                                "Tutor Académico",
-                                font_size="0.75rem",
-                                font_weight="800",
-                                color=COLOR_TEXTO_MUY_SUAVE,
-                                text_transform="uppercase",
-                            ),
-                            spacing="1",
-                            align="center",
-                        ),
-                        rx.text(
-                            tesis["tutor_academico"].to(str),
-                            font_size="0.875rem",
-                            font_weight="600",
-                            color=COLOR_TEXTO_TITULO,
-                            no_of_lines=1,
-                            style={"overflow": "hidden", "text_overflow": "ellipsis"},
-                        ),
-                        spacing="1",
-                        align="start",
-                        style={"min_width": "0", "flex": "1"},
-                    ),
-                    rx.vstack(
-                        rx.hstack(
-                            rx.icon("user-check", size=15, color="#10B981", stroke_width=2.5),
-                            rx.text(
-                                "Tutor Empresarial",
-                                font_size="0.75rem",
-                                font_weight="800",
-                                color=COLOR_TEXTO_MUY_SUAVE,
-                                text_transform="uppercase",
-                            ),
-                            spacing="1",
-                            align="center",
-                        ),
-                        rx.text(
-                            tesis["tutor_empresa"].to(str),
-                            font_size="0.875rem",
-                            font_weight="600",
-                            color=COLOR_TEXTO_TITULO,
-                            no_of_lines=1,
-                            style={"overflow": "hidden", "text_overflow": "ellipsis"},
-                        ),
-                        spacing="1",
-                        align="start",
-                        style={"min_width": "0", "flex": "1"},
-                    ),
-                    rx.vstack(
-                        rx.hstack(
-                            rx.icon("building-2", size=15, color="#0EA5E9", stroke_width=2.5),
-                            rx.text(
-                                "Empresa",
-                                font_size="0.75rem",
-                                font_weight="800",
-                                color=COLOR_TEXTO_MUY_SUAVE,
-                                text_transform="uppercase",
-                            ),
-                            spacing="1",
-                            align="center",
-                        ),
-                        rx.text(
-                            tesis["nombre_empresa"].to(str),
-                            font_size="0.875rem",
-                            font_weight="600",
-                            color=COLOR_TEXTO_TITULO,
-                            no_of_lines=1,
-                            style={"overflow": "hidden", "text_overflow": "ellipsis"},
-                        ),
-                        spacing="1",
-                        align="start",
-                        style={"min_width": "0", "flex": "1"},
-                    ),
-                    spacing="4",
-                    width="100%",
-                    align="start",
-                    padding_top="0.875rem",
-                    border_top=f"1px solid {COLOR_BORDE}",
+                    rx.icon("graduation-cap", size=16, color=COLOR_PRIMARIO),
+                    rx.text("Tutor Académico", font_size="0.7rem", color=COLOR_TEXTO_MUY_SUAVE, font_weight="600", text_transform="uppercase"),
+                    spacing="1",
+                    align="center"
                 ),
+                rx.text(
+                    tesis["tutor_academico"].to(str),
+                    font_size="0.9rem",
+                    font_weight="600",
+                    color=COLOR_TEXTO_TITULO,
+                    no_of_lines=1
+                ),
+                spacing="1",
+                align="start"
             ),
-            # Botones de acción
-            rx.hstack(
+            padding="1rem",
+            background="rgba(99,102,241,0.05)",
+            border_radius="0.75rem",
+            border="1px solid rgba(99,102,241,0.1)"
+        ),
+        rx.box(
+            rx.vstack(
+                rx.hstack(
+                    rx.icon("briefcase", size=16, color="#10B981"),
+                    rx.text("Tutor Empresa", font_size="0.7rem", color=COLOR_TEXTO_MUY_SUAVE, font_weight="600", text_transform="uppercase"),
+                    spacing="1",
+                    align="center"
+                ),
+                rx.text(
+                    tesis["tutor_empresa"].to(str),
+                    font_size="0.9rem",
+                    font_weight="600",
+                    color=COLOR_TEXTO_TITULO,
+                    no_of_lines=1
+                ),
+                spacing="1",
+                align="start"
+            ),
+            padding="1rem",
+            background="rgba(16,185,129,0.05)",
+            border_radius="0.75rem",
+            border="1px solid rgba(16,185,129,0.1)"
+        ),
+        rx.box(
+            rx.vstack(
+                rx.hstack(
+                    rx.icon("building", size=16, color="#F59E0B"),
+                    rx.text("Empresa", font_size="0.7rem", color=COLOR_TEXTO_MUY_SUAVE, font_weight="600", text_transform="uppercase"),
+                    spacing="1",
+                    align="center"
+                ),
+                rx.text(
+                    tesis["nombre_empresa"].to(str),
+                    font_size="0.9rem",
+                    font_weight="600",
+                    color=COLOR_TEXTO_TITULO,
+                    no_of_lines=1
+                ),
+                spacing="1",
+                align="start"
+            ),
+            padding="1rem",
+            background="rgba(245,158,11,0.05)",
+            border_radius="0.75rem",
+            border="1px solid rgba(245,158,11,0.1)"
+        ),
+        columns={"initial": "1", "sm": "3"},
+        spacing="3",
+        width="100%"
+    )
+
+    # Botones de acción
+    acciones = rx.cond(
+        EstadoAutenticacion.rol_usuario == "administrador",
+        # Layout para administrador: 3 botones en grid
+        rx.grid(
                 rx.link(
                     rx.button(
                         rx.hstack(
                             rx.icon("eye", size=16),
-                            rx.text(
-                                "Visualizar", font_size="0.9375rem", font_weight="700"
-                            ),
-                            spacing="1",
-                            align="center",
-                        ),
-                        variant="soft",
-                        color_scheme="indigo",
-                        size="2",
-                        width="100%",
-                        style={
-                            "cursor": "pointer",
-                            "border_radius": "0.625rem",
-                            "transition": "all 0.2s ease",
-                        },
-                        _hover={
-                            "background_color": "#EEF2F6",
-                            "transform": "translateY(-1px)",
-                        },
-                    ),
-                    href=rx.cond(
-                        tesis["url"].to(str) != "",
-                        tesis["url"].to(str)
-                        + "?token="
-                        + EstadoAutenticacion.token_actual
-                        + "#toolbar=0",
-                        "#",
-                    ),
-                    is_external=True,
-                    style={"text_decoration": "none", "flex": "1"},
-                ),
-                # Botón de descarga: SOLO para Administradores
-                rx.cond(
-                    EstadoAutenticacion.rol_usuario == "administrador",
-                    rx.button(
-                        rx.hstack(
-                            rx.icon("download", size=16),
-                            rx.text(
-                                "Descargar", font_size="0.9375rem", font_weight="700"
-                            ),
-                            spacing="1",
-                            align="center",
-                        ),
-                        on_click=rx.download(
-                            url=tesis["url"].to(str)
-                            + "?token="
-                            + EstadoAutenticacion.token_actual,
-                            filename=f"TrabajoDeGrado_{tesis['cedula_estudiante'].to(str)}.pdf",
+                            rx.text("Visualizar", font_weight="600", font_size="0.85rem"),
+                            spacing="2",
+                            align="center"
                         ),
                         variant="solid",
+                        size="3",
                         color_scheme="indigo",
-                        size="2",
                         style={
-                            "cursor": "pointer",
-                            "border_radius": "0.625rem",
-                            "background": "linear-gradient(135deg, #6366F1 0%, #4338CA 100%)",
-                            "color": "white",
-                            "box_shadow": "0 0.125rem 0.375rem rgba(99, 102, 241, 0.15)",
-                            "transition": "all 0.2s ease",
+                            "width": "100%",
+                            "border_radius": "0.875rem",
+                            "height": "2.5rem",
+                            "background": "linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)",
+                            "box_shadow": "0 4px 6px -1px rgba(99, 102, 241, 0.2)",
+                            "transition": "all 0.2s ease"
                         },
-                        flex="1",
                         _hover={
-                            "transform": "translateY(-0.0625rem)",
-                            "box_shadow": "0 0.25rem 0.75rem rgba(99, 102, 241, 0.25)",
-                        },
-                        width="100%",
+                            "background": "linear-gradient(135deg, #4F46E5 0%, #4338CA 100%)",
+                            "box_shadow": "0 6px 8px -1px rgba(99, 102, 241, 0.3)",
+                            "transform": "translateY(-1px)"
+                        }
                     ),
+                    href=rx.cond(tesis["url"].to(str) != "", tesis["url"].to(str) + "#toolbar=0", "#"),
+                    target="_blank",
+                    rel="noopener noreferrer",
+                    style={"text_decoration": "none", "width": "100%"}
                 ),
-                width="100%",
-                padding_top="0.75rem",
-                spacing="3",
-                style={"flexWrap": "wrap", "gap": "0.5rem"},
-                direction={"initial": "column", "md": "row"},
+            rx.button(
+                rx.hstack(
+                    rx.icon("download", size=16),
+                    rx.text("Descargar", font_weight="600", font_size="0.85rem"),
+                    spacing="2",
+                    align="center"
+                ),
+                variant="solid",
+                size="3",
+                color_scheme="green",
+                style={
+                    "width": "100%",
+                    "border_radius": "0.875rem",
+                    "height": "2.5rem",
+                    "background": "linear-gradient(135deg, #10B981 0%, #059669 100%)",
+                    "box_shadow": "0 4px 6px -1px rgba(16, 185, 129, 0.2)",
+                    "transition": "all 0.2s ease"
+                },
+                _hover={
+                    "background": "linear-gradient(135deg, #059669 0%, #047857 100%)",
+                    "box_shadow": "0 6px 8px -1px rgba(16, 185, 129, 0.3)",
+                    "transform": "translateY(-1px)"
+                },
+                on_click=rx.download(url=tesis["url"].to(str), filename="TrabajoDeGrado_" + tesis["cedula_estudiante"].to(str) + ".pdf")
             ),
-            height="100%",
-            padding={"initial": "1rem", "md": "1.5rem"},
-            style={"overflowX": "hidden", "boxSizing": "border-box"},
-            border_radius="1rem",
-            background="white",
-            border="1px solid " + COLOR_BORDE,
-            box_shadow="0 0.0625rem 0.25rem rgba(0,0,0,0.06)",
-            _hover={
-                "transform": "translateY(-0.25rem)",
-                "box_shadow": "0 0.75rem 1.75rem rgba(99,102,241,0.14), 0 0.25rem 0.625rem rgba(0,0,0,0.06)",
-                "border_color": "rgba(99,102,241,0.25)",
-            },
-            transition="all 0.22s cubic-bezier(0.4, 0, 0.2, 1)",
+            rx.button(
+                rx.hstack(
+                    rx.icon("trash-2", size=16),
+                    rx.text("Eliminar", font_weight="600", font_size="0.85rem"),
+                    spacing="2",
+                    align="center"
+                ),
+                variant="solid",
+                size="3",
+                color_scheme="red",
+                style={
+                    "width": "100%",
+                    "border_radius": "0.875rem",
+                    "height": "2.5rem",
+                    "background": "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)",
+                    "box_shadow": "0 4px 6px -1px rgba(239, 68, 68, 0.2)",
+                    "transition": "all 0.2s ease"
+                },
+                _hover={
+                    "background": "linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)",
+                    "box_shadow": "0 6px 8px -1px rgba(239, 68, 68, 0.3)",
+                    "transform": "translateY(-1px)"
+                },
+                on_click=lambda: EstadoBoveda.abrir_modal_confirmacion(tesis["id"].to(int))
+            ),
+            columns={"initial": "1", "sm": "3"},
+            spacing="3",
+            width="100%"
+        ),
+        # Layout para estudiante: verificar si es su propio trabajo
+        rx.cond(
+            tesis["usuario_id"].to(int) == EstadoAutenticacion.usuario_id,
+            # Es su propio trabajo: 3 botones (Visualizar, Editar, Eliminar)
+            rx.grid(
+                rx.link(
+                    rx.button(
+                        rx.hstack(
+                            rx.icon("eye", size=16),
+                            rx.text("Visualizar", font_weight="600", font_size="0.85rem"),
+                            spacing="2",
+                            align="center"
+                        ),
+                        variant="solid",
+                        size="3",
+                        color_scheme="indigo",
+                        style={
+                            "width": "100%",
+                            "border_radius": "0.875rem",
+                            "height": "2.5rem",
+                            "background": "linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)",
+                            "box_shadow": "0 4px 6px -1px rgba(99, 102, 241, 0.2)",
+                            "transition": "all 0.2s ease"
+                        },
+                        _hover={
+                            "background": "linear-gradient(135deg, #4F46E5 0%, #4338CA 100%)",
+                            "box_shadow": "0 6px 8px -1px rgba(99, 102, 241, 0.3)",
+                            "transform": "translateY(-1px)"
+                        }
+                    ),
+                    href=rx.cond(tesis["url"].to(str) != "", tesis["url"].to(str) + "#toolbar=0", "#"),
+                    target="_blank",
+                    rel="noopener noreferrer",
+                    style={"text_decoration": "none"}
+                ),
+                rx.button(
+                    rx.hstack(
+                        rx.icon("pencil", size=16),
+                        rx.text("Editar", font_weight="600", font_size="0.85rem"),
+                        spacing="2",
+                        align="center"
+                    ),
+                    variant="solid",
+                    size="3",
+                    color_scheme="amber",
+                    style={
+                        "width": "100%",
+                        "border_radius": "0.875rem",
+                        "height": "2.5rem",
+                        "background": "linear-gradient(135deg, #F59E0B 0%, #D97706 100%)",
+                        "box_shadow": "0 4px 6px -1px rgba(245, 158, 11, 0.2)",
+                        "transition": "all 0.2s ease"
+                    },
+                    _hover={
+                        "background": "linear-gradient(135deg, #D97706 0%, #B45309 100%)",
+                        "box_shadow": "0 6px 8px -1px rgba(245, 158, 11, 0.3)",
+                        "transform": "translateY(-1px)"
+                    },
+                    on_click=lambda: EstadoBoveda.abrir_modal_edicion(tesis["id"].to(int))
+                ),
+                rx.button(
+                    rx.hstack(
+                        rx.icon("trash-2", size=16),
+                        rx.text("Eliminar", font_weight="600", font_size="0.85rem"),
+                        spacing="2",
+                        align="center"
+                    ),
+                    variant="solid",
+                    size="3",
+                    color_scheme="red",
+                    style={
+                        "width": "100%",
+                        "border_radius": "0.875rem",
+                        "height": "2.5rem",
+                        "background": "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)",
+                        "box_shadow": "0 4px 6px -1px rgba(239, 68, 68, 0.2)",
+                        "transition": "all 0.2s ease"
+                    },
+                    _hover={
+                        "background": "linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)",
+                        "box_shadow": "0 6px 8px -1px rgba(239, 68, 68, 0.3)",
+                        "transform": "translateY(-1px)"
+                    },
+                    on_click=lambda: EstadoBoveda.abrir_modal_confirmacion(tesis["id"].to(int))
+                ),
+                columns={"initial": "1", "sm": "3"},
+                spacing="3",
+                width="100%"
+            ),
+            # No es su trabajo: solo visualizar
+            rx.link(
+                rx.button(
+                    rx.hstack(
+                        rx.icon("eye", size=16),
+                        rx.text("Visualizar", font_weight="600", font_size="0.9rem"),
+                        spacing="2",
+                        align="center"
+                    ),
+                    variant="solid",
+                    size="3",
+                    color_scheme="indigo",
+                    style={
+                        "width": "100%",
+                        "border_radius": "0.875rem",
+                        "height": "2.75rem",
+                        "background": "linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)",
+                        "box_shadow": "0 4px 6px -1px rgba(99, 102, 241, 0.2)",
+                        "transition": "all 0.2s ease"
+                    },
+                    _hover={
+                        "background": "linear-gradient(135deg, #4F46E5 0%, #4338CA 100%)",
+                        "box_shadow": "0 6px 8px -1px rgba(99, 102, 241, 0.3)",
+                        "transform": "translateY(-1px)"
+                    }
+                ),
+                href=rx.cond(tesis["url"].to(str) != "", tesis["url"].to(str) + "#toolbar=0", "#"),
+                target="_blank",
+                rel="noopener noreferrer",
+                is_external=True,
+                style={"text_decoration": "none"}
+            )
         )
+    )
+
+    return rx.box(
+        rx.vstack(
+            # Header con avatar e información principal
+            rx.hstack(
+                avatar,
+                rx.vstack(
+                    info_estudiante,
+                    titulo,
+                    badges_info,
+                    spacing="3",
+                    width="100%",
+                    align="start"
+                ),
+                spacing="4",
+                align="start",
+                width="100%"
+            ),
+            # Separador
+            rx.box(
+                height="1px",
+                width="100%",
+                background="linear-gradient(90deg, transparent, rgba(99,102,241,0.2), transparent)",
+                margin_y="2"
+            ),
+            # Información de tutores y empresa
+            info_meta,
+            # Botones de acción
+            acciones,
+            spacing="4",
+            width="100%",
+            align="start"
+        ),
+        padding="1.5rem",
+        border_radius="1.25rem",
+        background="white",
+        border="1px solid " + COLOR_BORDE,
+        box_shadow="0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06)",
+        _hover={
+            "transform": "translateY(-4px)",
+            "box_shadow": "0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)",
+            "border_color": COLOR_PRIMARIO
+        },
+        transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        style={"position": "relative", "overflow": "hidden"}
     )
 
 
@@ -379,7 +494,8 @@ def estado_vacio_boveda() -> rx.Component:
 
 
 def seccion_modal(icono: str, titulo: str, *contenido, **estilos) -> rx.Component:
-    # Definir valores por defecto y permitir sobrescritura desde **estilos para evitar duplicidad
+    # Definir valores por defecto y permitir sobrescritura desde **estilos
+    # para evitar duplicidad
     estilos.setdefault("spacing", "4")
     estilos.setdefault("width", "100%")
     estilos.setdefault("padding", "1.375rem")
@@ -676,7 +792,9 @@ def modal_nuevo_trabajo_de_grado() -> rx.Component:
                                     ),
                                     rx.vstack(
                                         rx.foreach(
-                                            rx.selected_files("upload_trabajo_de_grado"),
+                                            rx.selected_files(
+                                                "upload_trabajo_de_grado"
+                                            ),
                                             lambda f: rx.text(
                                                 f,
                                                 font_weight="bold",
@@ -1052,7 +1170,7 @@ def contenido_boveda() -> rx.Component:
                 width="100%",
             ),
             position="relative",
-            width=["100%", "100%", "40rem"],
+            width=["100%", "100%", "34rem"],
             margin_bottom="0.5rem",
         ),
         rx.flex(  # Contenido de filtros y búsqueda
@@ -1142,19 +1260,84 @@ def contenido_boveda() -> rx.Component:
         rx.cond(
             EstadoBoveda.total_trabajos_de_grado_count == 0,
             estado_vacio_boveda(),
-            rx.grid(
-                rx.foreach(EstadoBoveda.trabajos_de_grado_a_mostrar, tarjeta_trabajo_de_grado),
-                columns={"initial": "1", "sm": "2", "md": "2", "lg": "3"},
-                spacing="5",
+            rx.vstack(
+                rx.grid(
+                    rx.foreach(
+                        EstadoBoveda.trabajos_de_grado_paginados,
+                        tarjeta_trabajo_de_grado,
+                    ),
+                    columns={"initial": "1", "sm": "1", "md": "2", "lg": "2", "xl": "3"},
+                    spacing={"initial": "3", "sm": "3", "md": "4", "lg": "4"},
+                    width="100%",
+                ),
+                rx.cond(
+                    EstadoBoveda.total_paginas > 1,
+                    rx.box(
+                        rx.hstack(
+                            rx.button(
+                                rx.icon("chevrons-left", size=14),
+                                "Anterior",
+                                on_click=EstadoBoveda.pagina_anterior,
+                                variant="soft",
+                                size="2",
+                                disabled=EstadoBoveda.pagina_actual <= 1,
+                                style={"border_radius": "999px", "padding": "0.55rem 0.95rem"},
+                            ),
+                            rx.hstack(
+                                rx.foreach(
+                                    EstadoBoveda.paginas_disponibles,
+                                    lambda pagina: rx.button(
+                                        valor_a_string(pagina),
+                                        on_click=lambda pagina=pagina: EstadoBoveda.ir_a_pagina(pagina),
+                                        variant=rx.cond(
+                                            pagina == EstadoBoveda.pagina_actual,
+                                            "solid",
+                                            "soft",
+                                        ),
+                                        color_scheme=rx.cond(
+                                            pagina == EstadoBoveda.pagina_actual,
+                                            "indigo",
+                                            "gray",
+                                        ),
+                                        size="2",
+                                        style={"min_width": "2.2rem", "border_radius": "999px"},
+                                    ),
+                                ),
+                                spacing="2",
+                                wrap="wrap",
+                            ),
+                            rx.button(
+                                "Siguiente",
+                                rx.icon("chevrons-right", size=14),
+                                on_click=EstadoBoveda.pagina_siguiente,
+                                variant="solid",
+                                size="2",
+                                disabled=EstadoBoveda.pagina_actual >= EstadoBoveda.total_paginas,
+                                style={"border_radius": "999px", "padding": "0.55rem 0.95rem"},
+                            ),
+                            justify="between",
+                            width="100%",
+                            align="center",
+                            wrap="wrap",
+                            spacing="3",
+                        ),
+                        padding="0.9rem 1rem",
+                        border_radius="1rem",
+                        background="rgba(248, 250, 252, 0.95)",
+                        border="1px solid " + COLOR_BORDE,
+                        width="100%",
+                    ),
+                ),
                 width="100%",
+                spacing="4",
             ),
         ),
         modal_nuevo_trabajo_de_grado(),
         modal_confirmar_eliminacion_trabajo_de_grado(),
         toast_viewer(),
-        padding=["1rem", "1.25rem", "1.5rem", "1.5rem"],
+        padding=["0.5rem", "0.75rem", "0.75rem", "0.75rem"],
         width="100%",
-        spacing="5",
+        spacing="3",
         align="start",
     )
 

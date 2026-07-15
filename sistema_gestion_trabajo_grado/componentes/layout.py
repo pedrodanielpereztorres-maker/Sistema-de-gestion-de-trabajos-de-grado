@@ -1,7 +1,8 @@
 import reflex as rx
-from .barra_lateral import sidebar_contenido, ANCHO_BARRA, COLOR_BORDE
-from ..estado.estado_layout import EstadoLayout
+
 from ..estado.estado_autenticacion import EstadoAutenticacion
+from ..estado.estado_layout import EstadoLayout
+from .barra_lateral import ANCHO_BARRA, COLOR_BORDE, sidebar_contenido
 
 
 def admin_restringido_movil() -> rx.Component:

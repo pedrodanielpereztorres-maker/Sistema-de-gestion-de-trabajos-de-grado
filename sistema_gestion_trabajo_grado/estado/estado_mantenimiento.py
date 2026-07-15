@@ -2,8 +2,10 @@ import asyncio
 import logging
 import math
 import re
+
 import reflex as rx
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
+
 from ..database_manager import obtener_conexion
 from .estado_boveda import EstadoBoveda
 
@@ -143,7 +145,7 @@ class EstadoMantenimiento(rx.State):
                         for c_id, c_nom, c_act in res_c:
                             cursor.execute(
                                 """
-                                SELECT EXISTS(SELECT 1 FROM estudiante WHERE carrera_id = %s) OR 
+                                SELECT EXISTS(SELECT 1 FROM estudiante WHERE carrera_id = %s) OR
                                        EXISTS(SELECT 1 FROM tutor_academico WHERE carrera_id = %s);
                             """,
                                 (c_id, c_id),
@@ -159,8 +161,8 @@ class EstadoMantenimiento(rx.State):
                             )
                         # Tutores
                         cursor.execute("""
-                            SELECT ta.id, COALESCE(u.nombre, ta.nombre), COALESCE(u.apellido, ta.apellido), 
-                                   COALESCE(u.cedula, ta.cedula), COALESCE(u.correo, ta.correo), 
+                            SELECT ta.id, COALESCE(u.nombre, ta.nombre), COALESCE(u.apellido, ta.apellido),
+                                   COALESCE(u.cedula, ta.cedula), COALESCE(u.correo, ta.correo),
                                    ta.especialidad, ta.esta_activo, c.nombre as carrera_nom, ta.telefono
                             FROM tutor_academico ta
                             LEFT JOIN usuario u ON ta.usuario_id = u.id
@@ -173,8 +175,8 @@ class EstadoMantenimiento(rx.State):
                             cursor.execute(
                                 """
                                 SELECT EXISTS(
-                                    SELECT 1 FROM trabajo_de_grado 
-                                    JOIN estudiante ON trabajo_de_grado.estudiante_id = estudiante.id 
+                                    SELECT 1 FROM trabajo_de_grado
+                                    JOIN estudiante ON trabajo_de_grado.estudiante_id = estudiante.id
                                     WHERE estudiante.tutor_academico_id = %s
                                 );
                             """,
@@ -671,7 +673,7 @@ class EstadoMantenimiento(rx.State):
                         if self.t_en_edicion:
                             cursor.execute(
                                 """
-                                UPDATE tutor_academico SET 
+                                UPDATE tutor_academico SET
                                 especialidad = %s, carrera_id = %s, usuario_id = %s,
                                 correo = %s, telefono = %s, cedula = %s, nombre = %s, apellido = %s
                                 WHERE id = %s;
@@ -890,7 +892,7 @@ class EstadoMantenimiento(rx.State):
                     with conn2.cursor() as cursor:
                         cursor.execute(
                             """
-                            SELECT EXISTS(SELECT 1 FROM estudiante WHERE carrera_id = %s) OR 
+                            SELECT EXISTS(SELECT 1 FROM estudiante WHERE carrera_id = %s) OR
                                    EXISTS(SELECT 1 FROM tutor_academico WHERE carrera_id = %s);
                         """,
                             (carrera_id, carrera_id),
@@ -1117,7 +1119,7 @@ class EstadoMantenimiento(rx.State):
         Se usa obtener_conexion() y EncriptadorContrasena.verificar() para evitar comparar texto plano
         y garantizar que solo un administrador autenticado pueda eliminar roles.
         """
-        from .estado_autenticacion import EstadoAutenticacion, EncriptadorContrasena
+        from .estado_autenticacion import EncriptadorContrasena, EstadoAutenticacion
 
         auth_state = await self.get_state(EstadoAutenticacion)
         admin_id = auth_state.usuario.id if auth_state.usuario else None

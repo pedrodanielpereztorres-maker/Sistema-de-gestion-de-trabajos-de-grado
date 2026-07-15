@@ -1,13 +1,16 @@
 import asyncio
 import logging
-import reflex as rx
-from datetime import date, timedelta
-from pydantic import BaseModel
-from psycopg2 import sql
-from .estado_autenticacion import EstadoAutenticacion, EncriptadorContrasena
-from typing import List, Dict, Any
-from ..database_manager import obtener_conexion
 import math
+import re
+from datetime import date, datetime, timedelta
+from typing import Any, Dict, List, Optional
+
+import reflex as rx
+from psycopg2 import sql
+from pydantic import BaseModel
+
+from ..database_manager import obtener_conexion
+from .estado_autenticacion import EncriptadorContrasena, EstadoAutenticacion
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +48,8 @@ class EstudianteResumen(BaseModel):
     correo_empresa: str = ""
     telefono_empresa: str = ""
     inicial: str = ""
+    en_pasantia: bool = False
+    terminado: bool = False
 
 
 class EstadoEstudiante(rx.State):
@@ -69,9 +74,16 @@ class EstadoEstudiante(rx.State):
 
     filtro_carrera: str = ""
     filtro_estado: str = "Todos"
+    filtro_fecha_cierre_inicio: str = ""
+    filtro_fecha_cierre_fin: str = ""
     busqueda_dinamica: str = ""
 
     mostrar_modal: bool = False
+
+    @rx.var
+    def opciones_estados(self) -> list[str]:
+        return ["Todos", "En Pasantía", "Sin Pasantía", "Ya la terminó"]
+
     en_edicion: bool = False
     lista_estudiantes: List[EstudianteResumen] = []
     carreras_disponibles: list[str] = []
@@ -121,24 +133,35 @@ class EstadoEstudiante(rx.State):
             params.append(self.filtro_carrera)
 
         if self.filtro_estado == "En Pasantía":
-            condiciones.append(sql.SQL("e.tutor_academico_id IS NOT NULL"))
+            condiciones.append(
+                sql.SQL(
+                    "e.tutor_academico_id IS NOT NULL AND e.periodo_cierre >= CURRENT_DATE"
+                )
+            )
         elif self.filtro_estado == "Sin Pasantía":
             condiciones.append(sql.SQL("e.tutor_academico_id IS NULL"))
+        elif self.filtro_estado == "Ya la terminó":
+            condiciones.append(sql.SQL("e.periodo_cierre < CURRENT_DATE"))
+
+        # Filtro por rango de fechas de cierre
+        if self.filtro_fecha_cierre_inicio:
+            condiciones.append(sql.SQL("e.periodo_cierre >= %s"))
+            params.append(self.filtro_fecha_cierre_inicio)
+        if self.filtro_fecha_cierre_fin:
+            condiciones.append(sql.SQL("e.periodo_cierre <= %s"))
+            params.append(self.filtro_fecha_cierre_fin)
 
         where_clause = sql.SQL(" AND ").join(condiciones)
 
-        query_total = sql.SQL(
-            """
+        query_total = sql.SQL("""
             SELECT COUNT(*) FROM estudiante e
             LEFT JOIN usuario u ON e.usuario_id = u.id
             LEFT JOIN carrera c ON e.carrera_id = c.id
             WHERE {where}
-            """
-        ).format(where=where_clause)
+            """).format(where=where_clause)
 
-        query_estudiantes = sql.SQL(
-            """
-            SELECT 
+        query_estudiantes = sql.SQL("""
+            SELECT
                 e.cedula, e.nombre, e.apellido, c.nombre as carrera_nom,
                 e.celular, e.periodo_inicio, e.periodo_cierre,
                 ta.nombre || ' ' || ta.apellido as tutor_acad,
@@ -146,7 +169,7 @@ class EstadoEstudiante(rx.State):
                 te.nombre as tutor_emp, emp.nombre as empresa_nom,
                 emp.direccion, te.correo, te.telefono, u.correo
             FROM estudiante e
-            JOIN carrera c ON e.carrera_id = c.id
+            LEFT JOIN carrera c ON e.carrera_id = c.id
             LEFT JOIN usuario u ON e.usuario_id = u.id
             LEFT JOIN tutor_academico ta ON e.tutor_academico_id = ta.id
             LEFT JOIN carrera tc ON ta.carrera_id = tc.id
@@ -155,8 +178,7 @@ class EstadoEstudiante(rx.State):
             WHERE {where}
             ORDER BY e.id
             LIMIT %s OFFSET %s
-            """
-        ).format(where=where_clause)
+            """).format(where=where_clause)
 
         def _fetch_total():
             conn2 = obtener_conexion()
@@ -251,6 +273,8 @@ class EstadoEstudiante(rx.State):
                     correo_empresa=r[12] or "",
                     telefono_empresa=r[13] or "",
                     inicial=(r[1][0] if r[1] else ""),
+                    en_pasantia=bool(r[7]) and bool(r[6]) and r[6] >= date.today(),
+                    terminado=bool(r[6]) and r[6] < date.today(),
                 )
                 for r in rows
             ]
@@ -262,7 +286,6 @@ class EstadoEstudiante(rx.State):
 
     async def cargar_estadisticas_carrera(self) -> None:
         """Llena carreras_con_cantidad usando consultas SQL y los datos en memoria."""
-        conn = None
 
         def _fetch_carreras_db():
             conn = obtener_conexion()
@@ -306,6 +329,31 @@ class EstadoEstudiante(rx.State):
 
     @rx.var
     def estudiantes_filtrados(self) -> List[Dict[str, Any]]:
+        def _parse_date(value: Any) -> Optional[date]:
+            if value in (None, ""):
+                return None
+            if isinstance(value, date):
+                return value
+            if isinstance(value, datetime):
+                return value.date()
+            if isinstance(value, str):
+                text = value.strip()
+                if not text:
+                    return None
+                for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%Y/%m/%d"):
+                    try:
+                        return datetime.strptime(text, fmt).date()
+                    except ValueError:
+                        continue
+                try:
+                    return date.fromisoformat(text)
+                except ValueError:
+                    try:
+                        return datetime.fromisoformat(text).date()
+                    except ValueError:
+                        return None
+            return None
+
         lista = list(self.lista_estudiantes or [])
         if self.busqueda_dinamica:
             search = self.busqueda_dinamica.lower()
@@ -325,9 +373,36 @@ class EstadoEstudiante(rx.State):
                 e for e in lista if getattr(e, "carrera", "") == self.filtro_carrera
             ]
         if self.filtro_estado == "En Pasantía":
-            lista = [e for e in lista if getattr(e, "nombre_tutor", "")]
+            lista = [e for e in lista if getattr(e, "en_pasantia", False)]
         elif self.filtro_estado == "Sin Pasantía":
-            lista = [e for e in lista if not getattr(e, "nombre_tutor", "")]
+            lista = [
+                e
+                for e in lista
+                if not getattr(e, "en_pasantia", False)
+                and not getattr(e, "terminado", False)
+            ]
+        elif self.filtro_estado == "Ya la terminó":
+            lista = [e for e in lista if getattr(e, "terminado", False)]
+
+        if self.filtro_fecha_cierre_inicio:
+            inicio = _parse_date(self.filtro_fecha_cierre_inicio)
+            if inicio is not None:
+                lista = [
+                    e
+                    for e in lista
+                    if _parse_date(getattr(e, "periodo_cierre", "")) is not None
+                    and _parse_date(getattr(e, "periodo_cierre", "")) >= inicio
+                ]
+
+        if self.filtro_fecha_cierre_fin:
+            fin = _parse_date(self.filtro_fecha_cierre_fin)
+            if fin is not None:
+                lista = [
+                    e
+                    for e in lista
+                    if _parse_date(getattr(e, "periodo_cierre", "")) is not None
+                    and _parse_date(getattr(e, "periodo_cierre", "")) <= fin
+                ]
 
         # Convertir a lista de dicts serializables para Reflex
         def _to_dict(e):
@@ -457,10 +532,40 @@ class EstadoEstudiante(rx.State):
         self.pagina_actual = 1
         await self.cargar_estudiantes()
 
+    async def fijar_filtro_estado(self, val: str) -> None:
+        """Setter para filtro de estado. Recarga la lista de estudiantes."""
+        try:
+            self.filtro_estado = val
+        except Exception:
+            self.filtro_estado = str(val)
+        self.pagina_actual = 1
+        await self.cargar_estudiantes()
+
     async def limpiar_filtros(self) -> None:
         """Limpia todos los filtros de búsqueda y carrera en la tabla de estudiantes."""
         self.busqueda_dinamica = ""
         self.filtro_carrera = "Todas las carreras"
+        self.filtro_estado = "Todos"
+        self.filtro_fecha_cierre_inicio = ""
+        self.filtro_fecha_cierre_fin = ""
+        self.pagina_actual = 1
+        await self.cargar_estudiantes()
+
+    async def fijar_filtro_fecha_cierre_inicio(self, val: str) -> None:
+        """Setter para filtro de fecha de cierre inicio."""
+        try:
+            self.filtro_fecha_cierre_inicio = val
+        except Exception:
+            self.filtro_fecha_cierre_inicio = str(val)
+        self.pagina_actual = 1
+        await self.cargar_estudiantes()
+
+    async def fijar_filtro_fecha_cierre_fin(self, val: str) -> None:
+        """Setter para filtro de fecha de cierre fin."""
+        try:
+            self.filtro_fecha_cierre_fin = val
+        except Exception:
+            self.filtro_fecha_cierre_fin = str(val)
         self.pagina_actual = 1
         await self.cargar_estudiantes()
 
@@ -793,7 +898,10 @@ class EstadoEstudiante(rx.State):
                                 carrera_id = r[0]
 
                         tutor_academico_id = None
-                        if self.haciendo_trabajo_de_grado and self.tutor_academico_seleccionado:
+                        if (
+                            self.haciendo_trabajo_de_grado
+                            and self.tutor_academico_seleccionado
+                        ):
                             for t in self.tutores_mapeo:
                                 if t["nombre"] == self.tutor_academico_seleccionado:
                                     tutor_academico_id = t["id"]
@@ -913,8 +1021,18 @@ class EstadoEstudiante(rx.State):
         if not ok:
             return rx.toast.error(f"Error al guardar estudiante: {mensaje}")
 
-        await self.cargar_estudiantes()
-        self.cerrar_modal()
+        try:
+            await self.cargar_estudiantes()
+        except Exception:
+            logger.exception(
+                "No se pudo refrescar la lista de estudiantes tras guardar."
+            )
+
+        try:
+            self.cerrar_modal()
+        except Exception:
+            logger.exception("No se pudo cerrar el modal tras guardar el estudiante.")
+
         return rx.toast.success("Estudiante guardado correctamente.")
 
     # UI Setters
@@ -1078,9 +1196,10 @@ class EstadoEstudiante(rx.State):
         try:
             import io
             import os
+
             from openpyxl import Workbook
-            from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
             from openpyxl.drawing.image import Image as XLImage
+            from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 
             wb = Workbook()
             ws = wb.active
@@ -1145,7 +1264,8 @@ class EstadoEstudiante(rx.State):
 
             ws.merge_cells("A2:I2")
             ws["A2"] = (
-                f"Descripción: Listado detallado del estado actual de todos los alumnos registrados. | Generado: {datetime.now().strftime('%d/%m/%Y %H:%M')}"
+                f"Descripción: Listado detallado del estado actual de todos los alumnos registrados. | Generado: {
+                    datetime.now().strftime('%d/%m/%Y %H:%M')}"
             )
             ws["A2"].font = Font(name="Arial", size=11, italic=True)
             ws["A2"].alignment = alineacion_centro
@@ -1208,7 +1328,8 @@ class EstadoEstudiante(rx.State):
             wb.save(salida)
             return rx.download(
                 data=salida.getvalue(),
-                filename=f"reporte_estudiantes_{datetime.now().strftime('%d_%m_%Y')}.xlsx",
+                filename=f"reporte_estudiantes_{
+                    datetime.now().strftime('%d_%m_%Y')}.xlsx",
             )
         except Exception as e:
             logger.exception("Error al generar reporte de estudiantes: %s", e)
@@ -1221,6 +1342,7 @@ class EstadoEstudiante(rx.State):
 
         try:
             import os
+
             from fpdf import FPDF
 
             pdf = FPDF(orientation="L", unit="mm", format="A4")
@@ -1319,14 +1441,16 @@ class EstadoEstudiante(rx.State):
             pdf.cell(
                 0,
                 8,
-                f"Página {pdf.page_no()} - Documento Administrativo Confidencial - IUTEPI",
+                f"Página {
+                    pdf.page_no()} - Documento Administrativo Confidencial - IUTEPI",
                 align="C",
             )
 
             pdf_output = bytes(pdf.output())
             return rx.download(
                 data=pdf_output,
-                filename=f"reporte_estudiantes_{datetime.now().strftime('%d_%m_%Y')}.pdf",
+                filename=f"reporte_estudiantes_{
+                    datetime.now().strftime('%d_%m_%Y')}.pdf",
             )
         except Exception as e:
             logger.exception("Error al generar PDF de estudiantes: %s", e)

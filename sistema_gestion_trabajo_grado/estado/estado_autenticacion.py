@@ -1,12 +1,17 @@
 import asyncio
 import logging
-import reflex as rx
-from reflex import Cookie
-from pydantic import BaseModel
-import bcrypt
 import secrets
 from datetime import datetime, timedelta, timezone
+
+import bcrypt
+import reflex as rx
+from pydantic import BaseModel
+from reflex import Cookie
+
 from ..database_manager import obtener_conexion
+
+SESSION_TTL_HOURS = 1
+COOKIE_MAX_AGE_SECONDS = 1 * 60 * 60
 
 # En producción asegúrate que el nivel sea INFO o superior
 # Nunca configures basicConfig con DEBUG en el servidor
@@ -55,7 +60,14 @@ class EstadoAutenticacion(rx.State):
     usuario: Usuario | None = None
     entrada_usuario: str = ""
     entrada_contrasena: str = ""
-    token_cookie: Cookie | str = ""
+    token_cookie: Cookie | str = Cookie(
+        "",
+        name="sts_token",
+        max_age=COOKIE_MAX_AGE_SECONDS,
+        path="/",
+        secure=False,
+        same_site="lax",
+    )
 
     # Rate Limiting (Tarea 5)
     intentos_fallidos: int = 0
@@ -169,7 +181,10 @@ class EstadoAutenticacion(rx.State):
                 ahora_utc = datetime.now(timezone.utc)
 
                 if not self._create_session(
-                    u_id, token, ahora_utc, ahora_utc + timedelta(hours=24)
+                    u_id,
+                    token,
+                    ahora_utc,
+                    ahora_utc + timedelta(hours=SESSION_TTL_HOURS),
                 ):
                     return rx.toast.error(
                         "💥 Error Crítico: No se pudo iniciar la sesión en el servidor. Reintente más tarde."
@@ -186,7 +201,22 @@ class EstadoAutenticacion(rx.State):
                     correo=u_cor,
                     token_sesion=token,
                 )
-                self.token_cookie = token
+                api_url = rx.config.get_config().api_url or ""
+                secure_cookie = api_url.lower().startswith("https://")
+                self.token_cookie = Cookie(
+                    token,
+                    name="sts_token",
+                    max_age=COOKIE_MAX_AGE_SECONDS,
+                    path="/",
+                    secure=secure_cookie,
+                    same_site="lax",
+                )
+                logger.info(
+                    "Creada cookie sts_token (token_prefix=%s..., secure=%s, same_site=%s)",
+                    token[:8],
+                    secure_cookie,
+                    "lax",
+                )
                 self.entrada_contrasena = ""
                 logger.debug("Sesión creada exitosamente.")
                 return rx.redirect("/")
@@ -290,7 +320,14 @@ class EstadoAutenticacion(rx.State):
                         pass
 
             await asyncio.to_thread(_deactivate_session, self.usuario.token_sesion)
-        self.token_cookie = ""
+        self.token_cookie = Cookie(
+            "",
+            name="sts_token",
+            max_age=0,
+            path="/",
+            secure=False,
+            same_site="lax",
+        )
         self.reset()
         return rx.redirect("/login")
 

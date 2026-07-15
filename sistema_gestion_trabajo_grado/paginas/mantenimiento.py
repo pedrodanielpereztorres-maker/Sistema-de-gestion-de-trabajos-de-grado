@@ -1,18 +1,17 @@
 import reflex as rx
-from ..componentes.encabezado import encabezado_pagina
-from ..componentes.campo_texto import campo_texto
-from ..componentes.toast_viewer import toast_viewer
 
 # Importar desde el componente base
-from ..componentes.campo_texto import COLOR_TEXTO_BOLD
-from ..estado.estado_autenticacion import EstadoAutenticacion
+from ..componentes.campo_texto import COLOR_TEXTO_BOLD, campo_texto
+from ..componentes.encabezado import encabezado_pagina
 from ..componentes.layout import layout_principal
+from ..componentes.toast_viewer import toast_viewer
+from ..estado.estado_autenticacion import EstadoAutenticacion
 from ..estado.estado_mantenimiento import (
-    EstadoMantenimiento,
-    TutorAcademico,
-    Rol,
-    UsuarioSistema,
     Carrera,
+    EstadoMantenimiento,
+    Rol,
+    TutorAcademico,
+    UsuarioSistema,
 )
 
 COLOR_CABECERA_TABLA = "#F8FAFC"

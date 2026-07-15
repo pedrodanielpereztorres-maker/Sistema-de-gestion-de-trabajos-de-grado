@@ -1,8 +1,8 @@
-psycopg2-binary
-sqlalchemy
-pydantic
-bcrypt
-python-dotenv
+psycopg2-binary==2.9.9
+SQLAlchemy==2.0.23
+pydantic==2.13.4
+bcrypt==4.1.1
+python-dotenv==1.0.0
 reflex==0.9.1
-fpdf2
-openpyxl
+fpdf2==2.7.6
+openpyxl==3.1.2

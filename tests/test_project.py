@@ -1,15 +1,18 @@
+import importlib
 import os
 import sys
-import importlib
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
 
+import reflex as rx
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-import reflex as rx
-from sistema_gestion_trabajo_grado import database_manager
+database_manager = importlib.import_module(
+    "sistema_gestion_trabajo_grado.database_manager"
+)
 
 
 class TestProyecto(unittest.TestCase):

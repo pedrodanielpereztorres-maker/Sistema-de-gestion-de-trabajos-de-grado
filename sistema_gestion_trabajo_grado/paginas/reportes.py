@@ -1,10 +1,11 @@
+from datetime import datetime
+
 import reflex as rx
-from ..componentes.encabezado import encabezado_pagina
+
 from ..componentes.layout import layout_principal
 from ..estado.estado_autenticacion import EstadoAutenticacion
-from ..estado.estado_reportes import EstadoReportes
 from ..estado.estado_estudiante import EstadoEstudiante
-from datetime import datetime
+from ..estado.estado_reportes import EstadoReportes
 
 # Paleta de colores del sistema
 C_PRIMARIO = "#6366F1"  # Indigo

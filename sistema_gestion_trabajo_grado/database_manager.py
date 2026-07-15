@@ -1,7 +1,8 @@
 import logging
+from typing import Any
+
 import reflex as rx
-from sqlalchemy import create_engine, text
-from typing import Any, Optional
+from sqlalchemy import create_engine
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +50,7 @@ CREATE TABLE IF NOT EXISTS usuario (
     correo VARCHAR(150) UNIQUE NOT NULL,
     contrasena_hash TEXT NOT NULL,
     rol_id INTEGER REFERENCES rol(id),
-    esta_activo BOOLEAN DEFAULT TRUE, 
+    esta_activo BOOLEAN DEFAULT TRUE,
     creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -114,7 +115,7 @@ CREATE TABLE IF NOT EXISTS sesion (
     usuario_id INTEGER REFERENCES usuario(id),
     token TEXT UNIQUE NOT NULL,
     creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    expira_en TIMESTAMP NOT NULL, 
+    expira_en TIMESTAMP NOT NULL,
     esta_activa BOOLEAN DEFAULT TRUE
 );
 

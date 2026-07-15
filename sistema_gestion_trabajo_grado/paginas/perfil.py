@@ -1,11 +1,11 @@
 import logging
 import re
+
 import reflex as rx
-from pydantic import BaseModel
-from datetime import date, datetime, timedelta, timezone
-from ..database_manager import obtener_conexion
-from ..estado.estado_autenticacion import EstadoAutenticacion, EncriptadorContrasena
+
 from ..componentes.layout import layout_principal
+from ..database_manager import obtener_conexion
+from ..estado.estado_autenticacion import EncriptadorContrasena, EstadoAutenticacion
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +69,7 @@ class EstadoPerfil(EstadoAutenticacion):
                     with conn.cursor() as cursor:
                         cursor.execute(
                             """
-                            SELECT 
+                            SELECT
                                 ta.nombre || ' ' || ta.apellido, ta.correo, ta.telefono,
                                 te.nombre, te.correo, te.telefono,
                                 emp.nombre, emp.direccion,

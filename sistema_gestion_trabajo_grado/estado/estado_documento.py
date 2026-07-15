@@ -1,10 +1,12 @@
 import asyncio
 import logging
 import os
-import reflex as rx
 from datetime import date
-from pydantic import BaseModel
 from typing import List
+
+import reflex as rx
+from pydantic import BaseModel
+
 from ..database_manager import obtener_conexion
 
 logger = logging.getLogger(__name__)
@@ -48,8 +50,8 @@ class EstadoDocumento(rx.State):
                 with conn:
                     with conn.cursor() as cursor:
                         cursor.execute("""
-                            SELECT id, titulo, descripcion, fecha_subida, tipo, tamano_kb, ruta_archivo 
-                            FROM documento 
+                            SELECT id, titulo, descripcion, fecha_subida, tipo, tamano_kb, ruta_archivo
+                            FROM documento
                             ORDER BY fecha_subida DESC;
                         """)
                         return cursor.fetchall()
@@ -73,7 +75,7 @@ class EstadoDocumento(rx.State):
                 tamano_kb=fila[5] or 0,
                 tamano=f"{fila[5]} KB" if fila[5] is not None else "0 KB",
                 url=(
-                    f"{rx.config.get_config().api_url}/almacen/{fila[6].lstrip('/')}"
+                    f"/almacen/{fila[6].lstrip('/')}"
                     if fila[6]
                     else ""
                 ),
@@ -202,7 +204,8 @@ class EstadoDocumento(rx.State):
                 magic = TIPOS_PERMITIDOS[extension]
                 if not datos_subida.startswith(magic):
                     return rx.toast.error(
-                        f"El archivo {archivo.filename} no cumple con los bytes mágicos esperados para .{extension}."
+                        f"El archivo {
+                            archivo.filename} no cumple con los bytes mágicos esperados para .{extension}."
                     )
 
                 # Sanitizar nombre y preparar rutas
@@ -237,9 +240,8 @@ class EstadoDocumento(rx.State):
                 except Exception as e:
                     logger.error("Error al escribir archivo en disco: %s", e)
                     await asyncio.to_thread(_delete_registro_documento, nuevo_id)
-                    return rx.toast.error(
-                        f"Error al guardar el archivo {archivo.filename} en el servidor."
-                    )
+                    return rx.toast.error(f"Error al guardar el archivo {
+                            archivo.filename} en el servidor.")
 
             # Si llegamos aquí, todos los archivos se procesaron correctamente
             self.titulo_nuevo = ""
@@ -357,7 +359,7 @@ class EstadoDocumento(rx.State):
                     with conn2.cursor() as cursor:
                         cursor.execute(
                             """
-                            UPDATE documento 
+                            UPDATE documento
                             SET titulo = %s, descripcion = %s
                             WHERE id = %s;
                         """,

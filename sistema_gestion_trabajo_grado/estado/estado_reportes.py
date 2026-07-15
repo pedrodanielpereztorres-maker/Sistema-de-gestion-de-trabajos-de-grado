@@ -1,12 +1,12 @@
 import asyncio
 import logging
-import reflex as rx
-from typing import List, Dict, Any
-import csv
-import io
 from datetime import datetime
-from ..database_manager import obtener_conexion
+from typing import Any, Dict, List
+
+import reflex as rx
 from fpdf import FPDF
+
+from ..database_manager import obtener_conexion
 from .estado_boveda import EstadoBoveda
 
 logger = logging.getLogger(__name__)
@@ -40,9 +40,10 @@ class EstadoReportes(rx.State):
         try:
             import io
             import os
+
             from openpyxl import Workbook
-            from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
             from openpyxl.drawing.image import Image as XLImage
+            from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 
             wb = Workbook()
             ws = wb.active
@@ -109,7 +110,8 @@ class EstadoReportes(rx.State):
 
             ws.merge_cells("A2:J2")
             ws["A2"] = (
-                f"Descripción: Listado detallado de todos los Trabajos de Grado registrados en el sistema. | Generado: {datetime.now().strftime('%d/%m/%Y %H:%M')}"
+                f"Descripción: Listado detallado de todos los Trabajos de Grado registrados en el sistema. | Generado: {
+                    datetime.now().strftime('%d/%m/%Y %H:%M')}"
             )
             ws["A2"].font = Font(name="Arial", size=11, italic=True)
             ws["A2"].alignment = alineacion_centro
@@ -137,7 +139,9 @@ class EstadoReportes(rx.State):
             ws.freeze_panes = "A5"
             ws.sheet_view.showGridLines = False
             ultima_letra = ws.cell(row=4, column=len(headers)).column_letter
-            ws.auto_filter.ref = f"A4:{ultima_letra}{len(boveda.lista_trabajos_de_grado) + 4}"
+            ws.auto_filter.ref = (
+                f"A4:{ultima_letra}{len(boveda.lista_trabajos_de_grado) + 4}"
+            )
 
             # Datos
             for row_num, t in enumerate(boveda.lista_trabajos_de_grado, 5):
@@ -214,8 +218,8 @@ class EstadoReportes(rx.State):
 
                         # 2. Estadísticas por Carrera
                         cursor.execute("""
-                            SELECT c.nombre, COUNT(e.id) 
-                            FROM carrera c 
+                            SELECT c.nombre, COUNT(e.id)
+                            FROM carrera c
                             LEFT JOIN estudiante e ON c.id = e.carrera_id AND e.esta_activo = TRUE
                             WHERE c.esta_activa = TRUE
                             GROUP BY c.nombre
@@ -307,9 +311,10 @@ class EstadoReportes(rx.State):
         try:
             import io
             import os
+
             from openpyxl import Workbook
-            from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
             from openpyxl.drawing.image import Image as XLImage
+            from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 
             wb = Workbook()
             ws = wb.active
@@ -374,7 +379,8 @@ class EstadoReportes(rx.State):
 
             ws.merge_cells("A2:F2")
             ws["A2"] = (
-                f"Descripción: Listado detallado de todas las entidades aliadas y su carga de pasantes. | Generado: {datetime.now().strftime('%d/%m/%Y %H:%M')}"
+                f"Descripción: Listado detallado de todas las entidades aliadas y su carga de pasantes. | Generado: {
+                    datetime.now().strftime('%d/%m/%Y %H:%M')}"
             )
             ws["A2"].font = Font(name="Arial", size=11, italic=True)
             ws["A2"].alignment = alineacion_centro
@@ -560,7 +566,8 @@ class EstadoReportes(rx.State):
             pdf.cell(
                 0,
                 10,
-                f"Página {pdf.page_no()} - Documento Administrativo Confidencial - IUTEPI",
+                f"Página {
+                    pdf.page_no()} - Documento Administrativo Confidencial - IUTEPI",
                 align="C",
             )
 
@@ -582,7 +589,9 @@ class EstadoReportes(rx.State):
             await boveda.cargar_trabajos_de_grado()
 
         if not boveda.lista_trabajos_de_grado:
-            return rx.toast.warning("No hay trabajos de grado registrados para exportar.")
+            return rx.toast.warning(
+                "No hay trabajos de grado registrados para exportar."
+            )
 
         try:
             import os
@@ -624,7 +633,10 @@ class EstadoReportes(rx.State):
             pdf.cell(
                 0,
                 5,
-                f"Fecha de emisión: {datetime.now().strftime('%d/%m/%Y %H:%M')}  |  Total registros: {len(boveda.lista_trabajos_de_grado)}",
+                f"Fecha de emisión: {
+                    datetime.now().strftime('%d/%m/%Y %H:%M')}  |  Total registros: {
+                    len(
+                        boveda.lista_trabajos_de_grado)}",
                 ln=True,
                 align="L",
             )
@@ -695,7 +707,8 @@ class EstadoReportes(rx.State):
             pdf.cell(
                 0,
                 8,
-                f"Página {pdf.page_no()} - Documento Administrativo Confidencial - IUTEPI",
+                f"Página {
+                    pdf.page_no()} - Documento Administrativo Confidencial - IUTEPI",
                 align="C",
             )
 

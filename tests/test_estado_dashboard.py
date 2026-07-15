@@ -1,13 +1,15 @@
+import asyncio
 import sys
 import unittest
-import asyncio
 from pathlib import Path
-from unittest.mock import AsyncMock, patch
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from sistema_gestion_trabajo_grado.estado.estado_dashboard import EstadoDashboard
+from sistema_gestion_trabajo_grado.estado.estado_dashboard import (  # noqa: E402
+    EstadoDashboard,
+)
 
 
 class FakeCursor:

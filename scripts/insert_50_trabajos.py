@@ -26,7 +26,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from rxconfig import URL_BASE_DATOS
+from rxconfig import URL_BASE_DATOS  # noqa: E402
 
 OUTPUT_DIR = os.path.join("almacen_privado", "trabajo_de_grado")
 TOTAL = 50
@@ -99,7 +99,7 @@ def ensure_students(cursor, needed):
         nombre = random.choice(FIRST_NAMES)
         apellido = random.choice(LAST_NAMES)
         correo = f"auto{cedula}@example.com"
-        celular = f"0412{random.randint(1000000,9999999)}"
+        celular = f"0412{random.randint(1000000, 9999999)}"
 
         cursor.execute(
             "SELECT 1 FROM usuario WHERE cedula = %s OR correo = %s;",
@@ -109,7 +109,9 @@ def ensure_students(cursor, needed):
             index += 1
             continue
 
-        password_hash = bcrypt.hashpw(PASSWORD.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+        password_hash = bcrypt.hashpw(
+            PASSWORD.encode("utf-8"), bcrypt.gensalt()
+        ).decode("utf-8")
         cursor.execute(
             "INSERT INTO usuario (cedula, nombre, apellido, correo, contrasena_hash, rol_id, esta_activo) VALUES (%s,%s,%s,%s,%s,%s,TRUE) RETURNING id;",
             (cedula, nombre, apellido, correo, password_hash, rol_id),
@@ -149,8 +151,7 @@ def main():
     try:
         # obtener lista de estudiantes candidatos
         cur.execute("SELECT id FROM estudiante ORDER BY id;")
-        rows = cur.fetchall()
-        all_estudiantes = [r[0] for r in rows]
+        _ = cur.fetchall()
         estudiantes = ensure_students(cur, TOTAL)
         conn.commit()
 
@@ -163,7 +164,10 @@ def main():
         for i, estudiante_id in enumerate(estudiantes[:TOTAL]):
             try:
                 # comprobar si ya existe trabajo_de_grado para el estudiante
-                cur.execute("SELECT id FROM trabajo_de_grado WHERE estudiante_id = %s;", (estudiante_id,))
+                cur.execute(
+                    "SELECT id FROM trabajo_de_grado WHERE estudiante_id = %s;",
+                    (estudiante_id,),
+                )
                 if cur.fetchone():
                     skipped += 1
                     continue
@@ -174,7 +178,7 @@ def main():
                     "INSERT INTO trabajo_de_grado (titulo, es_publica, ruta_archivo, estudiante_id) VALUES (%s, %s, %s, %s) RETURNING id;",
                     (titulo, False, ruta, estudiante_id),
                 )
-                trabajo_id = cur.fetchone()[0]
+                _ = cur.fetchone()[0]
                 conn.commit()
 
                 # crear archivo placeholder
@@ -191,7 +195,9 @@ def main():
                 errors.append(str(e))
 
         total_time = time.time() - start
-        print(f"Intentos: {TOTAL}, Insertados: {inserted}, Saltados: {skipped}, Errores: {len(errors)}, Tiempo: {total_time:.2f}s")
+        print(
+            f"Intentos: {TOTAL}, Insertados: {inserted}, Saltados: {skipped}, Errores: {len(errors)}, Tiempo: {total_time:.2f}s"
+        )
         if errors:
             print("Errores (muestra 10):", errors[:10])
 
@@ -205,7 +211,9 @@ def main():
                     total_bytes += os.path.getsize(os.path.join(root, name))
                 except Exception:
                     pass
-        print(f"Archivos en {OUTPUT_DIR}: {total_files}, tamaño total: {total_bytes/1024:.1f} KB")
+        print(
+            f"Archivos en {OUTPUT_DIR}: {total_files}, tamaño total: {total_bytes/1024:.1f} KB"
+        )
 
     finally:
         cur.close()

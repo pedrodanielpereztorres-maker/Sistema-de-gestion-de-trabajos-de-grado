@@ -47,9 +47,27 @@ def campo_texto(
         **props,
     )
 
+    # Si es un campo tipo fecha en modo solo lectura, formatear a dd/mm/YYYY
+    display_val = valor
+    try:
+        if tipo == "date" and valor:
+            from datetime import date
+
+            # Aceptar tanto objetos date como strings ISO 'YYYY-MM-DD'
+            if isinstance(valor, str):
+                try:
+                    parsed = date.fromisoformat(valor)
+                    display_val = parsed.strftime("%d/%m/%Y")
+                except Exception:
+                    display_val = valor
+            elif isinstance(valor, date):
+                display_val = valor.strftime("%d/%m/%Y")
+    except Exception:
+        display_val = valor
+
     input_solo_lectura = rx.box(
         rx.text(
-            valor,
+            display_val,
             font_size="13.5px",
             font_weight="600",
             color="#1E293B",

@@ -28,6 +28,7 @@ assets/external/
 # Virtualenvs adicionales
 .venv_test/
 env/
+node_modules/
 
 # Distribution / packaging
 build/

@@ -1,16 +1,18 @@
-import sys
-import unittest
 import asyncio
 import os
+import sys
+import unittest
 from pathlib import Path
-from unittest.mock import AsyncMock, patch, mock_open
+from unittest.mock import AsyncMock, mock_open, patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 os.environ["PYTEST_CURRENT_TEST"] = "1"
 
-from sistema_gestion_trabajo_grado.estado.estado_boveda import EstadoBoveda
+from sistema_gestion_trabajo_grado.estado.estado_boveda import (  # noqa: E402
+    EstadoBoveda,
+)
 
 
 class FakeCursor:
@@ -114,6 +116,18 @@ class TestEstadoBoveda(unittest.TestCase):
         visibles = estado.trabajos_de_grado_visibles
         self.assertEqual({t["id"] for t in visibles}, {2, 3})
 
+    def test_trabajos_de_grado_paginados_retorna_segmento_correcto(self):
+        estado = EstadoBoveda()
+        estado.lista_trabajos_de_grado = [
+            {"id": i, "publico": True, "usuario_id": 1} for i in range(1, 10)
+        ]
+        estado.pagina_actual = 2
+        estado.elementos_por_pagina = 3
+
+        paginados = estado.trabajos_de_grado_paginados
+
+        self.assertEqual([t["id"] for t in paginados], [4, 5, 6])
+
     def test_opciones_carreras_agrega_todas_las_carreras(self):
         estado = EstadoBoveda()
         estado.carreras_disponibles = ["Sistemas", "Derecho"]
@@ -123,7 +137,11 @@ class TestEstadoBoveda(unittest.TestCase):
 
     def test_balance_privacidad_trabajos_de_grado_calcuala_correctamente(self):
         estado = EstadoBoveda()
-        estado.lista_trabajos_de_grado = [{"publico": True}, {"publico": False}, {"publico": False}]
+        estado.lista_trabajos_de_grado = [
+            {"publico": True},
+            {"publico": False},
+            {"publico": False},
+        ]
         balance = estado.balance_privacidad_trabajos_de_grado
         self.assertEqual(balance[0]["valor"], 1)
         self.assertEqual(balance[1]["valor"], 2)
@@ -233,7 +251,9 @@ class TestEstadoBoveda(unittest.TestCase):
                 return_value="error_perm",
             ):
                 resultado = asyncio.run(
-                    estado.registrar_trabajo_de_grado([FakeUploadFile("tesis.pdf", b"%PDF-1.4")])
+                    estado.registrar_trabajo_de_grado(
+                        [FakeUploadFile("tesis.pdf", b"%PDF-1.4")]
+                    )
                 )
         self.assertEqual(resultado, "error_perm")
 

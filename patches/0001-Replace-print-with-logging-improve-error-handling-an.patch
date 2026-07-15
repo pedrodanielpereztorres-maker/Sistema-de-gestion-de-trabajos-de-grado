@@ -52234,7 +52234,7 @@ index 0000000..fb8bc54
 +
 +def barra_lateral() -> rx.Component:
 +    """
-+    Componente de compatibilidad. 
++    Componente de compatibilidad.
 +    Permite que las páginas que aún no usan 'layout_principal' sigan funcionando
 +    mientras se completa la migración.
 +    """
@@ -53152,7 +53152,7 @@ index 0000000..24054e2
 +    correo VARCHAR(150) UNIQUE NOT NULL,
 +    contrasena_hash TEXT NOT NULL,
 +    rol_id INTEGER REFERENCES rol(id),
-+    esta_activo BOOLEAN DEFAULT TRUE, 
++    esta_activo BOOLEAN DEFAULT TRUE,
 +    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 +);
 +
@@ -53217,7 +53217,7 @@ index 0000000..24054e2
 +    usuario_id INTEGER REFERENCES usuario(id),
 +    token TEXT UNIQUE NOT NULL,
 +    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-+    expira_en TIMESTAMP NOT NULL, 
++    expira_en TIMESTAMP NOT NULL,
 +    esta_activa BOOLEAN DEFAULT TRUE
 +);
 +
@@ -53545,7 +53545,7 @@ index 0000000..45e4934
 +        self.usuario_actual_rol = estado_auth.rol_usuario if estado_auth.usuario else ""
 +
 +        consulta = """
-+            SELECT 
++            SELECT
 +                t.id,
 +                e.cedula, e.nombre, e.apellido, c.nombre as carrera_nom,
 +                ta.nombre || ' ' || ta.apellido as tutor_acad,
@@ -53797,7 +53797,7 @@ index 0000000..45e4934
 +            return rx.toast.warning("Ingrese una cédula válida.")
 +
 +        consulta = """
-+                SELECT 
++                SELECT
 +                    e.nombre, e.apellido, c.nombre as carrera_nom,
 +                    ta.nombre || ' ' || ta.apellido as tutor_acad,
 +                    emp.nombre as empresa_nom, te.nombre as tutor_emp
@@ -53895,8 +53895,8 @@ index 0000000..45e4934
 +                        cursor.execute("""
 +                            INSERT INTO tesis (titulo, es_publica, ruta_archivo, estudiante_id)
 +                            VALUES (%s, %s, %s, %s)
-+                            ON CONFLICT (estudiante_id) DO UPDATE SET 
-+                                titulo = EXCLUDED.titulo, 
++                            ON CONFLICT (estudiante_id) DO UPDATE SET
++                                titulo = EXCLUDED.titulo,
 +                                ruta_archivo = EXCLUDED.ruta_archivo,
 +                                es_publica = EXCLUDED.es_publica;
 +                        """, (self.titulo_tesis, self.hacer_publico, ruta_destino_final, id_estudiante))
@@ -54009,8 +54009,8 @@ index 0000000..e9b5f3a
 +        try:
 +            with conn.cursor() as cursor:
 +                cursor.execute("""
-+                    SELECT id, titulo, descripcion, fecha_subida, tipo, tamano_kb, ruta_archivo 
-+                    FROM documento 
++                    SELECT id, titulo, descripcion, fecha_subida, tipo, tamano_kb, ruta_archivo
++                    FROM documento
 +                    ORDER BY fecha_subida DESC;
 +                """)
 +                resultados = cursor.fetchall()
@@ -54200,18 +54200,18 @@ index 0000000..e9b5f3a
 +                    # 1. Obtener ruta del archivo antes de borrar el registro
 +                    cursor.execute("SELECT ruta_archivo FROM documento WHERE id = %s;", (id_documento,))
 +                    res_archivo = cursor.fetchone()
-+                    
++
 +                    # 2. Borrar de la base de datos
 +                    cursor.execute(
 +                        "DELETE FROM documento WHERE id = %s;", (id_documento,))
 +                    conn.commit()
-+                    
++
 +                    # 3. Borrar archivo físico del disco
 +                    if res_archivo and res_archivo[0]:
 +                        ruta_fisica = os.path.join("assets", res_archivo[0])
 +                        if os.path.exists(ruta_fisica):
 +                            os.remove(ruta_fisica)
-+                            
++
 +            await self.cargar_documentos()
 +            return rx.toast.success("Documento eliminado correctamente.")
 +        except Exception as e:
@@ -54242,7 +54242,7 @@ index 0000000..e9b5f3a
 +            with conn:
 +                with conn.cursor() as cursor:
 +                    cursor.execute("""
-+                        UPDATE documento 
++                        UPDATE documento
 +                        SET titulo = %s, descripcion = %s
 +                        WHERE id = %s;
 +                    """, (self.titulo_edicion, self.descripcion_edicion, self.id_edicion))
@@ -54365,7 +54365,7 @@ index 0000000..b3aeba5
 +                    offset = (self.pagina_actual - 1) * self.registros_por_pagina
 +
 +                    consulta = """
-+                        SELECT 
++                        SELECT
 +                            e.cedula, e.nombre, e.apellido, c.nombre as carrera_nom,
 +                            e.celular, e.periodo_inicio, e.periodo_cierre,
 +                            ta.nombre || ' ' || ta.apellido as tutor_acad,
@@ -54981,7 +54981,7 @@ index 0000000..08adb24
 +                    self.carreras = []
 +                    for c_id, c_nom, c_act in res_c:
 +                        cursor.execute("""
-+                            SELECT EXISTS(SELECT 1 FROM estudiante WHERE carrera_id = %s) OR 
++                            SELECT EXISTS(SELECT 1 FROM estudiante WHERE carrera_id = %s) OR
 +                                   EXISTS(SELECT 1 FROM tutor_academico WHERE carrera_id = %s);
 +                        """, (c_id, c_id))
 +                        tiene_mov = cursor.fetchone()[0]
@@ -54989,8 +54989,8 @@ index 0000000..08adb24
 +                            Carrera(id=c_id, nombre=c_nom, esta_activa=bool(c_act), tiene_movimientos=bool(tiene_mov)))
 +                    # Tutores
 +                    cursor.execute("""
-+                        SELECT ta.id, COALESCE(u.nombre, ta.nombre), COALESCE(u.apellido, ta.apellido), 
-+                               COALESCE(u.cedula, ta.cedula), COALESCE(u.correo, ta.correo), 
++                        SELECT ta.id, COALESCE(u.nombre, ta.nombre), COALESCE(u.apellido, ta.apellido),
++                               COALESCE(u.cedula, ta.cedula), COALESCE(u.correo, ta.correo),
 +                               ta.especialidad, ta.esta_activo, c.nombre as carrera_nom, ta.telefono
 +                        FROM tutor_academico ta
 +                        LEFT JOIN usuario u ON ta.usuario_id = u.id
@@ -55002,8 +55002,8 @@ index 0000000..08adb24
 +                    for t in res_tutores:
 +                        cursor.execute("""
 +                            SELECT EXISTS(
-+                                SELECT 1 FROM tesis 
-+                                JOIN estudiante ON tesis.estudiante_id = estudiante.id 
++                                SELECT 1 FROM tesis
++                                JOIN estudiante ON tesis.estudiante_id = estudiante.id
 +                                WHERE estudiante.tutor_academico_id = %s
 +                            );
 +                        """, (t[0],))
@@ -55215,7 +55215,7 @@ index 0000000..08adb24
 +
 +                    if self.t_en_edicion:
 +                        cursor.execute("""
-+                            UPDATE tutor_academico SET 
++                            UPDATE tutor_academico SET
 +                            especialidad = %s, carrera_id = %s, usuario_id = %s,
 +                            correo = %s, telefono = %s, cedula = %s, nombre = %s, apellido = %s
 +                            WHERE id = %s;
@@ -55329,7 +55329,7 @@ index 0000000..08adb24
 +            with conn:
 +                with conn.cursor() as cursor:
 +                    cursor.execute("""
-+                        SELECT EXISTS(SELECT 1 FROM estudiante WHERE carrera_id = %s) OR 
++                        SELECT EXISTS(SELECT 1 FROM estudiante WHERE carrera_id = %s) OR
 +                               EXISTS(SELECT 1 FROM tutor_academico WHERE carrera_id = %s);
 +                    """, (id_carrera, id_carrera))
 +                    if cursor.fetchone()[0]:
@@ -55500,7 +55500,7 @@ index 0000000..cae4ab5
 +        boveda = await self.get_state(EstadoBoveda)
 +        if not boveda.lista_tesis:
 +            await boveda.cargar_tesis()
-+        
++
 +        return boveda.generar_reporte_tesis()
 +
 +    async def cargar_reportes(self):
@@ -55508,20 +55508,20 @@ index 0000000..cae4ab5
 +        conn = obtener_conexion()
 +        if conn is None:
 +            return rx.toast.error("Error de conexión al cargar reportes.")
-+        
++
 +        try:
 +            with conn:
 +                with conn.cursor() as cursor:
 +                    # 1. Resumen Global
 +                    cursor.execute("SELECT COUNT(*) FROM estudiante WHERE esta_activo = TRUE")
 +                    total = cursor.fetchone()[0]
-+                    
++
 +                    cursor.execute("SELECT COUNT(*) FROM estudiante WHERE tutor_academico_id IS NOT NULL AND esta_activo = TRUE")
 +                    con_pasantia = cursor.fetchone()[0]
-+                    
++
 +                    cursor.execute("SELECT COUNT(*) FROM tesis")
 +                    total_tesis = cursor.fetchone()[0]
-+                    
++
 +                    self.resumen_global = {
 +                        "total_estudiantes": total,
 +                        "con_pasantia": con_pasantia,
@@ -55531,8 +55531,8 @@ index 0000000..cae4ab5
 +
 +                    # 2. Estadísticas por Carrera
 +                    cursor.execute("""
-+                        SELECT c.nombre, COUNT(e.id) 
-+                        FROM carrera c 
++                        SELECT c.nombre, COUNT(e.id)
++                        FROM carrera c
 +                        LEFT JOIN estudiante e ON c.id = e.carrera_id AND e.esta_activo = TRUE
 +                        WHERE c.esta_activa = TRUE
 +                        GROUP BY c.nombre
@@ -55565,7 +55565,7 @@ index 0000000..cae4ab5
 +                        ORDER BY cantidad DESC, emp.nombre ASC
 +                    """)
 +                    self.mejores_empresas = [
-+                        {"nombre": r[0], "direccion": r[1], "correo": r[2], "telefono": r[3], "cantidad": r[4]} 
++                        {"nombre": r[0], "direccion": r[1], "correo": r[2], "telefono": r[3], "cantidad": r[4]}
 +                        for r in cursor.fetchall()
 +                    ]
 +        except Exception as e:
@@ -55577,7 +55577,7 @@ index 0000000..cae4ab5
 +        """Genera un reporte CSV de todas las empresas vinculadas."""
 +        if not self.mejores_empresas:
 +            return rx.toast.warning("No hay datos de empresas para exportar.")
-+            
++
 +        salida = io.StringIO()
 +        escritor = csv.writer(salida)
 +        # Estructura de encabezado visual (Simulación de bordes)
@@ -55587,13 +55587,13 @@ index 0000000..cae4ab5
 +        escritor.writerow(["DESCRIPCIÓN:", "Listado detallado de todas las entidades aliadas y su carga de pasantes."])
 +        escritor.writerow(["FECHA GENERACIÓN:", datetime.now().strftime('%d/%m/%Y %H:%M')])
 +        escritor.writerow(["=========================================================================================="])
-+        escritor.writerow([]) 
++        escritor.writerow([])
 +
 +        escritor.writerow(["Empresa", "Dirección", "Correo de Contacto", "Teléfono", "Pasantes Actuales"])
-+        
++
 +        for emp in self.mejores_empresas:
 +            escritor.writerow([emp["nombre"], emp["direccion"], emp["correo"], emp["telefono"], emp["cantidad"]])
-+            
++
 +        return rx.download(
 +            data=salida.getvalue(),
 +            filename=f"reporte_empresas_{datetime.now().strftime('%d_%m_%Y')}.csv"
@@ -55607,12 +55607,12 @@ index 0000000..cae4ab5
 +        try:
 +            pdf = FPDF(orientation='P', unit='mm', format='A4')
 +            pdf.add_page()
-+            
++
 +            # --- Encabezado con Identidad Institucional ---
 +            pdf.set_font("Helvetica", 'B', 18)
 +            pdf.set_text_color(31, 41, 55)  # Gris oscuro
 +            pdf.cell(0, 15, "SISTEMA DE GESTIÓN DE TESIS", ln=True, align='C')
-+            
++
 +            # Línea decorativa
 +            pdf.set_draw_color(99, 102, 241)  # Indigo
 +            pdf.set_line_width(0.5)
@@ -55622,18 +55622,18 @@ index 0000000..cae4ab5
 +            # --- Título del Reporte y Metadatos ---
 +            pdf.set_font("Helvetica", 'B', 14)
 +            pdf.cell(0, 10, "Reporte de Vinculación Empresarial", ln=True, align='L')
-+            
++
 +            pdf.set_font("Helvetica", 'I', 9)
 +            pdf.set_text_color(100, 116, 139)  # Slate
 +            pdf.cell(0, 5, f"Fecha de emisión: {datetime.now().strftime('%d/%m/%Y %H:%M')}", ln=True, align='L')
 +            pdf.ln(10)
-+            
++
 +            # --- Descripción del Reporte ---
 +            pdf.set_font("Helvetica", '', 10)
 +            pdf.set_text_color(30, 41, 59)
 +            desc = "Listado oficial de entidades receptoras de pasantes y vinculación académica institucional."
 +            pdf.cell(0, 10, desc, ln=True)
-+            
++
 +            # Resumen de métricas en el PDF
 +            pdf.set_font("Helvetica", 'B', 10)
 +            pdf.cell(0, 8, f"Total de Empresas Registradas: {len(self.mejores_empresas)}", ln=True)
@@ -55643,24 +55643,24 @@ index 0000000..cae4ab5
 +            pdf.set_fill_color(99, 102, 241) # Color Indigo del sistema
 +            pdf.set_text_color(255, 255, 255)
 +            pdf.set_font("Helvetica", 'B', 10)
-+            
++
 +            pdf.cell(65, 10, "Nombre de la Empresa", 1, 0, 'C', True)
 +            pdf.cell(75, 10, "Correo de Contacto", 1, 0, 'C', True)
 +            pdf.cell(30, 10, "Teléfono", 1, 0, 'C', True)
 +            pdf.cell(20, 10, "Pasantes", 1, 1, 'C', True)
-+            
++
 +            # --- Datos de la tabla ---
 +            pdf.set_text_color(30, 41, 59)
 +            pdf.set_font("Helvetica", '', 9)
-+            
++
 +            relleno = False
 +            for emp in self.mejores_empresas:
 +                pdf.set_fill_color(248, 250, 252) if relleno else pdf.set_fill_color(255, 255, 255)
-+                
++
 +                # Control de longitud para evitar desbordamiento
 +                nombre = (emp["nombre"][:35] + '..') if len(emp["nombre"]) > 37 else emp["nombre"]
 +                correo = (emp["correo"][:40] + '..') if len(emp["correo"]) > 42 else emp["correo"]
-+                
++
 +                pdf.cell(65, 8, nombre, 1, 0, 'L', relleno)
 +                pdf.cell(75, 8, correo, 1, 0, 'L', relleno)
 +                pdf.cell(30, 8, emp["telefono"] or "N/A", 1, 0, 'C', relleno)
@@ -55672,10 +55672,10 @@ index 0000000..cae4ab5
 +            pdf.set_font("Helvetica", 'I', 8)
 +            pdf.set_text_color(148, 163, 184)
 +            pdf.cell(0, 10, f"Página {pdf.page_no()} - Documento Administrativo Confidencial", align='C')
-+            
++
 +            # Obtener el contenido de forma segura
 +            pdf_output = bytes(pdf.output())
-+            
++
 +            return rx.download(data=pdf_output, filename=f"reporte_empresas_{datetime.now().strftime('%d_%m_%Y')}.pdf")
 +        except Exception as e:
 +            logger.exception("Error al generar PDF de reportes: %s", e)
@@ -56112,8 +56112,8 @@ index 0000000..cdf5e6f
 +                            seccion_modal(
 +                                "user", "Autor",
 +                                rx.vstack(
-+                                    campo_texto("Nombre Completo", 
-+                                                EstadoBoveda.nombre_encontrado + " " + EstadoBoveda.apellido_encontrado, 
++                                    campo_texto("Nombre Completo",
++                                                EstadoBoveda.nombre_encontrado + " " + EstadoBoveda.apellido_encontrado,
 +                                                None, solo_lectura=True),
 +                                    campo_texto("Carrera", EstadoBoveda.carrera_encontrada, None, solo_lectura=True),
 +                                    campo_texto("Tutor Académico", EstadoBoveda.tutor_academico_encontrado, None, solo_lectura=True),
@@ -58194,7 +58194,7 @@ index 0000000..d7c1d67
 +                    rx.foreach(
 +                        EstadoMantenimiento.carreras_filtradas, fila_carrera)
 +                ),
-+                variant="surface", 
++                variant="surface",
 +                width="100%"
 +            )
 +        ),
@@ -58298,7 +58298,7 @@ index 0000000..d7c1d67
 +                    rx.foreach(
 +                        EstadoMantenimiento.tutores_filtrados, fila_tutor)
 +                ),
-+                variant="surface", 
++                variant="surface",
 +                width="100%"
 +            )
 +        ),
@@ -58341,7 +58341,7 @@ index 0000000..d7c1d67
 +                rx.table.body(
 +                    rx.foreach(EstadoMantenimiento.roles_filtrados, fila_rol)
 +                ),
-+                variant="surface", 
++                variant="surface",
 +                width="100%"
 +            )
 +        ),
@@ -58796,7 +58796,7 @@ index 0000000..838b837
 +                with conn:
 +                    with conn.cursor() as cursor:
 +                        cursor.execute("""
-+                            SELECT 
++                            SELECT
 +                                ta.nombre || ' ' || ta.apellido as tutor_acad,
 +                                ta.correo as tutor_acad_correo,
 +                                ta.telefono as tutor_acad_tel,
@@ -59067,9 +59067,9 @@ index 0000000..42a6867
 +                rx.hstack(
 +                    rx.heading(valor, size="7", weight="bold", color=COLOR_TEXTO_TITULO),
 +                    rx.badge(
-+                        "Activo", 
-+                        color_scheme=color_scheme, 
-+                        variant="soft", 
++                        "Activo",
++                        color_scheme=color_scheme,
++                        variant="soft",
 +                        radius="full",
 +                        size="1"
 +                    ),
@@ -59138,11 +59138,11 @@ index 0000000..42a6867
 +def contenido_reportes() -> rx.Component:
 +    return rx.vstack(
 +        encabezado_pagina(
-+            "Analítica y Reportes", 
-+            "Descargar Estudiantes (CSV)", 
++            "Analítica y Reportes",
++            "Descargar Estudiantes (CSV)",
 +            EstadoEstudiante.generar_reporte_estudiantes
 +        ),
-+        
++
 +        # ── NUEVA SECCIÓN: ACCIONES DE EXPORTACIÓN ──
 +        seccion_reporte(
 +            "Centro de Exportación de Datos", "Genera archivos físicos para trámites administrativos.", "cloud-download",
@@ -59166,7 +59166,7 @@ index 0000000..42a6867
 +
 +        rx.grid(
 +            seccion_reporte(
-+                "Distribución por Carreras", 
++                "Distribución por Carreras",
 +                "Visualización del volumen de estudiantes activos por cada programa académico.",
 +                "graduation-cap",
 +                rx.vstack(
@@ -59183,7 +59183,7 @@ index 0000000..42a6867
 +                )
 +            ),
 +            seccion_reporte(
-+                "Top 5 Tutores Académicos", 
++                "Top 5 Tutores Académicos",
 +                "Ranking de tutores con mayor carga de tutorías en el periodo actual.",
 +                "user-check",
 +                rx.vstack(
@@ -59306,6 +59306,5 @@ index 0000000..3995851
 +app.add_page(pagina_mantenimiento, route="/mantenimiento", on_load=EstadoAutenticacion.verificar_acceso_admin)
 +app.add_page(pagina_perfil, route="/perfil", on_load=EstadoAutenticacion.verificar_sesion_global)
 +app.add_page(pagina_reportes, route="/reportes", on_load=EstadoAutenticacion.verificar_acceso_admin)
--- 
+--
 2.43.0
-

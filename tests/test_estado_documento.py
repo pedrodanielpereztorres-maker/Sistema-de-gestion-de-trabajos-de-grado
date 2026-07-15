@@ -1,20 +1,21 @@
+import asyncio
+import importlib
+import os
 import sys
 import unittest
-import asyncio
-import builtins
-import os
 from pathlib import Path
-from unittest.mock import patch, mock_open
+from unittest.mock import mock_open, patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 os.environ["PYTEST_CURRENT_TEST"] = "1"
 
-from sistema_gestion_trabajo_grado.estado.estado_documento import (
-    EstadoDocumento,
-    Documento,
+estado_documento = importlib.import_module(
+    "sistema_gestion_trabajo_grado.estado.estado_documento"
 )
+Documento = estado_documento.Documento
+EstadoDocumento = estado_documento.EstadoDocumento
 
 
 class FakeUploadFile:

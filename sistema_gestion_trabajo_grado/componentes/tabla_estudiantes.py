@@ -1,4 +1,5 @@
 import reflex as rx
+
 from ..estado.estado_estudiante import EstadoEstudiante
 
 # Valores rem fijos para tipografía y paddings
@@ -613,8 +614,27 @@ def tabla_estudiantes() -> rx.Component:
                     },
                     _hover={"border_color": "#6366F1"},
                 ),
+                rx.select(
+                    items=EstadoEstudiante.opciones_estados,
+                    value=EstadoEstudiante.filtro_estado,
+                    on_change=EstadoEstudiante.fijar_filtro_estado,
+                    placeholder="Todos",
+                    size="3",
+                    variant="classic",
+                    radius="large",
+                    style={
+                        "background_color": "white",
+                        "border": "1.5px solid #CBD5E1",
+                        "color": "#0F172A",
+                        "font_size": FS_BODY,
+                        "cursor": "pointer",
+                    },
+                    _hover={"border_color": "#6366F1"},
+                ),
                 rx.cond(
                     (EstadoEstudiante.filtro_carrera != "")
+                    & (EstadoEstudiante.filtro_carrera != "Todas las carreras")
+                    | (EstadoEstudiante.filtro_estado != "Todos")
                     | (EstadoEstudiante.busqueda_dinamica != ""),
                     rx.button(
                         rx.icon("rotate-ccw", size=14),
@@ -664,7 +684,7 @@ def tabla_estudiantes() -> rx.Component:
                 # Font base para toda la tabla desde rem
                 style={
                     "font_size": FS_BODY,
-                        "table-layout": "fixed",
+                    "table-layout": "fixed",
                 },
             ),
             width="100%",

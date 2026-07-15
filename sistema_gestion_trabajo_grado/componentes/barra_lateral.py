@@ -1,7 +1,9 @@
 import reflex as rx
+
 from sistema_gestion_trabajo_grado.estado.estado_autenticacion import (
     EstadoAutenticacion,
 )
+
 from ..estado.estado_layout import EstadoLayout
 
 # ════════════════════════════════════════════════════════════
@@ -302,7 +304,8 @@ def sidebar_contenido() -> rx.Component:
             padding_x="0.5rem",
             padding_y="0.375rem",
             flex="1",
-            # Permitimos scroll vertical para que en Windows (donde las fuentes son más grandes) no se corten opciones
+            # Permitimos scroll vertical para que en Windows (donde las fuentes son
+            # más grandes) no se corten opciones
             overflow_y="auto",
             overflow_x="hidden",
             align="start",

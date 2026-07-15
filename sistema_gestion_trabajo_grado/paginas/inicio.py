@@ -1,9 +1,10 @@
 import reflex as rx
+
+from ..componentes.layout import layout_principal
 from ..estado.estado_autenticacion import EstadoAutenticacion
-from ..estado.estado_estudiante import EstadoEstudiante
 from ..estado.estado_boveda import EstadoBoveda
 from ..estado.estado_dashboard import EstadoDashboard
-from ..componentes.layout import layout_principal
+from ..estado.estado_estudiante import EstadoEstudiante
 from .perfil import EstadoPerfil
 
 COLOR_PRIMARIO = "#6366F1"

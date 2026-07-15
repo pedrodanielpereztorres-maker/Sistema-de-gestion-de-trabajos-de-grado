@@ -1,11 +1,12 @@
 import reflex as rx
+
 from ..componentes.encabezado import encabezado_pagina
+from ..componentes.layout import layout_principal
 from ..componentes.modal_estudiante import modal_registrar_estudiante
 from ..componentes.tabla_estudiantes import tabla_estudiantes
 from ..componentes.toast_viewer import toast_viewer
-from ..componentes.layout import layout_principal
-from ..estado.estado_estudiante import EstadoEstudiante
 from ..estado.estado_autenticacion import EstadoAutenticacion
+from ..estado.estado_estudiante import EstadoEstudiante
 
 
 def modal_seguridad_estudiante() -> rx.Component:

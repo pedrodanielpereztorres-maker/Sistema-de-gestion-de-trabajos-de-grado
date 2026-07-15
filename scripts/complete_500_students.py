@@ -12,7 +12,7 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from rxconfig import URL_BASE_DATOS
+from rxconfig import URL_BASE_DATOS  # noqa: E402
 
 COMPANY_NAMES = [
     "InnovaTech",
@@ -143,7 +143,11 @@ def build_tutor_empresarial_data(index: int, company_id: int):
     apellido = random.choice(LAST_NAMES)
     return (
         f"{nombre} {apellido}",
-        f"{nombre.lower()}.{apellido.lower().replace('á','a').replace('é','e').replace('í','i').replace('ó','o').replace('ú','u')}@empresa{company_id}.com",
+        (
+            f"{nombre.lower()}."
+            f"{apellido.lower().replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u')}"
+            f"@empresa{company_id}.com"
+        ),
         f"{PHONE_PREFIXES[index % len(PHONE_PREFIXES)]}{random.randint(1000000, 9999999)}",
         company_id,
     )
@@ -153,8 +157,15 @@ def build_academic_tutor_data(index: int, carrera_id: int):
     nombre = random.choice(FIRST_NAMES)
     apellido = random.choice(LAST_NAMES)
     specialty = random.choice(ACADEMIC_SPECIALTIES)
-    email = f"{nombre.lower()}.{apellido.lower().replace('á','a').replace('é','e').replace('í','i').replace('ó','o').replace('ú','u')}@tis.edu.vc"
-    phone = f"{PHONE_PREFIXES[index % len(PHONE_PREFIXES)]}{random.randint(1000000, 9999999)}"
+    email = (
+        f"{nombre.lower()}."
+        f"{apellido.lower().replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u')}"
+        f"@tis.edu.vc"
+    )
+    phone = (
+        f"{PHONE_PREFIXES[index % len(PHONE_PREFIXES)]}"
+        f"{random.randint(1000000, 9999999)}"
+    )
     cedula = str(50000000 + index)
     return nombre, apellido, email, phone, carrera_id, specialty, cedula
 
@@ -196,7 +207,7 @@ def main():
         )
         company_ids.append(cur.fetchone()[0])
 
-    # Create empresarial tutors
+    # Crear tutores empresariales
     cur.execute("SELECT id FROM tutor_empresarial ORDER BY id;")
     existing_te = [row[0] for row in cur.fetchall()]
     tutor_emp_ids = existing_te.copy()
@@ -212,7 +223,7 @@ def main():
         )
         tutor_emp_ids.append(cur.fetchone()[0])
 
-    # Create academic tutors
+    # Crear tutores académicos
     cur.execute("SELECT id FROM tutor_academico ORDER BY id;")
     academic_ids = [row[0] for row in cur.fetchall()]
     needed_academic = max(0, 30 - len(academic_ids))

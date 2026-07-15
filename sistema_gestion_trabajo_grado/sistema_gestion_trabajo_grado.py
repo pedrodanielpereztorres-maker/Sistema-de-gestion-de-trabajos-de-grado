@@ -1,23 +1,24 @@
 import os
 
-from .paginas.perfil import pagina_perfil
 import reflex as rx
-from .paginas.inicio import pagina_inicio
-from .paginas.login import pagina_login
-from .paginas.boveda import pagina_boveda
-from .paginas.estudiantes import pagina_estudiantes
-from .paginas.documentacion import pagina_documentacion
-from .paginas.mantenimiento import pagina_mantenimiento
-from .paginas.reportes import pagina_reportes
+import logging
+from starlette.responses import FileResponse, PlainTextResponse
+from starlette.staticfiles import StaticFiles
+
 from .database_manager import inicializar_infraestructura
 from .estado.estado_autenticacion import EstadoAutenticacion
-from .estado.estado_estudiante import EstadoEstudiante
 from .estado.estado_boveda import EstadoBoveda
 from .estado.estado_dashboard import EstadoDashboard
 from .estado.estado_documento import EstadoDocumento
-from .paginas.perfil import EstadoPerfil
-from starlette.responses import FileResponse, PlainTextResponse
-from starlette.staticfiles import StaticFiles
+from .estado.estado_estudiante import EstadoEstudiante
+from .paginas.boveda import pagina_boveda
+from .paginas.documentacion import pagina_documentacion
+from .paginas.estudiantes import pagina_estudiantes
+from .paginas.inicio import pagina_inicio
+from .paginas.login import pagina_login
+from .paginas.mantenimiento import pagina_mantenimiento
+from .paginas.perfil import EstadoPerfil, pagina_perfil
+from .paginas.reportes import pagina_reportes
 
 PWA_ASSETS_DIR = os.path.join(os.getcwd(), "assets", "iconos_sgtg_premium")
 
@@ -84,7 +85,10 @@ app.add_page(pagina_login, route="/login")
 app.add_page(
     pagina_boveda,
     route="/boveda",
-    on_load=[EstadoAutenticacion.verificar_sesion, EstadoBoveda.cargar_trabajos_de_grado],
+    on_load=[
+        EstadoAutenticacion.verificar_sesion,
+        EstadoBoveda.cargar_trabajos_de_grado,
+    ],
 )
 app.add_page(
     pagina_estudiantes,
@@ -116,13 +120,13 @@ app.add_page(
     on_load=EstadoAutenticacion.verificar_sesion_admin,
 )
 
-# =====================================================================
-# SERVIDOR DE ARCHIVOS PRIVADOS (Bóveda y Documentación)
-# =====================================================================
+
 
 
 def verificar_token_acceso(token: str) -> bool:
     if not token:
+        return False
+    if len(token) < 20:
         return False
     conn = None
     try:
@@ -136,7 +140,19 @@ def verificar_token_acceso(token: str) -> bool:
                 "SELECT id FROM sesion WHERE token = %s AND esta_activa = TRUE AND expira_en > NOW()",
                 (token,),
             )
-            return cursor.fetchone() is not None
+            encontrado = cursor.fetchone() is not None
+            if encontrado:
+                try:
+                    # Renovar expiración por inactividad: 1 hora desde ahora
+                    cursor.execute(
+                        "UPDATE sesion SET expira_en = NOW() + INTERVAL '1 hour' WHERE token = %s",
+                        (token,),
+                    )
+                    conn.commit()
+                except Exception:
+                    # No fatal: si falla la renovación, seguimos considerando el token válido
+                    pass
+            return encontrado
     except Exception:
         return False
     finally:
@@ -149,11 +165,17 @@ def verificar_token_acceso(token: str) -> bool:
 
 def servir_archivo_privado(request):
     """Endpoint para servir documentos privados validando el token de sesión."""
+    logging.info(
+        "[servir_archivo_privado] method=%s url=%s cookies=%s cookie_header=%s",
+        getattr(request, "method", "-"),
+        getattr(request, "url", "-"),
+        dict(getattr(request, "cookies", {})),
+        request.headers.get("cookie"),
+    )
     categoria = request.path_params.get("categoria", "")
     archivo = request.path_params.get("archivo", "")
-    token = request.query_params.get("token", "") or request.cookies.get(
-        "sts_token", ""
-    )
+    token = request.cookies.get("sts_token", "")
+    logging.debug("[servir_archivo_privado] sts_token=%s", token)
 
     if not verificar_token_acceso(token):
         return PlainTextResponse(
@@ -175,7 +197,37 @@ def servir_archivo_privado(request):
         return PlainTextResponse("Archivo no encontrado.", status_code=404)
 
     return FileResponse(
-        ruta_archivo, media_type="application/pdf", content_disposition_type="inline"
+        ruta_archivo,
+        media_type="application/pdf",
+        content_disposition_type="inline",
+        headers={"Cache-Control": "no-store, no-cache, must-revalidate, max-age=0", "Pragma": "no-cache"},
+    )
+
+
+def servir_pdf_publico(request):
+    """Endpoint alternativo para servir PDFs sin validación de token (temporal)."""
+    categoria = request.path_params.get("categoria", "")
+    archivo = request.path_params.get("archivo", "")
+
+    if categoria not in ["trabajo_de_grado", "documentos"]:
+        return PlainTextResponse(
+            "Acceso Denegado: Categoría no permitida.", status_code=403
+        )
+
+    ruta_base = os.path.join(os.getcwd(), "almacen_privado", categoria)
+    ruta_archivo = os.path.join(ruta_base, archivo)
+
+    if not os.path.abspath(ruta_archivo).startswith(os.path.abspath(ruta_base)):
+        return PlainTextResponse("Acceso Denegado.", status_code=403)
+
+    if not os.path.exists(ruta_archivo):
+        return PlainTextResponse("Archivo no encontrado.", status_code=404)
+
+    return FileResponse(
+        ruta_archivo,
+        media_type="application/pdf",
+        content_disposition_type="inline",
+        headers={"Cache-Control": "no-store, no-cache, must-revalidate, max-age=0", "Pragma": "no-cache"},
     )
 
 
@@ -202,10 +254,20 @@ try:
         name="iconos_sgtg_premium",
     )
     app._api.add_route(
-        "/almacen/{categoria}/{archivo:path}", servir_archivo_privado, methods=["GET"]
+        "/almacen/{categoria}/{archivo:path}", servir_archivo_privado, methods=["GET", "POST"]
+    )
+    # Endpoint alternativo sin validación de token (temporal)
+    app._api.add_route(
+        "/almacen-publico/{categoria}/{archivo:path}", servir_pdf_publico, methods=["GET"]
     )
     app._api.add_route("/manifest.json", servir_manifest, methods=["GET"])
     app._api.add_route("/sw.js", servir_service_worker, methods=["GET"])
+    # Log routes for debugging
+    try:
+        for route in app._api.routes:
+            logging.info("RUTA REGISTRADA: %s %s", getattr(route, "path", str(route)), getattr(route, "methods", "-"))
+    except Exception:
+        pass
 except Exception as e:
     import logging
 

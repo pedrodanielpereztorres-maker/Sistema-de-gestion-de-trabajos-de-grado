@@ -1,7 +1,7 @@
-import sys
-import unittest
 import asyncio
 import os
+import sys
+import unittest
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
@@ -10,7 +10,7 @@ sys.path.insert(0, str(ROOT))
 
 os.environ["PYTEST_CURRENT_TEST"] = "1"
 
-from sistema_gestion_trabajo_grado.estado.estado_mantenimiento import (
+from sistema_gestion_trabajo_grado.estado.estado_mantenimiento import (  # noqa: E402
     EstadoMantenimiento,
 )
 

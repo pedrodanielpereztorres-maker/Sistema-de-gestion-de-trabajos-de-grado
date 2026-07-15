@@ -1,6 +1,7 @@
-from .campo_texto import campo_texto
-from ..estado.estado_estudiante import EstadoEstudiante
 import reflex as rx
+
+from ..estado.estado_estudiante import EstadoEstudiante
+from .campo_texto import campo_texto
 
 COLOR_PRIMARIO = "#6366F1"
 COLOR_PRIMARIO_OSCURO = "#4338CA"

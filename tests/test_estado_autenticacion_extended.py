@@ -1,7 +1,8 @@
+import asyncio
+import importlib
+import os
 import sys
 import unittest
-import asyncio
-import os
 from pathlib import Path
 from unittest.mock import patch
 
@@ -10,11 +11,16 @@ sys.path.insert(0, str(ROOT))
 
 os.environ["PYTEST_CURRENT_TEST"] = "1"
 
-from sistema_gestion_trabajo_grado.estado.estado_autenticacion import (
-    EstadoAutenticacion,
-    EncriptadorContrasena,
-    Usuario,
+estado_autenticacion = importlib.import_module(
+    "sistema_gestion_trabajo_grado.estado.estado_autenticacion"
 )
+estado_estudiante = importlib.import_module(
+    "sistema_gestion_trabajo_grado.estado.estado_estudiante"
+)
+EncriptadorContrasena = estado_autenticacion.EncriptadorContrasena
+EstadoAutenticacion = estado_autenticacion.EstadoAutenticacion
+EstadoEstudiante = estado_estudiante.EstadoEstudiante
+Usuario = estado_autenticacion.Usuario
 
 
 class FakeCursor:
@@ -237,6 +243,47 @@ class TestEstadoAutenticacionExtended(unittest.TestCase):
         self.assertEqual(resultado, "error_invalid")
         self.assertTrue(estado.bloqueado_hasta)
         self.assertGreaterEqual(estado.intentos_fallidos, 5)
+
+    def test_guardar_estudiante_crea_cuenta_acceso_automaticamente(self):
+        estado = EstadoEstudiante()
+        estado.cedula = "12345678"
+        estado.nombre = "Ana"
+        estado.apellido = "Pérez"
+        estado.correo = "ana@example.com"
+        estado.carrera = "Ingeniería"
+        estado.telefono_personal = "04141234567"
+        estado.periodo_inicio = "2024-01-01"
+        estado.periodo_cierre = "2024-06-01"
+        estado.haciendo_trabajo_de_grado = False
+        estado.nombre_empresa = ""
+        estado.direccion_empresa = ""
+        estado.tutor_empresa = ""
+        estado.correo_empresa = ""
+        estado.telefono_empresa = ""
+        estado.tutores_mapeo = []
+        estado.tutores_disponibles = []
+
+        cursor = FakeCursor(responses=[None, None, (1,), (42,), None, None])
+        conn = FakeConn(cursor)
+
+        async def run_save():
+            with patch(
+                "sistema_gestion_trabajo_grado.estado.estado_estudiante.obtener_conexion",
+                return_value=conn,
+            ):
+                with patch(
+                    "sistema_gestion_trabajo_grado.estado.estado_estudiante.rx.toast.success",
+                    return_value="toast_ok",
+                ):
+                    return await estado.guardar_estudiante()
+
+        resultado = asyncio.run(run_save())
+
+        self.assertEqual(resultado, "toast_ok")
+        self.assertTrue(
+            any("INSERT INTO usuario" in query for query, _ in cursor.executed)
+        )
+        self.assertTrue(conn.committed)
 
     def test_cerrar_sesion_limpia_usuario_y_actualiza_bd(self):
         estado = EstadoAutenticacion()
