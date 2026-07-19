@@ -1,11 +1,23 @@
+import logging
 import os
+from urllib.parse import urlparse
 
 import reflex as rx
-import logging
-from starlette.responses import FileResponse, PlainTextResponse
+from starlette.responses import FileResponse, PlainTextResponse, Response
 from starlette.staticfiles import StaticFiles
 
+# Configurar logging para eliminar advertencias de disconnected client
+logging.getLogger("reflex").setLevel(logging.ERROR)
+logging.getLogger("uvicorn").setLevel(logging.ERROR)
+logging.getLogger("uvicorn.access").setLevel(logging.ERROR)
+
 from .database_manager import inicializar_infraestructura
+from .seguridad import (
+    SECURITY_LOGGER,
+    decrypt_bytes,
+    registrar_evento_seguridad,
+    verificar_token_acceso_archivo,
+)
 from .estado.estado_autenticacion import EstadoAutenticacion
 from .estado.estado_boveda import EstadoBoveda
 from .estado.estado_dashboard import EstadoDashboard
@@ -163,8 +175,29 @@ def verificar_token_acceso(token: str) -> bool:
                 pass
 
 
+def _obtener_ruta_solicitada(request) -> str:
+    url_obj = getattr(request, "url", None)
+    if url_obj is None:
+        return ""
+    if hasattr(url_obj, "path"):
+        return str(getattr(url_obj, "path", "") or "")
+    url_texto = str(url_obj)
+    if not url_texto:
+        return ""
+    return urlparse(url_texto).path or url_texto
+
+
 def servir_archivo_privado(request):
     """Endpoint para servir documentos privados validando el token de sesión."""
+    ruta_solicitada = _obtener_ruta_solicitada(request)
+    if request.method == "GET" and not request.cookies.get("sts_token"):
+        SECURITY_LOGGER.warning("acceso denegado 403 para ruta %s", ruta_solicitada)
+        registrar_evento_seguridad(
+            "warning",
+            "Acceso denegado 403",
+            ruta=ruta_solicitada,
+            usuario=request.cookies.get("sts_token"),
+        )
     logging.info(
         "[servir_archivo_privado] method=%s url=%s cookies=%s cookie_header=%s",
         getattr(request, "method", "-"),
@@ -174,13 +207,24 @@ def servir_archivo_privado(request):
     )
     categoria = request.path_params.get("categoria", "")
     archivo = request.path_params.get("archivo", "")
-    token = request.cookies.get("sts_token", "")
-    logging.debug("[servir_archivo_privado] sts_token=%s", token)
+    query_params = getattr(request, "query_params", {}) or {}
+    token_query = query_params.get("token", "")
+    token_cookie = request.cookies.get("sts_token", "")
+    ruta_archivo_rel = f"{categoria}/{archivo}" if categoria and archivo else ""
+    logging.debug(
+        "[servir_archivo_privado] token_query=%s token_cookie=%s ruta=%s",
+        bool(token_query),
+        bool(token_cookie),
+        ruta_archivo_rel,
+    )
 
-    if not verificar_token_acceso(token):
+    if not token_query:
         return PlainTextResponse(
-            "Acceso Denegado: Sesión inválida o expirada.", status_code=401
+            "Acceso Denegado: se requiere un token de archivo válido.", status_code=401
         )
+
+    if not verificar_token_acceso_archivo(token_query, ruta_archivo_rel):
+        return PlainTextResponse("Acceso Denegado: token de archivo inválido o expirado.", status_code=401)
 
     if categoria not in ["trabajo_de_grado", "documentos"]:
         return PlainTextResponse(
@@ -196,38 +240,29 @@ def servir_archivo_privado(request):
     if not os.path.exists(ruta_archivo):
         return PlainTextResponse("Archivo no encontrado.", status_code=404)
 
-    return FileResponse(
-        ruta_archivo,
+    with open(ruta_archivo, "rb") as handle:
+        contenido = handle.read()
+    try:
+        contenido = decrypt_bytes(contenido)
+    except Exception:
+        return PlainTextResponse("Archivo no disponible.", status_code=500)
+
+    return Response(
+        contenido,
         media_type="application/pdf",
-        content_disposition_type="inline",
-        headers={"Cache-Control": "no-store, no-cache, must-revalidate, max-age=0", "Pragma": "no-cache"},
+        headers={
+            "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+            "Pragma": "no-cache",
+            "Content-Disposition": "inline; filename=archivo.pdf",
+        },
     )
 
 
 def servir_pdf_publico(request):
-    """Endpoint alternativo para servir PDFs sin validación de token (temporal)."""
-    categoria = request.path_params.get("categoria", "")
-    archivo = request.path_params.get("archivo", "")
-
-    if categoria not in ["trabajo_de_grado", "documentos"]:
-        return PlainTextResponse(
-            "Acceso Denegado: Categoría no permitida.", status_code=403
-        )
-
-    ruta_base = os.path.join(os.getcwd(), "almacen_privado", categoria)
-    ruta_archivo = os.path.join(ruta_base, archivo)
-
-    if not os.path.abspath(ruta_archivo).startswith(os.path.abspath(ruta_base)):
-        return PlainTextResponse("Acceso Denegado.", status_code=403)
-
-    if not os.path.exists(ruta_archivo):
-        return PlainTextResponse("Archivo no encontrado.", status_code=404)
-
-    return FileResponse(
-        ruta_archivo,
-        media_type="application/pdf",
-        content_disposition_type="inline",
-        headers={"Cache-Control": "no-store, no-cache, must-revalidate, max-age=0", "Pragma": "no-cache"},
+    """Bloquea explícitamente el acceso público a documentos privados."""
+    return PlainTextResponse(
+        "Acceso Denegado: el acceso público a documentos privados está deshabilitado.",
+        status_code=403,
     )
 
 

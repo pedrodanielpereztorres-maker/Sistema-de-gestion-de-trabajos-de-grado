@@ -1,0 +1,504 @@
+2026-07-18 21:34:29,203 WARNING acceso denegado para ruta /secret
+2026-07-18 21:34:40,669 WARNING acceso denegado para ruta /secret
+2026-07-18 21:35:37,482 WARNING acceso denegado para ruta /secret
+2026-07-18 22:00:13,970 WARNING acceso denegado para ruta /secret
+2026-07-18 22:01:14,489 WARNING acceso denegado para ruta /secret
+2026-07-18 22:08:40,345 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 22:08:40,346 WARNING Acceso denegado 403
+2026-07-18 22:08:40,355 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 22:08:42,403 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 22:08:42,403 WARNING Acceso denegado 403
+2026-07-18 22:08:42,413 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 22:09:30,785 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 22:09:30,786 WARNING Acceso denegado 403
+2026-07-18 22:09:30,798 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 22:09:32,970 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 22:09:32,970 WARNING Acceso denegado 403
+2026-07-18 22:09:32,978 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 22:09:43,212 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 22:09:43,212 WARNING Acceso denegado 403
+2026-07-18 22:09:43,219 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 22:09:54,654 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 22:09:54,654 WARNING Acceso denegado 403
+2026-07-18 22:09:54,664 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 22:11:14,971 WARNING acceso denegado para ruta /secret
+2026-07-18 22:14:51,707 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 22:14:51,707 WARNING Acceso denegado 403
+2026-07-18 22:14:51,719 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 22:55:22,751 WARNING acceso denegado para ruta /secret
+2026-07-18 22:59:11,229 WARNING acceso denegado 403 para ruta /almacen/documentos/doc_2026-07-14_UNIDAD_III_-_MARCO_TEORICO_-_PARTE_II.pdf
+2026-07-18 22:59:11,229 WARNING Acceso denegado 403
+2026-07-18 22:59:11,239 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 22:59:12,951 WARNING acceso denegado 403 para ruta /almacen/documentos/doc_2026-07-14_UNIDAD_III_-_MARCO_TEORICO_-_PARTE_II.pdf
+2026-07-18 22:59:12,952 WARNING Acceso denegado 403
+2026-07-18 22:59:12,963 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 22:59:13,647 WARNING acceso denegado 403 para ruta /almacen/documentos/doc_2026-07-14_UNIDAD_III_-_MARCO_TEORICO_-_PARTE_II.pdf
+2026-07-18 22:59:13,647 WARNING Acceso denegado 403
+2026-07-18 22:59:13,655 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 22:59:13,828 WARNING acceso denegado 403 para ruta /almacen/documentos/doc_2026-07-14_UNIDAD_III_-_MARCO_TEORICO_-_PARTE_II.pdf
+2026-07-18 22:59:13,828 WARNING Acceso denegado 403
+2026-07-18 22:59:13,835 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 22:59:17,680 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 22:59:17,680 WARNING Acceso denegado 403
+2026-07-18 22:59:17,693 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 22:59:43,496 WARNING acceso denegado 403 para ruta /almacen/documentos/doc_2026-07-14_UNIDAD_III_-_MARCO_TEORICO_-_PARTE_II.pdf
+2026-07-18 22:59:43,497 WARNING Acceso denegado 403
+2026-07-18 22:59:43,506 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:00:00,336 WARNING acceso denegado 403 para ruta /almacen/documentos/doc_2026-07-14_UNIDAD_III_-_MARCO_TEORICO_-_PARTE_II.pdf
+2026-07-18 23:00:00,336 WARNING Acceso denegado 403
+2026-07-18 23:00:00,348 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:02:10,728 WARNING acceso denegado para ruta /secret
+2026-07-18 23:02:50,350 WARNING acceso denegado para ruta /secret
+2026-07-18 23:05:08,766 WARNING acceso denegado 403 para ruta /almacen/documentos/doc_2026-07-14_UNIDAD_III_-_MARCO_TEORICO_-_PARTE_II.pdf
+2026-07-18 23:05:08,767 WARNING Acceso denegado 403
+2026-07-18 23:05:08,779 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:07:27,778 WARNING acceso denegado 403 para ruta /almacen/documentos/doc_2026-07-14_UNIDAD_III_-_MARCO_TEORICO_-_PARTE_II.pdf
+2026-07-18 23:07:27,778 WARNING Acceso denegado 403
+2026-07-18 23:07:27,787 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:11:22,959 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 23:11:22,959 WARNING Acceso denegado 403
+2026-07-18 23:11:22,972 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:11:24,826 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 23:11:24,826 WARNING Acceso denegado 403
+2026-07-18 23:11:24,833 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:11:25,273 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 23:11:25,273 WARNING Acceso denegado 403
+2026-07-18 23:11:25,280 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:11:25,433 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 23:11:25,433 WARNING Acceso denegado 403
+2026-07-18 23:11:25,441 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:11:25,583 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 23:11:25,584 WARNING Acceso denegado 403
+2026-07-18 23:11:25,592 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:11:25,721 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 23:11:25,721 WARNING Acceso denegado 403
+2026-07-18 23:11:25,730 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:11:25,981 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 23:11:25,981 WARNING Acceso denegado 403
+2026-07-18 23:11:25,989 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:11:26,219 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 23:11:26,219 WARNING Acceso denegado 403
+2026-07-18 23:11:26,227 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:11:26,356 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 23:11:26,356 WARNING Acceso denegado 403
+2026-07-18 23:11:26,364 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:11:26,508 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 23:11:26,508 WARNING Acceso denegado 403
+2026-07-18 23:11:26,516 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:11:26,687 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 23:11:26,687 WARNING Acceso denegado 403
+2026-07-18 23:11:26,697 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:12:16,898 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 23:12:16,898 WARNING Acceso denegado 403
+2026-07-18 23:12:16,909 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:13:50,913 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 23:13:50,914 WARNING Acceso denegado 403
+2026-07-18 23:13:50,926 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:13:59,147 WARNING acceso denegado 403 para ruta /almacen/documentos/doc_2026-07-14_UNIDAD_III_-_MARCO_TEORICO_-_PARTE_II.pdf
+2026-07-18 23:13:59,147 WARNING Acceso denegado 403
+2026-07-18 23:13:59,159 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:17:47,471 WARNING acceso denegado para ruta /secret
+2026-07-18 23:18:39,490 WARNING acceso denegado para ruta /secret
+2026-07-18 23:18:39,492 WARNING acceso denegado 403 para ruta /
+2026-07-18 23:18:39,492 WARNING Acceso denegado 403
+2026-07-18 23:18:39,500 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:19:41,565 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 23:19:41,565 WARNING Acceso denegado 403
+2026-07-18 23:19:41,575 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:19:45,812 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 23:19:45,812 WARNING Acceso denegado 403
+2026-07-18 23:19:45,820 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:19:52,398 WARNING acceso denegado 403 para ruta /almacen/documentos/doc_2026-07-14_UNIDAD_III_-_MARCO_TEORICO_-_PARTE_II.pdf
+2026-07-18 23:19:52,398 WARNING Acceso denegado 403
+2026-07-18 23:19:52,408 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:20:06,485 WARNING acceso denegado 403 para ruta /almacen/documentos/doc_2026-07-14_UNIDAD_III_-_MARCO_TEORICO_-_PARTE_II.pdf
+2026-07-18 23:20:06,485 WARNING Acceso denegado 403
+2026-07-18 23:20:06,495 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:20:15,533 WARNING acceso denegado 403 para ruta /almacen/documentos/doc_2026-07-14_UNIDAD_III_-_MARCO_TEORICO_-_PARTE_II.pdf
+2026-07-18 23:20:15,533 WARNING Acceso denegado 403
+2026-07-18 23:20:15,540 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 68, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:22:13,078 WARNING acceso denegado para ruta /secret
+2026-07-18 23:22:13,082 WARNING acceso denegado 403 para ruta /
+2026-07-18 23:22:13,082 WARNING Acceso denegado 403
+2026-07-18 23:22:13,092 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 100, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:23:31,820 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 23:23:31,820 WARNING Acceso denegado 403
+2026-07-18 23:23:31,834 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 100, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:23:37,929 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 23:23:37,929 WARNING Acceso denegado 403
+2026-07-18 23:23:37,938 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 100, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:23:43,043 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 23:23:43,043 WARNING Acceso denegado 403
+2026-07-18 23:23:43,050 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 100, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:23:52,796 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 23:23:52,796 WARNING Acceso denegado 403
+2026-07-18 23:23:52,806 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 100, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:24:11,427 WARNING acceso denegado para ruta /secret
+2026-07-18 23:24:11,430 WARNING acceso denegado 403 para ruta /
+2026-07-18 23:24:11,430 WARNING Acceso denegado 403
+2026-07-18 23:24:11,437 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 100, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:25:07,230 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 23:25:07,231 WARNING Acceso denegado 403
+2026-07-18 23:25:07,243 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 100, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:25:18,245 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 23:25:18,246 WARNING Acceso denegado 403
+2026-07-18 23:25:18,258 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 100, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:25:26,680 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 23:25:26,680 WARNING Acceso denegado 403
+2026-07-18 23:25:26,689 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 100, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:25:30,069 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 23:25:30,069 WARNING Acceso denegado 403
+2026-07-18 23:25:30,080 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 100, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:27:02,800 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 23:27:02,801 WARNING Acceso denegado 403
+2026-07-18 23:27:02,812 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 100, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:27:11,092 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 23:27:11,092 WARNING Acceso denegado 403
+2026-07-18 23:27:11,105 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 100, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:27:49,666 WARNING acceso denegado 403 para ruta /almacen/trabajo_de_grado/trabajo_de_grado_15693764.pdf
+2026-07-18 23:27:49,666 WARNING Acceso denegado 403
+2026-07-18 23:27:49,675 ERROR No se pudo persistir el evento de seguridad en la base de datos
+Traceback (most recent call last):
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/seguridad.py", line 100, in registrar_evento_seguridad
+    with conn.transaction():
+  File "/home/pedro-perez/Documentos/sistema_gestion_trabajo_grado/sistema_gestion_trabajo_grado/database_manager.py", line 196, in __enter__
+    self._conn.begin()
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'begin'
+2026-07-18 23:29:32,318 WARNING acceso denegado para ruta /secret

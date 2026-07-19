@@ -161,6 +161,10 @@ class ConnectionProxy:
             self._closed = True
         return False
 
+    def transaction(self):
+        """Context manager explícito con BEGIN/COMMIT/ROLLBACK."""
+        return _TransactionContext(self)
+
     def cursor(self, *args, **kwargs):
         return self._conn.cursor(*args, **kwargs)
 
@@ -181,6 +185,23 @@ class ConnectionProxy:
 
     def __getattr__(self, name: str):
         return getattr(self._conn, name)
+
+
+class _TransactionContext:
+    def __init__(self, proxy: ConnectionProxy):
+        self._proxy = proxy
+        self._conn = getattr(proxy, "_conn", proxy)
+
+    def __enter__(self):
+        self._conn.begin()
+        return self._conn
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type is None:
+            self._conn.commit()
+        else:
+            self._conn.rollback()
+        return False
 
 
 def obtener_conexion() -> Any:

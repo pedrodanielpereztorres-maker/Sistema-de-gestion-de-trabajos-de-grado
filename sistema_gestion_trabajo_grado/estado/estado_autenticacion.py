@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 import secrets
 from datetime import datetime, timedelta, timezone
 
@@ -9,13 +10,35 @@ from pydantic import BaseModel
 from reflex import Cookie
 
 from ..database_manager import obtener_conexion
+from ..seguridad import SECURITY_LOGGER, registrar_evento_seguridad
 
-SESSION_TTL_HOURS = 1
-COOKIE_MAX_AGE_SECONDS = 1 * 60 * 60
+SESSION_TTL_HOURS = 8
+COOKIE_MAX_AGE_SECONDS = int(SESSION_TTL_HOURS * 60 * 60)
 
 # En producción asegúrate que el nivel sea INFO o superior
 # Nunca configures basicConfig con DEBUG en el servidor
 logger = logging.getLogger(__name__)
+
+
+def _es_cookie_secure() -> bool:
+    api_url = str(rx.config.get_config().api_url or "").strip()
+    if api_url.lower().startswith("https://"):
+        return True
+    return os.getenv("COOKIE_SECURE", "false").lower() == "true"
+
+
+def _crear_cookie_sesion_base(valor: str, max_age: int, secure: bool) -> Cookie:
+    same_site = "lax" if not secure else "strict"
+    cookie = Cookie(
+        valor,
+        name="sts_token",
+        max_age=max_age,
+        path="/",
+        secure=secure,
+        same_site=same_site,
+    )
+    cookie.http_only = True
+    return cookie
 
 
 class EncriptadorContrasena:
@@ -60,13 +83,8 @@ class EstadoAutenticacion(rx.State):
     usuario: Usuario | None = None
     entrada_usuario: str = ""
     entrada_contrasena: str = ""
-    token_cookie: Cookie | str = Cookie(
-        "",
-        name="sts_token",
-        max_age=COOKIE_MAX_AGE_SECONDS,
-        path="/",
-        secure=False,
-        same_site="lax",
+    token_cookie: Cookie | str = _crear_cookie_sesion_base(
+        "", COOKIE_MAX_AGE_SECONDS, _es_cookie_secure()
     )
 
     # Rate Limiting (Tarea 5)
@@ -100,6 +118,9 @@ class EstadoAutenticacion(rx.State):
         if self.usuario and self.usuario.token_sesion:
             return self.usuario.token_sesion
         return str(self.token_cookie or "")
+
+    def _crear_cookie_sesion(self, valor: str, max_age: int) -> Cookie:
+        return _crear_cookie_sesion_base(valor, max_age, _es_cookie_secure())
 
     async def restaurar_sesion(self):
         if self.usuario and self.usuario.token_sesion:
@@ -201,27 +222,25 @@ class EstadoAutenticacion(rx.State):
                     correo=u_cor,
                     token_sesion=token,
                 )
-                api_url = rx.config.get_config().api_url or ""
-                secure_cookie = api_url.lower().startswith("https://")
-                self.token_cookie = Cookie(
-                    token,
-                    name="sts_token",
-                    max_age=COOKIE_MAX_AGE_SECONDS,
-                    path="/",
-                    secure=secure_cookie,
-                    same_site="lax",
+                self.token_cookie = self._crear_cookie_sesion(
+                    token, COOKIE_MAX_AGE_SECONDS
                 )
                 logger.info(
-                    "Creada cookie sts_token (token_prefix=%s..., secure=%s, same_site=%s)",
+                    "Creada cookie sts_token (token_prefix=%s..., same_site=%s)",
                     token[:8],
-                    secure_cookie,
-                    "lax",
+                    "strict",
                 )
                 self.entrada_contrasena = ""
                 logger.debug("Sesión creada exitosamente.")
                 return rx.redirect("/")
 
         self.intentos_fallidos += 1
+        registrar_evento_seguridad(
+            "warning",
+            f"Intento de autenticación fallido para {correo_entrada}",
+            ruta="/login",
+            usuario=correo_entrada,
+        )
         if self.intentos_fallidos >= 5:
             self.bloqueado_hasta = (
                 datetime.now(timezone.utc) + timedelta(minutes=5)
@@ -320,14 +339,7 @@ class EstadoAutenticacion(rx.State):
                         pass
 
             await asyncio.to_thread(_deactivate_session, self.usuario.token_sesion)
-        self.token_cookie = Cookie(
-            "",
-            name="sts_token",
-            max_age=0,
-            path="/",
-            secure=False,
-            same_site="lax",
-        )
+        self.token_cookie = self._crear_cookie_sesion("", 0)
         self.reset()
         return rx.redirect("/login")
 

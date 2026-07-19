@@ -3,11 +3,14 @@ import logging
 import os
 from datetime import date
 from typing import List
+from urllib.parse import quote
 
 import reflex as rx
 from pydantic import BaseModel
 
 from ..database_manager import obtener_conexion
+from ..seguridad import crear_token_acceso_archivo, decrypt_bytes, encrypt_bytes
+from .estado_autenticacion import EstadoAutenticacion
 
 logger = logging.getLogger(__name__)
 
@@ -65,6 +68,9 @@ class EstadoDocumento(rx.State):
                     pass
 
         resultados = await asyncio.to_thread(_fetch_documentos)
+        estado_auth = await self.get_state(EstadoAutenticacion)
+        usuario_id = estado_auth.usuario.id if estado_auth and estado_auth.usuario else None
+
         self.lista_documentos = [
             Documento(
                 id=fila[0],
@@ -82,6 +88,14 @@ class EstadoDocumento(rx.State):
             )
             for fila in resultados
         ]
+
+        if usuario_id is not None:
+            for documento in self.lista_documentos:
+                if documento.url:
+                    ruta_archivo = documento.url.lstrip("/").replace("almacen/", "", 1)
+                    token_archivo = crear_token_acceso_archivo(ruta_archivo, usuario_id=usuario_id)
+                    separator = "&" if "?" in documento.url else "?"
+                    documento.url = f"{documento.url}{separator}token={quote(token_archivo, safe='')}"
 
     def fijar_titulo_nuevo(self, val: str) -> None:
         self.titulo_nuevo = val
@@ -130,38 +144,6 @@ class EstadoDocumento(rx.State):
 
         self.procesando = True
         archivos_creados_bd_ids = []
-
-        async def _insert_registro_documento(
-            titulo: str, descripcion: str, extension: str, tamano_kb: int, ruta_bd: str
-        ):
-            def _insert():
-                conn2 = obtener_conexion()
-                if conn2 is None:
-                    return None
-                try:
-                    with conn2:
-                        with conn2.cursor() as cursor:
-                            cursor.execute(
-                                """
-                                INSERT INTO documento (titulo, descripcion, tipo, tamano_kb, ruta_archivo)
-                                VALUES (%s, %s, %s, %s, %s)
-                                RETURNING id;
-                            """,
-                                (titulo, descripcion, extension, tamano_kb, ruta_bd),
-                            )
-                            nuevo_id = cursor.fetchone()[0]
-                        conn2.commit()
-                    return nuevo_id
-                except Exception as exc:
-                    logger.exception("Error al insertar documento en BD: %s", exc)
-                    return None
-                finally:
-                    try:
-                        conn2.close()
-                    except Exception:
-                        pass
-
-            return await asyncio.to_thread(_insert)
 
         def _delete_registro_documento(documento_id: int):
             conn2 = obtener_conexion()
@@ -218,30 +200,48 @@ class EstadoDocumento(rx.State):
                     "almacen_privado", "documentos", nombre_final
                 )
 
-                # Insertar registro en BD y obtener id
-                nuevo_id = await _insert_registro_documento(
-                    self.titulo_nuevo,
-                    self.descripcion_nueva or "Sin descripción",
-                    extension,
-                    max(1, len(datos_subida) // 1024),
-                    ruta_bd,
-                )
-                if nuevo_id is None:
+                conn2 = obtener_conexion()
+                if conn2 is None:
                     return rx.toast.error(
                         "Error al guardar el registro del documento en la base de datos."
                     )
 
-                # Escribir archivo en disco; si falla, eliminar registro BD creado
                 try:
-                    os.makedirs(os.path.dirname(ruta_destino), exist_ok=True)
-                    with open(ruta_destino, "wb") as f:
-                        f.write(datos_subida)
+                    with conn2.transaction():
+                        with conn2.cursor() as cursor:
+                            cursor.execute(
+                                """
+                                INSERT INTO documento (titulo, descripcion, tipo, tamano_kb, ruta_archivo)
+                                VALUES (%s, %s, %s, %s, %s)
+                                RETURNING id;
+                            """,
+                                (
+                                    self.titulo_nuevo,
+                                    self.descripcion_nueva or "Sin descripción",
+                                    extension,
+                                    max(1, len(datos_subida) // 1024),
+                                    ruta_bd,
+                                ),
+                            )
+                            nuevo_id = cursor.fetchone()[0]
+
+                        os.makedirs(os.path.dirname(ruta_destino), exist_ok=True)
+                        datos_encriptados = encrypt_bytes(datos_subida)
+                        with open(ruta_destino, "wb") as f:
+                            f.write(datos_encriptados)
+
                     archivos_creados_bd_ids.append((nuevo_id, ruta_destino))
                 except Exception as e:
                     logger.error("Error al escribir archivo en disco: %s", e)
                     await asyncio.to_thread(_delete_registro_documento, nuevo_id)
-                    return rx.toast.error(f"Error al guardar el archivo {
-                            archivo.filename} en el servidor.")
+                    return rx.toast.error(
+                        f"Error al guardar el archivo {archivo.filename} en el servidor."
+                    )
+                finally:
+                    try:
+                        conn2.close()
+                    except Exception:
+                        pass
 
             # Si llegamos aquí, todos los archivos se procesaron correctamente
             self.titulo_nuevo = ""

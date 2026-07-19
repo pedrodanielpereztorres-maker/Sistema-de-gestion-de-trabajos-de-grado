@@ -30,7 +30,7 @@ def pagina_login() -> rx.Component:
                         # Cabecera / Títulos
                         rx.vstack(
                             rx.heading(
-                                "Acceso al Portal",
+                                "Inicio de Sesión",
                                 size="7",
                                 align="center",
                                 weight="bold",
@@ -38,7 +38,7 @@ def pagina_login() -> rx.Component:
                             ),
                             rx.text(
                                 "Ingresa tus credenciales para acceder a la plataforma ",
-                                rx.text.span("SGT", class_name="notranslate"),
+                                rx.text.span("SGTG", class_name="notranslate"),
                                 color="#64748B",
                                 size="2",
                                 text_align="center",

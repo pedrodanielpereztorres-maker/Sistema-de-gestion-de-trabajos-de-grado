@@ -5,10 +5,12 @@ import logging
 import os
 import re
 from typing import Any, Dict, List
+from urllib.parse import quote
 
 import reflex as rx
 
 from ..database_manager import obtener_conexion
+from ..seguridad import crear_token_acceso_archivo, encrypt_bytes
 from .estado_autenticacion import EncriptadorContrasena, EstadoAutenticacion
 
 logger = logging.getLogger(__name__)
@@ -62,6 +64,7 @@ class EstadoBoveda(rx.State):
         estado_auth = await self.get_state(EstadoAutenticacion)
         self.usuario_actual_id = estado_auth.usuario.id if estado_auth.usuario else 0
         self.usuario_actual_rol = estado_auth.rol_usuario if estado_auth.usuario else ""
+        usuario_id = estado_auth.usuario.id if estado_auth and estado_auth.usuario else None
 
         consulta = """
             SELECT
@@ -110,9 +113,15 @@ class EstadoBoveda(rx.State):
 
         datos, carreras = resultado
 
-        def _build_archivo_url(path: str) -> str:
+        def _build_archivo_url(path: str, usuario_id: int | None) -> str:
             archivo_path = f"almacen/{path.lstrip('/')}"
-            return f"/{archivo_path}"
+            url = f"/{archivo_path}"
+            if usuario_id is not None:
+                ruta_archivo = path.lstrip("/")
+                token_archivo = crear_token_acceso_archivo(ruta_archivo, usuario_id=usuario_id)
+                separator = "&" if "?" in url else "?"
+                url = f"{url}{separator}token={quote(token_archivo, safe='')}"
+            return url
 
         self.lista_trabajos_de_grado = [
             {
@@ -126,7 +135,7 @@ class EstadoBoveda(rx.State):
                 "nombre_empresa": r[7] or "N/A",
                 "titulo": r[8],
                 "publico": r[9],
-                "url": _build_archivo_url(r[10]) if r[10] else "",
+                "url": _build_archivo_url(r[10], usuario_id) if r[10] else "",
                 "fecha_registro": r[11],
                 "fecha_registro_formateada": (
                     r[11].strftime("%d/%m/%Y") if r[11] else ""
@@ -757,7 +766,7 @@ class EstadoBoveda(rx.State):
             try:
                 os.makedirs(os.path.dirname(ruta_destino), exist_ok=True)
                 with open(ruta_destino, "wb") as f:
-                    f.write(datos_subida)
+                    f.write(encrypt_bytes(datos_subida))
             except Exception as e:
                 logger.error(
                     "Error al escribir archivo de trabajo de grado tras commit: %s", e
